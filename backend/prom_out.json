@@ -1,0 +1,177 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "vector",
+    "result": [
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/metrics",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "615"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/health",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "30"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/simulate/reset",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "55"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/api/checkout",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "1380"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/webhook/payment-event",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "824"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/simulate/bad-deployment",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "29"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/api/checkout",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "500"
+        },
+        "value": [
+          1788033114.841,
+          "119"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/simulate/bad-deployment",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "409"
+        },
+        "value": [
+          1788033114.841,
+          "8"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/docs",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/openapi.json",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "200"
+        },
+        "value": [
+          1788033114.841,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/simulator/deploy/bad",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "404"
+        },
+        "value": [
+          1788033114.841,
+          "1"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/simulator/reset",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "404"
+        },
+        "value": [
+          1788033114.841,
+          "4"
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "http_requests_total",
+          "endpoint": "/webhook/payment-event",
+          "instance": "host.docker.internal:9000",
+          "job": "simulator",
+          "status": "500"
+        },
+        "value": [
+          1788033114.841,
+          "1"
+        ]
+      }
+    ]
+  }
+}

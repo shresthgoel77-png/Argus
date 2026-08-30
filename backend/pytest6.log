@@ -1,0 +1,15 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\OneDrive\Desktop\.vscode\Argus\ai-reliability-engineer\backend
+plugins: anyio-4.14.1, langsmith-0.9.2, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 5 items
+
+tests/test_observability_clients.py::test_prometheus_instant_query_success PASSED [ 20%]
+tests/test_observability_clients.py::test_prometheus_range_query_success PASSED [ 40%]
+tests/test_observability_clients.py::test_prometheus_unavailable PASSED  [ 60%]
+tests/test_observability_clients.py::test_loki_query_range_success PASSED [ 80%]
+tests/test_observability_clients.py::test_loki_unavailable PASSED        [100%]
+
+============================== 5 passed in 8.27s ==============================

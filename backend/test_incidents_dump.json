@@ -1,0 +1,40 @@
+[
+  {
+    "timestamp": "2026-08-26T19:16:46.988184",
+    "type": "high_error_rate",
+    "service": "simulator",
+    "status": "resolved",
+    "resolved_at": "2026-08-26T19:17:59.151657",
+    "id": 2,
+    "severity": "medium",
+    "trigger": "high_error_rate_threshold_exceeded",
+    "initial_metrics": {
+      "firing": true,
+      "type": "high_error_rate",
+      "service": "simulator",
+      "severity": "medium",
+      "value": 0.06666666666666667,
+      "query": "sum(rate(http_requests_total{job=\"simulator\",status=~\"5..\"}[1m])) / sum(rate(http_requests_total{job=\"simulator\"}[1m]))",
+      "window": "1m"
+    }
+  },
+  {
+    "timestamp": "2026-08-26T19:16:41.897446",
+    "type": "high_latency",
+    "service": "simulator",
+    "status": "resolved",
+    "resolved_at": "2026-08-26T19:18:00.259123",
+    "id": 1,
+    "severity": "high",
+    "trigger": "high_latency_threshold_exceeded",
+    "initial_metrics": {
+      "firing": true,
+      "type": "high_latency",
+      "service": "simulator",
+      "severity": "high",
+      "value": 1524.9999999999977,
+      "query": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"simulator\"}[1m])) by (le)) * 1000",
+      "window": "1m"
+    }
+  }
+]

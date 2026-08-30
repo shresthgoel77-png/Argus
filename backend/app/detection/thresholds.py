@@ -1,0 +1,12 @@
+import os
+
+ERROR_RATE_MEDIUM = float(os.getenv("ERROR_RATE_MEDIUM", "0.05"))
+ERROR_RATE_HIGH = float(os.getenv("ERROR_RATE_HIGH", "0.15"))
+
+LATENCY_P95_MEDIUM_MS = float(os.getenv("LATENCY_P95_MEDIUM_MS", "500"))
+LATENCY_P95_HIGH_MS = float(os.getenv("LATENCY_P95_HIGH_MS", "1500"))
+
+WEBHOOK_FAILURE_MEDIUM = float(os.getenv("WEBHOOK_FAILURE_MEDIUM", "0.10"))
+WEBHOOK_FAILURE_HIGH = float(os.getenv("WEBHOOK_FAILURE_HIGH", "0.25"))
+
+DETECTION_WINDOW = os.getenv("DETECTION_WINDOW", "1m")

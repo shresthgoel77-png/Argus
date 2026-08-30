@@ -1,0 +1,10 @@
+.env
+__pycache__/
+node_modules/
+.next/
+*.db
+.venv/
+.DS_Store
+
+# Generated test/log output
+*.txt

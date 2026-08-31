@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db import engine, Base
-from app.api import health, detection, investigation, ai, remediation
+from app.api import health, detection, investigation, ai, remediation, verification
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,6 +27,7 @@ app.include_router(detection.router)
 app.include_router(investigation.router)
 app.include_router(ai.router)
 app.include_router(remediation.router)
+app.include_router(verification.router)
 
 import os
 import asyncio

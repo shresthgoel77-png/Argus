@@ -6,6 +6,7 @@ import EvidencePanel from "@/components/EvidencePanel";
 import TimelineView from "@/components/TimelineView";
 import RCAPanel from "@/components/RCAPanel";
 import RemediationPanel from "@/components/RemediationPanel";
+import VerificationPanel from "@/components/VerificationPanel";
 
 // Manual Verification Steps:
 // 1. Trigger realistic incident end-to-end via simulator.
@@ -145,9 +146,7 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
 
                     <section>
                         <h2 className="text-2xl font-bold border-b border-slate-800 pb-2">Verification</h2>
-                        <div className="mt-4 p-4 border border-slate-700 bg-slate-900 rounded text-slate-400">
-                            Verification will appear here once remediation has run
-                        </div>
+                        <VerificationPanel incidentId={incidentId} incidentStatus={incident.status} evidenceRows={evidence} onStatusChange={fetchData} />
                     </section>
 
                 </div>

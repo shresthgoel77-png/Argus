@@ -62,6 +62,7 @@ export default function Home() {
   }, [refresh]);
 
   const activeIncident = incidents.find((incident) => activeStatuses.has(incident.status));
+  const resolvedIncidents = incidents.filter((incident) => incident.status === "resolved");
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-10 text-slate-100">
@@ -85,6 +86,18 @@ export default function Home() {
             <p className="mt-3 text-sm text-slate-400">No active incidents.</p>
           )}
         </section>
+        {resolvedIncidents.length > 0 && (
+          <section className="mt-5 rounded-xl border border-emerald-700 bg-emerald-950/30 p-5 shadow-sm">
+            <h2 className="text-lg font-semibold text-emerald-300">✓ Recently Resolved</h2>
+            <ul className="mt-3 space-y-2">
+              {resolvedIncidents.slice(0, 5).map((incident) => (
+                <li key={incident.id} className="text-sm text-emerald-300">
+                  {incident.type} · {incident.severity} — resolved at {new Date(incident.resolved_at || incident.timestamp).toLocaleString()}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <div className="mt-5"><IncidentList incidents={incidents} error={incidentsError} /></div>
       </div>
     </main>

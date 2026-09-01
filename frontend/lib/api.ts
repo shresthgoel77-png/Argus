@@ -39,3 +39,4 @@ export const executeRemediation = (actionId: number) => request<any>(`${apiUrl}/
 export const getIncidentRemediation = (incidentId: number) => request<RemediationAction | null>(`${apiUrl}/incidents/${incidentId}/remediation`);
 export const runVerification = (incidentId: number) => request<any>(`${apiUrl}/verification/run/${incidentId}`, { method: "POST" });
 export const getIncidentVerification = (incidentId: number) => request<VerificationResult | null>(`${apiUrl}/incidents/${incidentId}/verification`);
+export const sendRazorpayDemoWebhook = (variant: "valid" | "tampered" | "duplicate") => request<any>(`${simulatorUrl}/simulate/razorpay-webhook?variant=${encodeURIComponent(variant)}`, { method: "POST" });

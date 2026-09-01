@@ -36,6 +36,7 @@ STRICT INSTRUCTIONS:
 5. NEVER state or imply that any remediation action has already been executed — only RECOMMEND one.
 6. If the provided evidence is insufficient to identify a plausible root cause, set confidence="low" and state honestly in `root_cause` that the root cause could not be determined, rather than fabricating certainty.
 7. Return raw JSON text ONLY.
+8. When the incident type is webhook_failure and Razorpay-specific evidence (razorpay_signature_failure_rate, razorpay_duplicate_event_rate) is present, consider whether elevated signature failures or duplicate events point to a client-side integration issue distinct from a server-side regression, and reflect that in root_cause/alternative_hypotheses.
 """
 
 def build_rca_prompt(evidence_package: dict) -> str:

@@ -22,6 +22,33 @@ export default function EvidencePanel({ evidenceRows }: Props) {
 
     const renderContent = (content: any) => {
         if (!content) return "No content";
+
+        if (content.signal && (content.peak_value !== undefined)) {
+            return (
+                <div className="mt-2 bg-slate-950 p-4 rounded border border-slate-800">
+                    <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-slate-400 capitalize font-medium">
+                            {content.signal.replace(/_/g, " ")}
+                        </span>
+                        <span className="font-mono text-lg font-bold text-sky-400">
+                            {Number(content.peak_value).toFixed(4)}
+                        </span>
+                    </div>
+                    {content.window && (
+                        <div className="text-xs text-slate-500 mb-2 font-mono">
+                            Window: {new Date(content.window.start).toLocaleTimeString()} - {new Date(content.window.end).toLocaleTimeString()}
+                        </div>
+                    )}
+                    <details className="mt-3 text-xs text-slate-500">
+                        <summary className="cursor-pointer hover:text-slate-300">View Raw Data</summary>
+                        <pre className="mt-2 max-h-32 overflow-y-auto whitespace-pre-wrap border border-slate-800 p-2 rounded bg-slate-950">
+                            {JSON.stringify(content, null, 2)}
+                        </pre>
+                    </details>
+                </div>
+            );
+        }
+
         return (
             <pre className="text-xs max-h-40 overflow-y-auto whitespace-pre-wrap mt-2 bg-slate-950 p-2 rounded">
                 {JSON.stringify(content, null, 2)}

@@ -6,12 +6,11 @@ from app.investigation.git_evidence import PROJECT_ROOT, collect_git_evidence
 from app.investigation.hypotheses import generate_hypotheses
 from app.investigation.logs_evidence import collect_logs_evidence
 from app.investigation.metrics_evidence import collect_metrics_evidence
+from app.investigation.razorpay_evidence import collect_razorpay_evidence
 from app.investigation.timeline import build_timeline
 from app.models import Evidence, Incident
 
-
 logger = logging.getLogger(__name__)
-
 
 def _record_collection_error(
     incident: Incident, db_session: Session, collector: str, error: Exception
@@ -61,6 +60,16 @@ def run_investigation(incident_id: int, db_session: Session) -> dict:
             logger.exception("%s evidence collection failed for incident %s", collector_name, incident.id)
             collected_evidence.append(
                 _record_collection_error(incident, db_session, collector_name, error)
+            )
+
+    if incident.type == "webhook_failure":
+        try:
+            collected = collect_razorpay_evidence(incident, db_session)
+            collected_evidence.extend(collected)
+        except Exception as error:
+            logger.exception("razorpay evidence collection failed for incident %s", incident.id)
+            collected_evidence.append(
+                _record_collection_error(incident, db_session, "razorpay", error)
             )
 
     hypotheses = generate_hypotheses(incident, collected_evidence, db_session)

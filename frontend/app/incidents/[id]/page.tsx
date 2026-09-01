@@ -7,6 +7,7 @@ import TimelineView from "@/components/TimelineView";
 import RCAPanel from "@/components/RCAPanel";
 import RemediationPanel from "@/components/RemediationPanel";
 import VerificationPanel from "@/components/VerificationPanel";
+import GitHubPanel from "@/components/GitHubPanel";
 
 // Manual Verification Steps:
 // 1. Trigger realistic incident end-to-end via simulator.
@@ -147,6 +148,11 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
                     <section>
                         <h2 className="text-2xl font-bold border-b border-slate-800 pb-2">Verification</h2>
                         <VerificationPanel incidentId={incidentId} incidentStatus={incident.status} evidenceRows={evidence} onStatusChange={fetchData} />
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-bold border-b border-slate-800 pb-2">Incident Report</h2>
+                        <GitHubPanel incidentId={incidentId} incidentStatus={incident.status} />
                     </section>
 
                 </div>

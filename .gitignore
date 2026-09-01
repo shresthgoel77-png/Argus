@@ -9,3 +9,9 @@ node_modules/
 # Generated test/log output
 *.txt
 !*requirements.txt
+
+# Local Hackathon Dev Files
+/*.py
+/prometheus.zip
+/prometheus/
+/data/

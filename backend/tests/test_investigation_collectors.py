@@ -52,6 +52,11 @@ def test_investigation_collectors_e2e(monkeypatch):
         requests.get(f"{SIMULATOR_URL}/health", timeout=2.0)
     except requests.exceptions.RequestException as e:
         pytest.skip(f"Simulator not available at {SIMULATOR_URL}: {e}")
+        
+    try:
+        requests.get(os.environ.get("LOKI_URL", "http://localhost:3100"), timeout=1.0)
+    except requests.exceptions.RequestException:
+        pytest.skip("Loki not available")
 
     # 1. Healthy state
     requests.post(f"{SIMULATOR_URL}/simulate/reset")

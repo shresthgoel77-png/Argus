@@ -22,7 +22,7 @@ def build_rca_report(
     
     # Extract ai_rca and git evidence rows
     ai_rca_row = next((e for e in evidence_rows if e.category == "ai_rca"), None)
-    git_row = next((e for e in evidence_rows if e.category == "git"), None)
+    git_row = next((e for e in evidence_rows if e.category == "observed_fact" and e.content and e.content.get("source") == "git"), None)
     
     ai_rca = ai_rca_row.content if ai_rca_row and ai_rca_row.content else {}
     
@@ -106,23 +106,24 @@ def build_rca_report(
                 if row:
                     content = row.content or {}
                     summary = f"Evidence #{eid} ({row.category})"
+                    source = content.get("source", "")
                     # Create a short real summary based on category
-                    if row.category == "git":
+                    if row.category == "observed_fact" and source == "git":
                         commits = content.get("commits", [])
                         if commits:
                             commit = commits[0]
                             sha = commit.get("sha", "")[:7]
-                            msg = commit.get("message", "").split("\\n")[0]
+                            msg = commit.get("message", "").split("\n")[0]
                             summary = f"commit {sha}: {msg}"
                         else:
                             summary = "git history checked"
-                    elif row.category == "metrics":
+                    elif row.category == "observed_fact" and source == "metrics":
                         signal = content.get("signal", "metric")
                         datapoints = content.get("datapoints", [])
                         if datapoints:
                             peak_val = max([float(dp[1]) for dp in datapoints if len(dp) > 1] or [0])
                             summary = f"{signal} peak value {peak_val}"
-                    elif row.category == "logs":
+                    elif row.category == "observed_fact" and source == "logs":
                         matched = content.get("matched_lines", [])
                         summary = f"{len(matched)} matched log lines"
                     report.append(f"- {summary}")

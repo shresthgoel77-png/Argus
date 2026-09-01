@@ -1,4 +1,4 @@
-﻿============================= test session starts =============================
+============================= test session starts =============================
 platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\.venv\Scripts\python.exe
 cachedir: .pytest_cache
 rootdir: C:\Users\HP\Desktop\.vscode\ai-reliability-engineer
@@ -6,13 +6,13 @@ configfile: pytest.ini
 plugins: anyio-4.14.2
 collecting ... collected 1 item
 
-backend/tests/test_golden_path_e2e.py::test_golden_path DEBUG COLLECTION ERRORS: [{'error': 'Failed to connect to Loki: HTTPConnectionPool(host=\'localhost\', port=3100): Max retries exceeded with url: /loki/api/v1/query_range?query=%7Bjob%3D%22simulator%22%7D+%7C%3D+%22error%22&start=1788294824218358016&end=1788295424363100160&limit=500 (Caused by NewConnectionError("HTTPConnection(host=\'localhost\', port=3100): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))'}]
+backend/tests/test_golden_path_e2e.py::test_golden_path DEBUG COLLECTION ERRORS: []
 FAILED
 
 ================================== FAILURES ===================================
 ______________________________ test_golden_path _______________________________
 
-generate_traffic = <function generate_traffic.<locals>._generate at 0x0000016467984B40>
+generate_traffic = <function generate_traffic.<locals>._generate at 0x0000020CD6E88A90>
 SIMULATOR_URL = 'http://localhost:9000'
 
     @pytest.mark.skipif(
@@ -87,76 +87,12 @@ SIMULATOR_URL = 'http://localhost:9000'
     
         # --- 7. AI Root Cause Analysis ---
         res_rca = client.post(f"/ai/rca/{incident_id}")
-        assert res_rca.status_code == 200, f"stage 7: RCA failed, got {res_rca.status_code}: {res_rca.text}"
-        rca_data = res_rca.json()["rca"]
-    
-        action_type = rca_data["recommended_remediation"]["action_type"]
-        from app.ai.schema import ALLOWED_REMEDIATION_TYPES
-        assert action_type in ALLOWED_REMEDIATION_TYPES, f"stage 7: action_type '{action_type}' not in allowlist"
-    
-        for ref_id in rca_data["supporting_evidence"]:
-            assert str(ref_id) in ev_ids, f"stage 7: supporting_evidence ID {ref_id} not real"
-    
-        db = SessionLocal()
-        ai_ev = db.query(Evidence).filter(Evidence.incident_id == incident_id, Evidence.category == "ai_rca").first()
-        assert ai_ev, "stage 7: ai_rca evidence row not persisted"
-        db.close()
-    
-        # --- 8. Remediation Propose ---
-        res_prop = client.post(f"/remediation/propose/{incident_id}")
-        assert res_prop.status_code == 200, f"stage 8: remediation propose failed, get {res_prop.text}"
-        action_id = res_prop.json()["id"]
-        assert res_prop.json()["status"] == "pending_approval", "stage 8: expected status pending_approval"
-    
-        # --- 9. Remediation Approve ---
-        res_app = client.post(f"/remediation/{action_id}/approve", json={"approved_by": "golden_path_agent"})
-        assert res_app.status_code == 200, "stage 9: remediation approve failed"
-        assert res_app.json()["status"] == "approved", "stage 9: expected status approved"
-    
-        # Edge case: AI proposed an action we don't have a handler for. Skip cleanly.
-        if action_type != "rollback_deployment":
-            pytest.skip(f"stage 10: skipping execution/verification because action_type was {action_type}, which correctly lacks a handler in Phase 7")
-    
-        # --- 10. Remediation Execute ---
-        res_exec = client.post(f"/remediation/{action_id}/execute")
-        assert res_exec.status_code == 200, f"stage 10: remediation execute failed: {res_exec.text}"
-        exec_data = res_exec.json()
-        assert exec_data["action"]["status"] == "executed", f"stage 10: expected executed status, got {exec_data['action']['status']}"
-        assert exec_data["result"].get("commit_sha"), "stage 10: missing commit_sha in execution result"
-    
-        res_state = httpx.get(f"{SIMULATOR_URL}/simulate/state")
-        assert res_state.json()["bad_deployment_active"] is False, "stage 10: simulator state should not be bad_deployment_active"
-    
-        # --- 11 & 12. Verification Wait/Recovery (w/ background traffic) ---
-        def bg_traffic():
-            generate_traffic(50.0)
-    
-        t = threading.Thread(target=bg_traffic)
-        t.start()
-    
-        res_ver = client.post(f"/verification/run/{incident_id}")
-        t.join()
-    
-        assert res_ver.status_code == 200, f"stage 12: verification failed: {res_ver.text}"
-        ver_data = res_ver.json()
-        assert ver_data["recovered"] is True, "stage 12: expected recovered=True"
-    
-        db = SessionLocal()
-        db_inc = db.query(Incident).filter(Incident.id == incident_id).first()
-        assert db_inc.status == "resolved", f"stage 12: expected incident.status resolved, got {db_inc.status}"
-        db.close()
-    
-        # --- 13. AI Incident Report Generation ---
-        res_rep = client.get(f"/incidents/{incident_id}/report")
-        assert res_rep.status_code == 200, "stage 13: report fetch failed"
-        markdown = res_rep.json()["markdown"]
-    
-        assert rca_data["root_cause"] in markdown, "stage 13: report missing real root cause text"
->       assert commit_sha in markdown, "stage 13: report missing real bad commit sha"
-E       AssertionError: stage 13: report missing real bad commit sha
-E       assert 'ef8f77110b1baccb4b61f6f19538a5de45df351e' in "# Incident Report: high_error_rate ù simulator (medium)\\n**Status:** resolved **Incident ID:** 1 **Detected:** 2026-09-01 20:43:44 UTC\\n\\n## Summary\\nHigh error rate and increased latency observed in the 'simulator' service, directly correlating with recent configuration changes that intentionally introduced these conditions.\\n\\n## Impact\\nUsers experienced elevated error rates and significantly increased response times when interacting with the 'simulator' service.\\n\\n## Affected Components\\n- simulator\\n\\n## Timeline\\n- **2026-09-01 20:36:34 UTC**: Commit fa161f3: revert: restore stable configuration\\n- **2026-09-01 20:36:44 UTC**: webhook_failure peak observed at 0.0.\\n- **2026-09-01 20:36:53 UTC**: Commit 0802355: chore: tune payment gateway timeout and retry thresholds\\n- **2026-09-01 20:37:38 UTC**: Commit b8304ab: revert: restore stable configuration\\n- **2026-09-01 20:38:35 UTC**: Commit 8794e9c: chore: tune payment gateway timeout and retry thresholds\\n- **2026-09-01 20:39:29 UTC**: latency_p95 peak observed at 2262.5.\\n- **2026-09-01 20:39:32 UTC**: Commit 49664b4: revert: restore stable configuration\\n- **2026-09-01 20:39:51 UTC**: Commit af00916: ...her than the changes directly simulating the observed metrics.\\n\\n## Supporting Evidence\\n- Evidence #1 (observed_fact)\\n- Evidence #2 (observed_fact)\\n- Evidence #5 (observed_fact)\\n- Evidence #6 (hypothesis)\\n\\n## Relevant Git Change\\nNo git evidence gathered.\\n\\n## Recommended Fix\\nRevert the configuration change introduced by commit ef8f771 to restore the stable 'error_rate' and 'latency_ms_base' values in 'simulator/config.json'. Implement stricter controls or review processes for configuration changes, especially those that simulate adverse conditions in production or production-like environments.\\n\\n## Remediation\\n- **Action Type:** rollback_deployment\\n- **Risk Level:** Medium\\n- **Status:** executed\\n- **Approved By:** golden_path_agent\\n- **Executed At:** 2026-09-01 20:44:12 UTC\\n- **Result Summary:** Executed commit 69a46ba5478946dab13b9472b0bb09faa0ef6d71\\n\\n## Verification Result\\n**Recovery verified.**\\n- **Before:** Detector firing: True, Value: 0.0689655172413793\\n- **After:** Detector firing: False, Value: 0.0\\n\\n---\\n*Auto-generated by AI Reliability Engineer at 2026-09-01 20:45:06 UTC. Reflects system state at generation time only.*"
+>       assert res_rca.status_code == 200, f"stage 7: RCA failed, got {res_rca.status_code}: {res_rca.text}"
+E       AssertionError: stage 7: RCA failed, got 502: {"detail":"AI call failed: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 46.347466415s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}}"}
+E       assert 502 == 200
+E        +  where 502 = <Response [502 Bad Gateway]>.status_code
 
-backend\tests\test_golden_path_e2e.py:178: AssertionError
+backend\tests\test_golden_path_e2e.py:113: AssertionError
 ------------------------------ Captured log call ------------------------------
 WARNING  google_genai.models:models.py:6247 Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
 ============================== warnings summary ===============================
@@ -187,7 +123,6 @@ backend\app\main.py:52
     return self.router.on_event(event_type)  # ty: ignore[deprecated]
 
 backend/tests/test_golden_path_e2e.py::test_golden_path
-backend/tests/test_golden_path_e2e.py::test_golden_path
   C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\backend\app\detection\engine.py:80: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
     timestamp=datetime.datetime.utcnow(),
 
@@ -195,11 +130,7 @@ backend/tests/test_golden_path_e2e.py: 10 warnings
   C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\.venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
     return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
 
-backend/tests/test_golden_path_e2e.py::test_golden_path
-  C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\backend\app\remediation\engine.py:147: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-    action.executed_at = datetime.datetime.utcnow()
-
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 =========================== short test summary info ===========================
 FAILED backend/tests/test_golden_path_e2e.py::test_golden_path - AssertionErr...
-================= 1 failed, 17 warnings in 120.70s (0:02:00) ==================
+======================= 1 failed, 15 warnings in 41.69s =======================

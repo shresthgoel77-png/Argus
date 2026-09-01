@@ -50,19 +50,19 @@ def _create_incident(status="resolved", include_rca=True, include_remediation=Tr
     # 2. Base evidence (Metrics, Logs, Git)
     metrics_ev = Evidence(
         incident_id=inc_id,
-        category="metrics",
-        content={"signal": "error_rate", "datapoints": [[timestamp.timestamp(), 0.15]]}
+        category="observed_fact",
+        content={"source": "metrics", "signal": "error_rate", "datapoints": [[timestamp.timestamp(), 0.15]]}
     )
     logs_ev = Evidence(
         incident_id=inc_id,
-        category="logs",
-        content={"matched_lines": [{"timestamp": timestamp.timestamp(), "line": "Error processing request"}, 
+        category="observed_fact",
+        content={"source": "logs", "matched_lines": [{"timestamp": timestamp.timestamp(), "line": "Error processing request"}, 
                                    {"timestamp": timestamp.timestamp() + 1, "line": "Database connection failed"}]}
     )
     git_ev = Evidence(
         incident_id=inc_id,
-        category="git",
-        content={"commits": [{"sha": "f8a19bcde", "message": "Deploy broken changes", "timestamp": timestamp.isoformat(), "files": ["app.js", "style.css"]}]}
+        category="observed_fact",
+        content={"source": "git", "commits": [{"sha": "f8a19bcde", "message": "Deploy broken changes", "timestamp": timestamp.isoformat(), "files": ["app.js", "style.css"]}]}
     )
     db.add_all([metrics_ev, logs_ev, git_ev])
     db.commit()

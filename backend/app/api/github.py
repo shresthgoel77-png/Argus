@@ -5,6 +5,8 @@ import datetime
 from app.db import get_db
 from app.models import Incident, Evidence, RemediationAction, VerificationResult
 from app.github.report_builder import build_rca_report
+from app.github.client import get_github_status, GitHubUnconfiguredError, GitHubAPIError
+from app.github.engine import create_incident_issue
 
 router = APIRouter(tags=["github"])
 
@@ -41,3 +43,39 @@ def get_incident_report(id: int, db: Session = Depends(get_db)):
         "markdown": markdown_report,
         "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
     }
+
+@router.get("/github/status")
+def get_status():
+    """
+    Returns whether GitHub is configured.
+    """
+    return get_github_status()
+
+@router.post("/incidents/{id}/github-issue")
+def create_issue_endpoint(id: int, db: Session = Depends(get_db)):
+    """
+    Creates a GitHub issue from the RCA report for this incident.
+    """
+    try:
+        result = create_incident_issue(id, db)
+        return result
+    except GitHubUnconfiguredError as e:
+        raise HTTPException(status_code=501, detail=str(e))
+    except GitHubAPIError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+@router.get("/incidents/{id}/github-issue")
+def get_issue_endpoint(id: int, db: Session = Depends(get_db)):
+    """
+    Gets the created GitHub issue details for this incident, if one exists.
+    Returns 404 if the incident doesn't exist, and null if the issue hasn't been created.
+    """
+    incident = db.query(Incident).filter(Incident.id == id).first()
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+        
+    issue_evidence = db.query(Evidence).filter(Evidence.incident_id == id, Evidence.category == "github_issue").first()
+    if issue_evidence and issue_evidence.content:
+        return issue_evidence.content
+        
+    return None

@@ -8,6 +8,8 @@ export type SimulatorAction = { status: string; commit_sha: string;[key: string]
 export type RemediationAction = { id: number; incident_id: number; action_type: string; params: Record<string, any>; risk_level: string; approved: boolean; approved_by: string | null; executed_at: string | null; status: string; result: any; };
 export type VerificationResult = { id: number; incident_id: number; before_metrics: Record<string, unknown> | null; after_metrics: Record<string, unknown> | null; recovered: boolean; checked_at: string; };
 export type IncidentReport = { markdown: string; generated_at: string };
+export type GitHubStatus = { configured: boolean };
+export type GitHubIssue = { issue_number: number; issue_url: string; created_at?: string };
 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -42,3 +44,6 @@ export const runVerification = (incidentId: number) => request<any>(`${apiUrl}/v
 export const getIncidentVerification = (incidentId: number) => request<VerificationResult | null>(`${apiUrl}/incidents/${incidentId}/verification`);
 export const sendRazorpayDemoWebhook = (variant: "valid" | "tampered" | "duplicate") => request<any>(`${simulatorUrl}/simulate/razorpay-webhook?variant=${encodeURIComponent(variant)}`, { method: "POST" });
 export const getIncidentReport = (incidentId: number) => request<IncidentReport>(`${apiUrl}/incidents/${incidentId}/report`);
+export const getGitHubStatus = () => request<GitHubStatus>(`${apiUrl}/github/status`);
+export const createGitHubIssue = (incidentId: number) => request<GitHubIssue>(`${apiUrl}/incidents/${incidentId}/github-issue`, { method: "POST" });
+export const getGitHubIssue = (incidentId: number) => request<GitHubIssue | null>(`${apiUrl}/incidents/${incidentId}/github-issue`);

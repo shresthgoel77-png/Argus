@@ -1,0 +1,203 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\ai-reliability-engineer
+plugins: anyio-4.14.2
+collecting ... collected 18 items
+
+backend/tests/test_remediation_execution.py::test_execute_success PASSED [  5%]
+backend/tests/test_remediation_execution.py::test_execute_unsupported_action PASSED [ 11%]
+backend/tests/test_remediation_execution.py::test_execute_simulator_unreachable PASSED [ 16%]
+backend/tests/test_remediation_execution.py::test_execute_non_approved_action PASSED [ 22%]
+backend/tests/test_verification_engine.py::test_real_recovery_flow FAILED [ 27%]
+backend/tests/test_verification_engine.py::test_real_non_recovery FAILED [ 33%]
+backend/tests/test_verification_engine.py::test_verification_requires_remediated_incident PASSED [ 38%]
+backend/tests/test_verification_engine.py::test_verification_is_one_shot PASSED [ 44%]
+backend/tests/test_verification_engine.py::test_transient_prometheus_failure_is_recorded_and_polling_continues PASSED [ 50%]
+backend/tests/test_verification_route.py::test_get_verification_returns_404_for_unknown_incident PASSED [ 55%]
+backend/tests/test_verification_route.py::test_run_verification_returns_404_for_unknown_incident PASSED [ 61%]
+backend/tests/test_verification_route.py::test_run_verification_returns_409_if_not_remediated PASSED [ 66%]
+backend/tests/test_verification_route.py::test_run_verification_returns_409_if_already_verified PASSED [ 72%]
+backend/tests/test_verification_route.py::test_get_verification_returns_null_before_running PASSED [ 77%]
+backend/tests/test_verification_route.py::test_happy_path_run_verification_with_real_recovery FAILED [ 83%]
+backend/tests/test_verification_route.py::test_happy_path_get_verification_after_run PASSED [ 88%]
+backend/tests/test_verification_route.py::test_run_verification_non_recovery FAILED [ 94%]
+backend/tests/test_verification_route.py::test_double_click_protection PASSED [100%]
+
+================================== FAILURES ===================================
+___________________________ test_real_recovery_flow ___________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001CA72AEA780>
+
+    def test_real_recovery_flow(monkeypatch):
+        """
+        Real Phase 3 -> Rollback -> Traffic -> Verification flow.
+        No mocking of DETECTOR_BY_INCIDENT_TYPE or _check_simulator_health.
+        """
+        # Use real settings to allow polling (must cover prometheus scrape interval)
+        monkeypatch.setenv("VERIFICATION_MAX_WAIT_SECONDS", "60")
+        monkeypatch.setenv("VERIFICATION_POLL_INTERVAL_SECONDS", "2")
+        monkeypatch.setenv("DETECTION_WINDOW", "15s")
+        monkeypatch.setenv("ERROR_RATE_MEDIUM", "0.05")
+    
+        # 1. Start clean, then trigger bad deployment
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/reset", timeout=5.0)
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/bad-deployment", timeout=5.0)
+    
+        # 2. Generate traffic so Prometheus has failing data
+        generate_traffic(15.0)
+    
+        # 3. Detect incident natively so we get real initial_metrics
+        session = SessionLocal()
+        detection_res = run_detection_pass(session, "simulator")
+    
+>       assert len(detection_res) > 0, "Expected detection pass to detect a high error rate incident!"
+E       AssertionError: Expected detection pass to detect a high error rate incident!
+E       assert 0 > 0
+E        +  where 0 = len([])
+
+backend\tests\test_verification_engine.py:90: AssertionError
+___________________________ test_real_non_recovery ____________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001CA72A67D10>
+
+    def test_real_non_recovery(monkeypatch):
+        """
+        Tests the flow when the service stays broken.
+        Uses real short timeout without mocking detectors.
+        """
+        monkeypatch.setenv("VERIFICATION_MAX_WAIT_SECONDS", "5")
+        monkeypatch.setenv("VERIFICATION_POLL_INTERVAL_SECONDS", "2")
+        monkeypatch.setenv("DETECTION_WINDOW", "15s")
+    
+        # 1. Trigger bad deployment and leave it broken
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/bad-deployment", timeout=5.0)
+    
+        # 2. Build some bad traffic
+        generate_traffic(10.0)
+    
+        # 3. Simulate an incident hitting the "remediated" phase even though it wasn't actually fixed
+        session = SessionLocal()
+        detection_res = run_detection_pass(session, "simulator")
+        if len(detection_res) > 0:
+            sim_incident_id = detection_res[0].id
+            inci = session.query(Incident).filter(Incident.id == sim_incident_id).first()
+            inci.status = "remediated"
+            session.commit()
+        else:
+            # Fallback if detection took longer: mock the incident DB row, but let verification run real prometheus
+            sim_incident_id = make_incident(status="remediated", incident_type="high_error_rate")
+        session.close()
+    
+        # 4. Generate a little more failing traffic during verify start
+        generate_traffic(2.0)
+    
+        # 5. Verify against failing system
+        session = SessionLocal()
+        verification_result = run_verification(sim_incident_id, session)
+    
+>       assert verification_result["recovered"] is False
+E       assert True is False
+
+backend\tests\test_verification_engine.py:190: AssertionError
+_____________ test_happy_path_run_verification_with_real_recovery _____________
+
+    def test_happy_path_run_verification_with_real_recovery():
+        """
+        Full happy-path test:
+        1. Trigger bad deployment
+        2. Generate traffic so detector fires
+        3. Run detection to get real incident
+        4. Simulate RCA/remediation approval
+        5. Execute rollback
+        6. Run verification
+        7. Confirm recovered=True, incident.status="resolved"
+        """
+        # 1. Reset and trigger bad deployment
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/reset", timeout=5.0)
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/bad-deployment", timeout=5.0)
+    
+        # 2. Generate traffic so Prometheus detects the incident
+        generate_traffic(15.0)
+    
+        # 3. Run detection to capture real incident with real initial_metrics
+        session = SessionLocal()
+        detection_results = run_detection_pass(session, "simulator")
+    
+>       assert len(detection_results) > 0, "Expected detection to find an incident"
+E       AssertionError: Expected detection to find an incident
+E       assert 0 > 0
+E        +  where 0 = len([])
+
+backend\tests\test_verification_route.py:191: AssertionError
+_____________________ test_run_verification_non_recovery ______________________
+
+    def test_run_verification_non_recovery():
+        """
+        Test case where verification confirms NON-recovery:
+        - Bad deployment active
+        - Incident marked as remediated
+        - But detector still firing after wait window
+        - Should result in recovered=False, incident.status="remediation_failed"
+    
+        (This may be hard to trigger in live env, so uses real flow with short timeout)
+        """
+        # Reset to clean state
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/reset", timeout=5.0)
+    
+        # Trigger bad deployment
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/bad-deployment", timeout=5.0)
+    
+        # Generate traffic so detector fires
+        generate_traffic(15.0)
+    
+        # Detect the incident
+        session = SessionLocal()
+        detection_results = run_detection_pass(session, "simulator")
+>       assert len(detection_results) > 0
+E       assert 0 > 0
+E        +  where 0 = len([])
+
+backend\tests\test_verification_route.py:329: AssertionError
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv\Lib\site-packages\google\genai\types.py:42
+  C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\.venv\Lib\site-packages\google\genai\types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+backend\app\main.py:52
+  C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\backend\app\main.py:52: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+.venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\.venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+backend/tests/test_remediation_execution.py::test_execute_success
+  C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\backend\app\remediation\engine.py:147: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    action.executed_at = datetime.datetime.utcnow()
+
+backend/tests/test_verification_engine.py::test_verification_is_one_shot
+  C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\.venv\Lib\site-packages\sqlalchemy\sql\schema.py:3627: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend/tests/test_verification_engine.py::test_real_recovery_flow - A...
+FAILED backend/tests/test_verification_engine.py::test_real_non_recovery - as...
+FAILED backend/tests/test_verification_route.py::test_happy_path_run_verification_with_real_recovery
+FAILED backend/tests/test_verification_route.py::test_run_verification_non_recovery
+============= 4 failed, 14 passed, 6 warnings in 95.88s (0:01:35) =============

@@ -91,3 +91,38 @@ def detect_webhook_failure(service: str) -> dict:
         "query": query,
         "window": thresholds.DETECTION_WINDOW
     }
+
+def detect_razorpay_tampering(service: str) -> dict:
+    """Detects tampered signatures or duplicated events from Razorpay."""
+    sig_query = f'increase(razorpay_webhook_signature_failures_total{{job="{service}"}}[{thresholds.DETECTION_WINDOW}])'
+    dup_query = f'increase(razorpay_webhook_duplicate_events_total{{job="{service}"}}[{thresholds.DETECTION_WINDOW}])'
+    
+    firing = False
+    max_val = 0.0
+    active_query = sig_query
+    
+    for q in [sig_query, dup_query]:
+        res = instant_query(q)
+        if res and len(res) > 0:
+            val_str = res[0].get("value", [0, "0"])[1]
+            try:
+                val = float(val_str)
+                if str(val) != "nan" and val > 0.5:
+                    firing = True
+                    if val > max_val:
+                        max_val = val
+                        active_query = q
+            except ValueError:
+                pass
+
+    severity = "high" if firing else None
+
+    return {
+        "firing": firing,
+        "type": "webhook_failure",
+        "service": service,
+        "severity": severity,
+        "value": max_val,
+        "query": active_query,
+        "window": thresholds.DETECTION_WINDOW
+    }

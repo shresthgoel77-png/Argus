@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from app.models import Incident
 from app.detection import detectors
 from app.detection.cooldown import should_cool_down
+from app.github.engine import auto_create_incident_issue
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +39,8 @@ def run_detection_pass(db_session: Session, service: str = "simulator") -> list[
         results = [
             detectors.detect_high_error_rate(service),
             detectors.detect_high_latency(service),
-            detectors.detect_webhook_failure(service)
+            detectors.detect_webhook_failure(service),
+            detectors.detect_razorpay_tampering(service)
         ]
     except Exception as e:
         logger.error(f"Error querying Prometheus during detection pass: {e}")
@@ -88,6 +91,9 @@ def run_detection_pass(db_session: Session, service: str = "simulator") -> list[
         db_session.commit()
         db_session.refresh(new_incident)
         new_incidents.append(new_incident)
+        
+        # Fire off issue creation in a background thread so we don't block the polling engine
+        threading.Thread(target=auto_create_incident_issue, args=(new_incident.id,)).start()
         
     detection_status.last_run_new_incidents = len(new_incidents)
     return new_incidents

@@ -194,8 +194,6 @@ async def simulate_razorpay_webhook(variant: str):
     if variant == "duplicate":
         if _last_demo_event_id is None:
             _last_demo_event_id = event["id"]
-            raw_body = json.dumps(event).encode()
-            await _process_razorpay_webhook(raw_body, sign_payload(secret, raw_body))
         event["id"] = _last_demo_event_id
         raw_body = json.dumps(event).encode()
         signature = sign_payload(secret, raw_body)
@@ -207,7 +205,20 @@ async def simulate_razorpay_webhook(variant: str):
         if variant == "tampered":
             signature = ("1" if signature[0] != "1" else "0") + signature[1:]
 
-    status_code, result = await _process_razorpay_webhook(raw_body, signature)
+    import requests
+    backend_url = os.getenv("BACKEND_URL", "http://127.0.0.1:8000")
+    webhook_url = f"{backend_url}/webhooks/razorpay"
+    try:
+        resp = requests.post(webhook_url, data=raw_body, headers={"X-Razorpay-Signature": signature}, timeout=3.0)
+        status_code = resp.status_code
+        try:
+            result = resp.json()
+        except BaseException:
+            result = {"status": "invalid_response", "body": resp.text}
+    except requests.RequestException as e:
+        status_code = 502
+        result = {"status": "backend_unreachable", "error": str(e)}
+
     response = {"variant": variant, "result": result, "event_id": event["id"]}
     return JSONResponse(status_code=200, content=response)
 

@@ -27,3 +27,33 @@ def generate_traffic(SIMULATOR_URL):
                 pass
             time.sleep(0.5)
     return _generate
+
+@pytest.fixture
+def security_db(monkeypatch):
+    """
+    Sets up an isolated SQLite database for security tests and provides a TestClient.
+    This avoids duplicating the DB creation boilerplate in every test file.
+    """
+    from fastapi.testclient import TestClient
+    from app.main import app
+    from app.db import Base, engine, SessionLocal
+    from app.models import Evidence, Incident, RemediationAction
+    
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///./test_security_suite.db")
+    
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    db.query(RemediationAction).delete()
+    db.query(Evidence).delete()
+    db.query(Incident).delete()
+    db.commit()
+    db.close()
+    
+    yield TestClient(app)
+    
+    db = SessionLocal()
+    db.query(RemediationAction).delete()
+    db.query(Evidence).delete()
+    db.query(Incident).delete()
+    db.commit()
+    db.close()

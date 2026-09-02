@@ -45,7 +45,7 @@ async def reset_demo_data(db: Session = Depends(get_db)):
     # so deleting the incidents table intrinsically clears the cooldown.
     
     # Call simulator reset to guarantee clean baseline
-    simulator_url = os.getenv("SIMULATOR_URL", "http://127.0.0.1:8001")
+    simulator_url = os.getenv("SIMULATOR_URL", "http://127.0.0.1:9000")
     try:
         async with httpx.AsyncClient() as client:
             await client.post(f"{simulator_url}/simulate/reset", timeout=5.0)

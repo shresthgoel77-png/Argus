@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db import engine, Base
-from app.api import health, detection, investigation, ai, remediation, verification, github, webhooks, demo
+from app.api import health, detection, investigation, ai, remediation, verification, github, webhooks, demo, payments
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,6 +31,7 @@ app.include_router(verification.router)
 app.include_router(github.router)
 app.include_router(webhooks.router)
 app.include_router(demo.router)
+app.include_router(payments.router)
 
 import os
 import asyncio

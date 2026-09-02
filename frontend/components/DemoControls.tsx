@@ -43,6 +43,60 @@ export default function DemoControls({ onCompleted }: Props) {
     }
   }
 
+  async function performRealCheckout() {
+    setBusy("real-checkout");
+    setMessage(null);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/payments/create_order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: 50000, currency: "INR" })
+      });
+      const order = await response.json();
+      if (!response.ok) throw new Error(order.detail || "Failed to create order");
+
+      if (!(window as any).Razorpay) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://checkout.razorpay.com/v1/checkout.js";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TXGV7KaGuBg6sZ",
+        amount: order.amount,
+        currency: order.currency,
+        name: "Test Checkout",
+        description: "Live Flow Transaction",
+        order_id: order.id,
+        handler: async function (response: any) {
+          setMessage(`Real checkout success: ${response.razorpay_payment_id}`);
+          onCompleted();
+        },
+        prefill: {
+          name: "Live User",
+          email: "user@example.com",
+          contact: "9999999999"
+        },
+        theme: { color: "#3399cc" }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        setMessage(`Real checkout failed: ${response.error.description}`);
+      });
+      rzp.open();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function performRehearsal(action: "warm-up" | "reset-demo") {
     if (action === "reset-demo") {
       if (!window.confirm("WARNING: This will destructively delete all demo data from the database. Are you sure?")) {
@@ -96,6 +150,13 @@ export default function DemoControls({ onCompleted }: Props) {
         </button>
         <button disabled={busy !== null} onClick={() => performRazorpay("duplicate")} className="rounded bg-purple-700 px-4 py-2 text-sm font-medium disabled:opacity-50">
           {busy === "razorpay-duplicate" ? "Sending…" : "Send Duplicate Webhook"}
+        </button>
+      </div>
+
+      <h3 className="text-md font-medium mt-5 mb-2 text-slate-300">Live Razorpay Checkout</h3>
+      <div className="flex flex-wrap gap-3">
+        <button disabled={busy !== null} onClick={() => performRealCheckout()} className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-indigo-500">
+          {busy === "real-checkout" ? "Loading Checkout…" : "Start Real Razorpay Checkout"}
         </button>
       </div>
 

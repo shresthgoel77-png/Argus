@@ -24,7 +24,8 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
     const [loading, setLoading] = useState(true);
     const [errorNotFound, setErrorNotFound] = useState(false);
 
-    const [actionLoading, setActionLoading] = useState(false);
+    const [actionInvLoading, setActionInvLoading] = useState(false);
+    const [actionRcaLoading, setActionRcaLoading] = useState(false);
     const [actionError, setActionError] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
@@ -53,7 +54,7 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
     if (errorNotFound || !incident) return <div className="p-8 text-rose-300">Incident not found</div>;
 
     const handleRunInvestigation = async () => {
-        setActionLoading(true);
+        setActionInvLoading(true);
         setActionError(null);
         try {
             await runInvestigation(incidentId);
@@ -61,12 +62,12 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
         } catch (err: any) {
             setActionError(err.message || String(err));
         } finally {
-            setActionLoading(false);
+            setActionInvLoading(false);
         }
     };
 
     const handleRunRCA = async () => {
-        setActionLoading(true);
+        setActionRcaLoading(true);
         setActionError(null);
         try {
             await runRCA(incidentId);
@@ -74,7 +75,7 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
         } catch (err: any) {
             setActionError(err.message || String(err));
         } finally {
-            setActionLoading(false);
+            setActionRcaLoading(false);
         }
     };
 
@@ -84,6 +85,9 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
 
                 {/* Header */}
                 <div className="border-b border-slate-800 pb-6 mb-6">
+                    <a href="/" className="mb-4 inline-block text-sm text-slate-400 hover:text-white transition">
+                        &larr; Back to Dashboard
+                    </a>
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold flex items-center gap-3">
@@ -101,17 +105,17 @@ export default function IncidentDetailPage({ params }: { params: Promise<{ id: s
                         <div className="flex gap-4">
                             <button
                                 onClick={handleRunInvestigation}
-                                disabled={incident.status !== "open" || actionLoading}
+                                disabled={incident.status !== "open" || actionInvLoading}
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded font-medium transition"
                             >
-                                {actionLoading && incident.status === "open" ? "Running..." : "Run Investigation"}
+                                {actionInvLoading ? "Running..." : "Run Investigation"}
                             </button>
                             <button
                                 onClick={handleRunRCA}
-                                disabled={incident.status !== "investigated" || actionLoading}
+                                disabled={incident.status !== "investigated" || actionRcaLoading}
                                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed rounded font-medium transition"
                             >
-                                {actionLoading && incident.status === "investigated" ? "Running..." : "Run RCA"}
+                                {actionRcaLoading ? "Running..." : "Run RCA"}
                             </button>
                         </div>
                     </div>

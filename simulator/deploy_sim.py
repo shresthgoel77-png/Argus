@@ -1,7 +1,7 @@
 import json
 import os
 import subprocess
-from .config import CONFIG_PATH, DEFAULT_CONFIG, get_config
+from config import CONFIG_PATH, DEFAULT_CONFIG, get_config
 import logging
 
 logger = logging.getLogger("simulator")

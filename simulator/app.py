@@ -10,9 +10,9 @@ from fastapi.responses import JSONResponse, Response
 from prometheus_client import Counter, Histogram, generate_latest
 
 from fastapi.middleware.cors import CORSMiddleware
-from .config import get_config
-from .logging_setup import logger
-from .razorpay_utils import build_test_payment_event, sign_payload, verify_signature
+from config import get_config
+from logging_setup import logger
+from razorpay_utils import build_test_payment_event, sign_payload, verify_signature
 
 app = FastAPI(title="Simulator Service")
 
@@ -215,7 +215,7 @@ async def simulate_razorpay_webhook(variant: str):
 async def metrics():
     return Response(content=generate_latest(), media_type="text/plain")
 
-from .deploy_sim import trigger_bad_deployment, trigger_reset, get_state, BAD_CONFIG
+from deploy_sim import trigger_bad_deployment, trigger_reset, get_state, BAD_CONFIG
 
 @app.post("/simulate/bad-deployment")
 async def bad_deployment():

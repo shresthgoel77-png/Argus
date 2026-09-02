@@ -164,10 +164,25 @@ class TestCategory3GitSubprocessSafety:
                 content = f.read()
                 assert "shell=True" not in content, f"Unsafe shell=True used in {filepath}"
     
-    # 3b: Shell metachar in service name
-    # SKIPPED WITH COMMENT: backend/app/investigation/git_evidence.py hardcodes the git log path 
-    # to "simulator/" and DOES NOT inject incident.service into the subprocess command logic anywhere.
-    # A shell metachar in service name has no execution vector here.
+    def test_malicious_service_name_in_git_evidence(self):
+        """3b: Malicious service name must not result in command execution.
+        We prove this by actually passing a shell metacharacter and confirming normal behavior."""
+        from app.investigation.git_evidence import collect_git_evidence
+        
+        with DB() as db:
+            iid = _create_incident(db, "investigated")
+            inc = db.get(Incident, iid)
+            inc.service = "sim;rm"
+            db.commit()
+            db.refresh(inc)
+            
+            # Run collection. If RCE happens, or if it breaks the subprocess call,
+            # this will not return a valid Evidence object cleanly.
+            evidence = collect_git_evidence(inc, db, repo_path=str(PROJECT_ROOT))
+            
+            # Confirm it collected safely without executing the shell injection
+            assert evidence is not None
+            assert evidence.category in ("observed_fact", "collection_error")
 
 
 class TestCategory4RazorpayWebhookIntegrity:

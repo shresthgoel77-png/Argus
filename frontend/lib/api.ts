@@ -47,3 +47,5 @@ export const getIncidentReport = (incidentId: number) => request<IncidentReport>
 export const getGitHubStatus = () => request<GitHubStatus>(`${apiUrl}/github/status`);
 export const createGitHubIssue = (incidentId: number) => request<GitHubIssue>(`${apiUrl}/incidents/${incidentId}/github-issue`, { method: "POST" });
 export const getGitHubIssue = (incidentId: number) => request<GitHubIssue | null>(`${apiUrl}/incidents/${incidentId}/github-issue`);
+export const simulateWarmUp = () => request<any>(`${simulatorUrl}/simulate/warm-up?requests=20`, { method: "POST" });
+export const resetDemoData = () => request<any>(`${apiUrl}/demo/reset-data`, { method: "POST" });

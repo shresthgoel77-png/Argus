@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db import engine, Base
-from app.api import health, detection, investigation, ai, remediation, verification, github, webhooks
+from app.api import health, detection, investigation, ai, remediation, verification, github, webhooks, demo
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,6 +30,7 @@ app.include_router(remediation.router)
 app.include_router(verification.router)
 app.include_router(github.router)
 app.include_router(webhooks.router)
+app.include_router(demo.router)
 
 import os
 import asyncio
@@ -52,5 +53,8 @@ async def detection_poll_loop():
 
 @app.on_event("startup")
 async def startup_event():
+    if os.getenv("DEMO_MODE", "").lower() == "true":
+        logger.warning("DEMO_MODE=true is enabled! /demo routes are exposed. Do not use in production.")
+        
     asyncio.create_task(detection_poll_loop())
 

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { runDetectionPass, simulateBadDeployment, simulateReset, sendRazorpayDemoWebhook } from "@/lib/api";
+import { runDetectionPass, simulateBadDeployment, simulateReset, sendRazorpayDemoWebhook, simulateWarmUp, resetDemoData } from "@/lib/api";
 
 type Props = { onCompleted: () => void };
 
@@ -43,6 +43,34 @@ export default function DemoControls({ onCompleted }: Props) {
     }
   }
 
+  async function performRehearsal(action: "warm-up" | "reset-demo") {
+    if (action === "reset-demo") {
+      if (!window.confirm("WARNING: This will destructively delete all demo data from the database. Are you sure?")) {
+        return;
+      }
+    }
+    setBusy(`rehearsal-${action}`);
+    setMessage(null);
+    try {
+      if (action === "warm-up") {
+        const result = await simulateWarmUp();
+        setMessage(`Warm up completed: sent ${result.requests_sent} requests. 2xx: ${result.results_summary["2xx"]}, 5xx: ${result.results_summary["5xx"]}`);
+      } else {
+        const result = await resetDemoData();
+        setMessage(`Reset completed: Tables cleared: ${result.tables_cleared.join(", ")}`);
+      }
+      onCompleted();
+    } catch (error: any) {
+      if (error?.message?.includes("403")) {
+        setMessage("Reset unavailable \u2014 set DEMO_MODE=true to enable");
+      } else {
+        setMessage(error instanceof Error ? error.message : String(error));
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <section className="rounded-xl border border-slate-700 bg-slate-900 p-5 shadow-sm">
       <h2 className="text-lg font-semibold">Demo Controls</h2>
@@ -68,6 +96,16 @@ export default function DemoControls({ onCompleted }: Props) {
         </button>
         <button disabled={busy !== null} onClick={() => performRazorpay("duplicate")} className="rounded bg-purple-700 px-4 py-2 text-sm font-medium disabled:opacity-50">
           {busy === "razorpay-duplicate" ? "Sending…" : "Send Duplicate Webhook"}
+        </button>
+      </div>
+
+      <h3 className="text-md font-medium mt-5 mb-2 text-slate-300">Rehearsal Tools</h3>
+      <div className="flex flex-wrap gap-3 rounded border border-dashed border-slate-600 p-3">
+        <button disabled={busy !== null} onClick={() => performRehearsal("warm-up")} className="rounded bg-slate-600 px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-slate-500">
+          {busy === "rehearsal-warm-up" ? "Warming Up…" : "Warm Up Traffic"}
+        </button>
+        <button disabled={busy !== null} onClick={() => performRehearsal("reset-demo")} className="rounded bg-rose-900 border border-rose-500 px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-rose-800">
+          {busy === "rehearsal-reset-demo" ? "Resetting Demo…" : "Reset Demo Data"}
         </button>
       </div>
 

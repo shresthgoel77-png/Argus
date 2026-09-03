@@ -150,6 +150,10 @@ def test_full_resolved_incident_report():
     assert "rollback_deployment" in markdown  # action type
     assert "a1b2c3d4e" in markdown  # executed rollback commit SHA (remediation result)
     assert "Recovery verified." in markdown  # verification result (recovered=True)
+    
+    # Verify proper Markdown newlines and no double-escaped literal \n
+    assert "\n" in markdown, "Markdown should contain an actual newline character"
+    assert "\\n" not in markdown, "Markdown should not contain literal escaped \\n characters"
 
 def test_rca_complete_only_report():
     """Test 2: RCA-complete incident (no remediation/verification yet) shows honest omit text."""

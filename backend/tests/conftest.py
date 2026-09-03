@@ -57,3 +57,16 @@ def security_db(monkeypatch):
     db.query(Incident).delete()
     db.commit()
     db.close()
+
+@pytest.fixture(autouse=True)
+def cleanup_fastapi_tasks():
+    """
+    Ensures that any background tasks spawned by global TestClient instances
+    are forcefully cancelled at test session shutdown to prevent anyio 
+    event-loop hangs at teardown and cross-test background detection stealing.
+    """
+    yield
+    from app.main import poll_task
+    import sys
+    if poll_task and not poll_task.done():
+        poll_task.cancel()

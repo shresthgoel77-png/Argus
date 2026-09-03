@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="53.657" timestamp="2026-09-04T02:05:37.077302+05:30" hostname="shresth"><testcase classname="backend.tests.test_verification_engine" name="test_real_recovery_flow" time="25.354"><failure message="AssertionError: Expected detection pass to detect a high error rate incident!&#10;assert 0 &gt; 0&#10; +  where 0 = len([])">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000029AC792EB10&gt;
+
+    def test_real_recovery_flow(monkeypatch):
+        """
+        Real Phase 3 -&gt; Rollback -&gt; Traffic -&gt; Verification flow.
+        No mocking of DETECTOR_BY_INCIDENT_TYPE or _check_simulator_health.
+        """
+        # Use real settings to allow polling (must cover prometheus scrape interval)
+        monkeypatch.setenv("VERIFICATION_MAX_WAIT_SECONDS", "60")
+        monkeypatch.setenv("VERIFICATION_POLL_INTERVAL_SECONDS", "2")
+        monkeypatch.setenv("DETECTION_WINDOW", "15s")
+        monkeypatch.setenv("ERROR_RATE_MEDIUM", "0.05")
+    
+        # 1. Start clean, then trigger bad deployment
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/reset", timeout=5.0)
+        httpx.post(f"{os.environ['SIMULATOR_URL']}/simulate/bad-deployment", timeout=5.0)
+    
+        # 2. Generate traffic so Prometheus has failing data
+        generate_traffic(15.0)
+    
+        # 3. Detect incident natively so we get real initial_metrics
+        session = SessionLocal()
+        detection_res = run_detection_pass(session, "simulator")
+    
+&gt;       assert len(detection_res) &gt; 0, "Expected detection pass to detect a high error rate incident!"
+E       AssertionError: Expected detection pass to detect a high error rate incident!
+E       assert 0 &gt; 0
+E        +  where 0 = len([])
+
+tests\test_verification_engine.py:90: AssertionError</failure></testcase><testcase classname="backend.tests.test_verification_engine" name="test_real_non_recovery" time="26.925" /><testcase classname="backend.tests.test_verification_engine" name="test_verification_requires_remediated_incident" time="0.026" /><testcase classname="backend.tests.test_verification_engine" name="test_verification_is_one_shot" time="0.031" /><testcase classname="backend.tests.test_verification_engine" name="test_transient_prometheus_failure_is_recorded_and_polling_continues" time="0.035" /></testsuite></testsuites>

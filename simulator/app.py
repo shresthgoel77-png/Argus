@@ -256,32 +256,22 @@ async def get_simulator_state():
 async def warm_up(requests: int = 20):
     """
     Fires `requests` real sequential/concurrent GET /api/checkout calls
-    in-process against the current (real) config.
+    against the current (real) config through the middleware.
     Returns: {"requests_sent": N, "results_summary": {"2xx": n, "5xx": n}}
     """
     results_summary = {"2xx": 0, "5xx": 0}
+    import httpx
     
-    async def _make_simulated_request():
-        start_time = time.time()
-        response = await checkout()
-        end_time = time.time()
-        latency_seconds = end_time - start_time
-        
-        status_code = 500 if (isinstance(response, JSONResponse) and response.status_code >= 500) else 200
-        
-        # Prime Prometheus metrics as if hit via middleware
-        HTTP_REQUESTS_TOTAL.labels(endpoint="/api/checkout", status=str(status_code)).inc()
-        HTTP_REQUEST_DURATION_SECONDS.labels(endpoint="/api/checkout").observe(latency_seconds)
-        
-        return status_code
-
-    # Sequential execution to easily honor any potential config states exactly like real traffic
-    for _ in range(requests):
-        status = await _make_simulated_request()
-        if status == 500:
-            results_summary["5xx"] += 1
-        else:
-            results_summary["2xx"] += 1
+    # Use ASGI transport to hit ourselves to accurately invoke middleware
+    # and Prometheus metrics without port binding constraints.
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        for _ in range(requests):
+            resp = await client.get("/api/checkout")
+            if resp.status_code >= 500:
+                results_summary["5xx"] += 1
+            else:
+                results_summary["2xx"] += 1
 
     return {"requests_sent": requests, "results_summary": results_summary}
 

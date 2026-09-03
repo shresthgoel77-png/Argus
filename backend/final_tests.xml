@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="13" skipped="4" tests="86" time="792.124" timestamp="2026-09-04T02:18:11.250836+05:30" hostname="shresth"><testcase classname="backend.tests.test_ai_evidence_package" name="test_build_evidence_package_returns_correct_structure" time="0.081" /><testcase classname="backend.tests.test_ai_evidence_package" name="test_build_evidence_package_zero_evidence" time="0.022" /><testcase classname="backend.tests.test_ai_evidence_package" name="test_clean_json_response_strips_markdown" time="0.018" /><testcase classname="backend.tests.test_ai_evidence_package" name="test_call_rca_model_returns_parseable_json" time="1.158"><failure message="app.ai.client.AICallError: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 33.566790652s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '33s'}]}}">app\ai\client.py:39: in call_rca_model
+    response = client.models.generate_content(
+..\.venv\Lib\site-packages\google\genai\models.py:6270: in generate_content
+    response = self._generate_content(
+..\.venv\Lib\site-packages\google\genai\models.py:4707: in _generate_content
+    response = self._api_client.request(
+..\.venv\Lib\site-packages\google\genai\_api_client.py:1747: in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\google\genai\_api_client.py:1534: in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:470: in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:371: in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:413: in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:184: in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:447: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:396: in __get_result
+    raise self._exception
+..\.venv\Lib\site-packages\tenacity\__init__.py:473: in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\google\genai\_api_client.py:1511: in _request_once
+    errors.APIError.raise_for_response(response)
+..\.venv\Lib\site-packages\google\genai\errors.py:173: in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+..\.venv\Lib\site-packages\google\genai\errors.py:202: in raise_error
+    raise ClientError(status_code, response_json, response)
+E   google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 33.566790652s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '33s'}]}}
+
+The above exception was the direct cause of the following exception:
+C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_ai_evidence_package.py:129: in test_call_rca_model_returns_parseable_json
+    ???
+app\ai\client.py:49: in call_rca_model
+    raise AICallError(f"Failed to call Gemini API: {str(e)}") from e
+E   app.ai.client.AICallError: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 33.566790652s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '33s'}]}}</failure></testcase><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_returns_404_for_unknown_incident" time="0.032" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_returns_409_for_non_investigated_incident" time="0.033" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_returns_409_for_duplicate_rca" time="0.036" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_validate_rca_output_rejects_hallucinated_evidence_id" time="0.015" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_validate_rca_output_rejects_invalid_remediation_type" time="0.014" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_validate_rca_output_accepts_valid_response" time="0.014" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_engine_retry_then_fail_on_hallucinated_response" time="0.053" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_happy_path_real_ai" time="1.075"><failure message="AssertionError: Expected 200, got 502: {&quot;detail&quot;:&quot;AI call failed: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 31.785262292s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '31s'}]}}&quot;}&#10;assert 502 == 200&#10; +  where 502 = &lt;Response [502 Bad Gateway]&gt;.status_code">C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_ai_rca_engine.py:325: in test_rca_happy_path_real_ai
+    ???
+E   AssertionError: Expected 200, got 502: {"detail":"AI call failed: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 31.785262292s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '31s'}]}}"}
+E   assert 502 == 200
+E    +  where 502 = &lt;Response [502 Bad Gateway]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_demo_reset" name="test_demo_reset_403_when_disabled" time="0.062" /><testcase classname="backend.tests.test_demo_reset" name="test_demo_reset_clears_data" time="0.768" /><testcase classname="backend.tests.test_demo_reset" name="test_simulator_warm_up" time="0.812" /><testcase classname="backend.tests.test_detection_engine" name="test_detection_engine_e2e" time="163.433"><failure message="app.observability.prometheus_client.PrometheusUnavailableError: Failed to connect to Prometheus: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)">..\.venv\Lib\site-packages\urllib3\connectionpool.py:534: in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\urllib3\connection.py:571: in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\http\client.py:1459: in getresponse
+    response.begin()
+C:\Python314\Lib\http\client.py:336: in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\http\client.py:297: in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\socket.py:729: in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+E   TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+..\.venv\Lib\site-packages\requests\adapters.py:696: in send
+    resp = conn.urlopen(
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:842: in urlopen
+    retries = retries.increment(
+..\.venv\Lib\site-packages\urllib3\util\retry.py:498: in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\urllib3\util\util.py:39: in reraise
+    raise value
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:788: in urlopen
+    response = self._make_request(
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:536: in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:367: in _raise_timeout
+    raise ReadTimeoutError(
+E   urllib3.exceptions.ReadTimeoutError: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)
+
+During handling of the above exception, another exception occurred:
+app\observability\prometheus_client.py:14: in _execute_query
+    response = requests.get(url, params=params, timeout=TIMEOUT_SECONDS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\api.py:87: in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\api.py:71: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\sessions.py:651: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\sessions.py:784: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\adapters.py:742: in send
+    raise ReadTimeout(e, request=request)
+E   requests.exceptions.ReadTimeout: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)
+
+During handling of the above exception, another exception occurred:
+C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_detection_engine.py:75: in test_detection_engine_e2e
+    ???
+app\detection\detectors.py:9: in detect_high_error_rate
+    res = instant_query(query)
+          ^^^^^^^^^^^^^^^^^^^^
+app\observability\prometheus_client.py:49: in instant_query
+    return _execute_query(url, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\observability\prometheus_client.py:39: in _execute_query
+    raise PrometheusUnavailableError(f"Failed to connect to Prometheus: {e}")
+E   app.observability.prometheus_client.PrometheusUnavailableError: Failed to connect to Prometheus: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)</failure></testcase><testcase classname="backend.tests.test_detection_engine" name="test_prometheus_unreachable_robustness" time="0.028" /><testcase classname="backend.tests.test_detection_status" name="test_detection_status_reports_real_manual_pass" time="5.043"><failure message="AssertionError: assert datetime.datetime(2026, 9, 3, 20, 51, 2, 197487, tzinfo=datetime.timezone.utc) &gt; (datetime.datetime(2026, 9, 3, 20, 51, 7, 225105, tzinfo=datetime.timezone.utc) - datetime.timedelta(seconds=5))&#10; +  where datetime.datetime(2026, 9, 3, 20, 51, 2, 197487, tzinfo=datetime.timezone.utc) = &lt;built-in method fromisoformat of type object at 0x00007FFADEB69270&gt;('2026-09-03T20:51:02.197487+00:00')&#10; +    where &lt;built-in method fromisoformat of type object at 0x00007FFADEB69270&gt; = datetime.fromisoformat&#10; +  and   datetime.datetime(2026, 9, 3, 20, 51, 7, 225105, tzinfo=datetime.timezone.utc) = &lt;built-in method now of type object at 0x00007FFADEB69270&gt;(datetime.timezone.utc)&#10; +    where &lt;built-in method now of type object at 0x00007FFADEB69270&gt; = datetime.now&#10; +    and   datetime.timezone.utc = timezone.utc&#10; +  and   datetime.timedelta(seconds=5) = timedelta(seconds=5)">C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_detection_status.py:21: in test_detection_status_reports_real_manual_pass
+    ???
+E   AssertionError: assert datetime.datetime(2026, 9, 3, 20, 51, 2, 197487, tzinfo=datetime.timezone.utc) &gt; (datetime.datetime(2026, 9, 3, 20, 51, 7, 225105, tzinfo=datetime.timezone.utc) - datetime.timedelta(seconds=5))
+E    +  where datetime.datetime(2026, 9, 3, 20, 51, 2, 197487, tzinfo=datetime.timezone.utc) = &lt;built-in method fromisoformat of type object at 0x00007FFADEB69270&gt;('2026-09-03T20:51:02.197487+00:00')
+E    +    where &lt;built-in method fromisoformat of type object at 0x00007FFADEB69270&gt; = datetime.fromisoformat
+E    +  and   datetime.datetime(2026, 9, 3, 20, 51, 7, 225105, tzinfo=datetime.timezone.utc) = &lt;built-in method now of type object at 0x00007FFADEB69270&gt;(datetime.timezone.utc)
+E    +    where &lt;built-in method now of type object at 0x00007FFADEB69270&gt; = datetime.now
+E    +    and   datetime.timezone.utc = timezone.utc
+E    +  and   datetime.timedelta(seconds=5) = timedelta(seconds=5)</failure></testcase><testcase classname="backend.tests.test_detectors" name="test_detectors_e2e" time="81.286"><failure message="app.observability.prometheus_client.PrometheusUnavailableError: Failed to connect to Prometheus: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)">..\.venv\Lib\site-packages\urllib3\connectionpool.py:534: in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\urllib3\connection.py:571: in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\http\client.py:1459: in getresponse
+    response.begin()
+C:\Python314\Lib\http\client.py:336: in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\http\client.py:297: in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\socket.py:729: in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+E   TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+..\.venv\Lib\site-packages\requests\adapters.py:696: in send
+    resp = conn.urlopen(
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:842: in urlopen
+    retries = retries.increment(
+..\.venv\Lib\site-packages\urllib3\util\retry.py:498: in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\urllib3\util\util.py:39: in reraise
+    raise value
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:788: in urlopen
+    response = self._make_request(
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:536: in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+..\.venv\Lib\site-packages\urllib3\connectionpool.py:367: in _raise_timeout
+    raise ReadTimeoutError(
+E   urllib3.exceptions.ReadTimeoutError: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)
+
+During handling of the above exception, another exception occurred:
+app\observability\prometheus_client.py:14: in _execute_query
+    response = requests.get(url, params=params, timeout=TIMEOUT_SECONDS)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\api.py:87: in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\api.py:71: in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\sessions.py:651: in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\sessions.py:784: in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\requests\adapters.py:742: in send
+    raise ReadTimeout(e, request=request)
+E   requests.exceptions.ReadTimeout: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)
+
+During handling of the above exception, another exception occurred:
+C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_detectors.py:42: in test_detectors_e2e
+    ???
+app\detection\detectors.py:9: in detect_high_error_rate
+    res = instant_query(query)
+          ^^^^^^^^^^^^^^^^^^^^
+app\observability\prometheus_client.py:49: in instant_query
+    return _execute_query(url, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\observability\prometheus_client.py:39: in _execute_query
+    raise PrometheusUnavailableError(f"Failed to connect to Prometheus: {e}")
+E   app.observability.prometheus_client.PrometheusUnavailableError: Failed to connect to Prometheus: HTTPConnectionPool(host='localhost', port=9090): Read timed out. (read timeout=5)</failure></testcase><testcase classname="backend.tests.test_github_issue" name="test_github_status_no_env" time="0.041" /><testcase classname="backend.tests.test_github_issue" name="test_github_status_malformed_repo" time="0.016" /><testcase classname="backend.tests.test_github_issue" name="test_create_issue_happy_path" time="0.054" /><testcase classname="backend.tests.test_github_issue" name="test_create_issue_duplicate_409" time="0.040" /><testcase classname="backend.tests.test_github_issue" name="test_create_issue_no_rca_409" time="0.034" /><testcase classname="backend.tests.test_github_issue" name="test_create_issue_api_error_502" time="0.045" /><testcase classname="backend.tests.test_github_issue" name="test_create_issue_unconfigured_501" time="0.035" /><testcase classname="backend.tests.test_golden_path_e2e" name="test_golden_path" time="97.714"><failure message="AssertionError: stage 5: expected at least 1 new incident, got 0&#10;assert 0 &gt;= 1&#10; +  where 0 = len([])">tests\test_golden_path_e2e.py:83: in test_golden_path
+    assert len(incidents) &gt;= 1, f"stage 5: expected at least 1 new incident, got {len(incidents)}"
+E   AssertionError: stage 5: expected at least 1 new incident, got 0
+E   assert 0 &gt;= 1
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_health" name="test_health_check_success" time="0.155" /><testcase classname="backend.tests.test_incident_evidence_route" name="test_get_evidence_returns_404_for_unknown_incident" time="0.362" /><testcase classname="backend.tests.test_incident_evidence_route" name="test_get_evidence_returns_list_for_existing_incident" time="0.281" /><testcase classname="backend.tests.test_investigation_collectors" name="test_investigation_collectors_e2e" time="3.260"><skipped type="pytest.skip" message="Loki not available">C:\Users\HP\Desktop\.vscode\ai-reliability-engineer\backend\tests\test_investigation_collectors.py:59: Loki not available</skipped></testcase><testcase classname="backend.tests.test_investigation_collectors" name="test_collectors_unreachable_robustness" time="16.401" /><testcase classname="backend.tests.test_investigation_engine" name="test_investigation_route_returns_404_and_409_without_collecting_evidence" time="0.079" /><testcase classname="backend.tests.test_investigation_engine" name="test_investigation_correlates_fault_injection_commit" time="201.269"><failure message="AssertionError: Bad deployment should create an incident&#10;assert []">C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_investigation_engine.py:110: in test_investigation_correlates_fault_injection_commit
+    ???
+E   AssertionError: Bad deployment should create an incident
+E   assert []</failure></testcase><testcase classname="backend.tests.test_observability_clients" name="test_prometheus_instant_query_success" time="1.028"><skipped type="pytest.skip" message="Prometheus not available">C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_observability_clients.py:31: Prometheus not available</skipped></testcase><testcase classname="backend.tests.test_observability_clients" name="test_prometheus_range_query_success" time="1.025"><skipped type="pytest.skip" message="Prometheus not available">C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_observability_clients.py:53: Prometheus not available</skipped></testcase><testcase classname="backend.tests.test_observability_clients" name="test_prometheus_unavailable" time="4.055" /><testcase classname="backend.tests.test_observability_clients" name="test_loki_query_range_success" time="1.004"><skipped type="pytest.skip" message="Loki not available">C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_observability_clients.py:103: Loki not available</skipped></testcase><testcase classname="backend.tests.test_observability_clients" name="test_loki_unavailable" time="4.064" /><testcase classname="backend.tests.test_razorpay_evidence" name="test_razorpay_tampered_traffic" time="33.267"><failure message="AssertionError: assert 'collection_error' == 'observed_fact'&#10;  &#10;  #x1B[0m#x1B[91m- observed_fact#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+ collection_error#x1B[39;49;00m#x1B[90m#x1B[39;49;00m">tests\test_razorpay_evidence.py:66: in test_razorpay_tampered_traffic
+    assert ev.category == "observed_fact"
+E   AssertionError: assert 'collection_error' == 'observed_fact'
+E     
+E     #x1B[0m#x1B[91m- observed_fact#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E     #x1B[92m+ collection_error#x1B[39;49;00m#x1B[90m#x1B[39;49;00m</failure></testcase><testcase classname="backend.tests.test_razorpay_evidence" name="test_razorpay_no_traffic" time="14.233"><failure message="AssertionError: assert 'collection_error' == 'observed_fact'&#10;  &#10;  #x1B[0m#x1B[91m- observed_fact#x1B[39;49;00m#x1B[90m#x1B[39;49;00m&#10;  #x1B[92m+ collection_error#x1B[39;49;00m#x1B[90m#x1B[39;49;00m">tests\test_razorpay_evidence.py:98: in test_razorpay_no_traffic
+    assert ev.category == "observed_fact"
+E   AssertionError: assert 'collection_error' == 'observed_fact'
+E     
+E     #x1B[0m#x1B[91m- observed_fact#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+E     #x1B[92m+ collection_error#x1B[39;49;00m#x1B[90m#x1B[39;49;00m</failure></testcase><testcase classname="backend.tests.test_razorpay_evidence" name="test_razorpay_wrong_incident_type" time="2.157" /><testcase classname="backend.tests.test_razorpay_evidence" name="test_razorpay_engine_integration" time="34.819"><failure message="assert 0 == 2&#10; +  where 0 = len([])">tests\test_razorpay_evidence.py:152: in test_razorpay_engine_integration
+    assert len(razorpay_signals) == 2
+E   assert 0 == 2
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_remediation_execution" name="test_execute_success" time="7.280" /><testcase classname="backend.tests.test_remediation_execution" name="test_execute_unsupported_action" time="0.101" /><testcase classname="backend.tests.test_remediation_execution" name="test_execute_simulator_unreachable" time="4.169" /><testcase classname="backend.tests.test_remediation_execution" name="test_execute_non_approved_action" time="0.062" /><testcase classname="backend.tests.test_remediation_proposal" name="test_propose_remediation_success" time="0.082" /><testcase classname="backend.tests.test_remediation_proposal" name="test_double_propose_returns_409" time="0.076" /><testcase classname="backend.tests.test_remediation_proposal" name="test_propose_on_not_rca_complete" time="0.047" /><testcase classname="backend.tests.test_remediation_proposal" name="test_approve_remediation_success" time="0.161" /><testcase classname="backend.tests.test_remediation_proposal" name="test_reject_remediation_success" time="0.274" /><testcase classname="backend.tests.test_remediation_proposal" name="test_unexpected_params_rejected" time="0.055" /><testcase classname="backend.tests.test_report_builder" name="test_full_resolved_incident_report" time="0.081" /><testcase classname="backend.tests.test_report_builder" name="test_rca_complete_only_report" time="0.066" /><testcase classname="backend.tests.test_report_builder" name="test_409_before_rca" time="0.054" /><testcase classname="backend.tests.test_report_builder" name="test_404_unknown_incident" time="0.032" /><testcase classname="backend.tests.test_security.TestCategory1RemediationAllowlist" name="test_disallowed_action_type_rejected_before_db_write" time="0.002" /><testcase classname="backend.tests.test_security.TestCategory1RemediationAllowlist" name="test_unexpected_params_rejected_by_policy" time="0.002" /><testcase classname="backend.tests.test_security.TestCategory1RemediationAllowlist" name="test_unsupported_handler_returns_501" time="0.069" /><testcase classname="backend.tests.test_security.TestCategory2AIOutputValidation" name="test_hallucinated_evidence_id_rejected" time="0.001" /><testcase classname="backend.tests.test_security.TestCategory2AIOutputValidation" name="test_out_of_allowlist_action_type_in_ai_output_rejected" time="0.002" /><testcase classname="backend.tests.test_security.TestCategory2AIOutputValidation" name="test_no_eval_exec_subprocess_with_ai_strings" time="0.006" /><testcase classname="backend.tests.test_security.TestCategory3GitSubprocessSafety" name="test_subprocess_uses_list_args_not_shell_true" time="0.002" /><testcase classname="backend.tests.test_security.TestCategory3GitSubprocessSafety" name="test_malicious_service_name_in_git_evidence" time="2.016" /><testcase classname="backend.tests.test_security.TestCategory4RazorpayWebhookIntegrity" name="test_tampered_signature_rejected_400" time="0.026" /><testcase classname="backend.tests.test_security.TestCategory4RazorpayWebhookIntegrity" name="test_duplicate_event_id_ignored" time="0.084" /><testcase classname="backend.tests.test_security.TestCategory4RazorpayWebhookIntegrity" name="test_missing_event_id_rejected_400" time="0.012" /><testcase classname="backend.tests.test_security.TestCategory5GitHubCredentialHandling" name="test_github_token_never_in_response_body" time="0.067" /><testcase classname="backend.tests.test_security.TestCategory5GitHubCredentialHandling" name="test_malformed_github_repo_unconfigured" time="0.028" /><testcase classname="backend.tests.test_security.TestCategory6InputValidationOnPublicEndpoints" name="test_invalid_status_filter_returns_400" time="0.041" /><testcase classname="backend.tests.test_security.TestCategory6InputValidationOnPublicEndpoints" name="test_empty_approved_by_returns_400" time="0.060" /><testcase classname="backend.tests.test_verification_engine" name="test_real_recovery_flow" time="25.526"><failure message="AssertionError: Expected detection pass to detect a high error rate incident!&#10;assert 0 &gt; 0&#10; +  where 0 = len([])">tests\test_verification_engine.py:90: in test_real_recovery_flow
+    assert len(detection_res) &gt; 0, "Expected detection pass to detect a high error rate incident!"
+E   AssertionError: Expected detection pass to detect a high error rate incident!
+E   assert 0 &gt; 0
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_verification_engine" name="test_real_non_recovery" time="26.927" /><testcase classname="backend.tests.test_verification_engine" name="test_verification_requires_remediated_incident" time="0.029" /><testcase classname="backend.tests.test_verification_engine" name="test_verification_is_one_shot" time="0.029" /><testcase classname="backend.tests.test_verification_engine" name="test_transient_prometheus_failure_is_recorded_and_polling_continues" time="0.028" /><testcase classname="backend.tests.test_verification_route" name="test_get_verification_returns_404_for_unknown_incident" time="0.024" /><testcase classname="backend.tests.test_verification_route" name="test_run_verification_returns_404_for_unknown_incident" time="0.022" /><testcase classname="backend.tests.test_verification_route" name="test_run_verification_returns_409_if_not_remediated" time="0.153" /><testcase classname="backend.tests.test_verification_route" name="test_run_verification_returns_409_if_already_verified" time="0.071" /><testcase classname="backend.tests.test_verification_route" name="test_get_verification_returns_null_before_running" time="0.037" /><testcase classname="backend.tests.test_verification_route" name="test_happy_path_run_verification_with_real_recovery" time="25.305"><failure message="AssertionError: Expected detection to find an incident&#10;assert 0 &gt; 0&#10; +  where 0 = len([])">tests\test_verification_route.py:191: in test_happy_path_run_verification_with_real_recovery
+    assert len(detection_results) &gt; 0, "Expected detection to find an incident"
+E   AssertionError: Expected detection to find an incident
+E   assert 0 &gt; 0
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_verification_route" name="test_happy_path_get_verification_after_run" time="0.072" /><testcase classname="backend.tests.test_verification_route" name="test_run_verification_non_recovery" time="25.418"><failure message="assert 0 &gt; 0&#10; +  where 0 = len([])">tests\test_verification_route.py:329: in test_run_verification_non_recovery
+    assert len(detection_results) &gt; 0
+E   assert 0 &gt; 0
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_verification_route" name="test_double_click_protection" time="0.069" /></testsuite></testsuites>

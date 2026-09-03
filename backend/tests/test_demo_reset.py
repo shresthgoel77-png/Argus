@@ -83,8 +83,26 @@ def test_demo_reset_clears_data(security_db, monkeypatch):
     assert detection_status.last_run_at is None
     assert detection_status.last_run_new_incidents == 0
 
+    # Ensure simulator was effectively reset
+    state_res = sim_client.get("/simulate/state")
+    assert state_res.status_code == 200
+    assert state_res.json()["bad_deployment_active"] is False
+
 
 def test_simulator_warm_up():
+    def get_checkout_count():
+        res = sim_client.get("/metrics")
+        count = 0.0
+        for line in res.text.split("\n"):
+            if line.startswith('http_requests_total{endpoint="/api/checkout"'):
+                try:
+                    count += float(line.split()[1])
+                except Exception:
+                    pass
+        return count
+
+    initial_count = get_checkout_count()
+
     res = sim_client.post("/simulate/warm-up?requests=10")
     assert res.status_code == 200
     data = res.json()
@@ -94,3 +112,6 @@ def test_simulator_warm_up():
     assert "2xx" in summary
     assert "5xx" in summary
     assert summary["2xx"] + summary["5xx"] == 10
+
+    final_count = get_checkout_count()
+    assert (final_count - initial_count) == 10

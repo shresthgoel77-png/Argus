@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="15" time="127.541" timestamp="2026-09-04T02:02:16.317567+05:30" hostname="shresth"><testcase classname="backend.tests.test_ai_evidence_package" name="test_build_evidence_package_returns_correct_structure" time="0.067" /><testcase classname="backend.tests.test_ai_evidence_package" name="test_build_evidence_package_zero_evidence" time="0.029" /><testcase classname="backend.tests.test_ai_evidence_package" name="test_clean_json_response_strips_markdown" time="0.019" /><testcase classname="backend.tests.test_ai_evidence_package" name="test_call_rca_model_returns_parseable_json" time="1.280"><failure message="app.ai.client.AICallError: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 28.178711168s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '28s'}]}}">evidence_package = {'incident': {'id': 1, 'type': 'CrashLoopBackOff', 'service': 'frontend', 'severity': 'high', ...}, 'evidence': [{'id'... 'observed_fact', 'content': {'log': 'OOMKilled process', 'source': 'kubectl'}, 'created_at': '2026-01-01T10:05:00Z'}]}
+
+    def call_rca_model(evidence_package: dict) -&gt; dict:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise AICallError("GEMINI_API_KEY environment variable is missing or empty.")
+    
+        client = genai.Client(api_key=api_key)
+        model = os.getenv("AI_MODEL", "gemini-2.5-flash")
+    
+        system_prompt = build_system_prompt()
+        user_prompt = build_rca_prompt(evidence_package)
+    
+        try:
+&gt;           response = client.models.generate_content(
+                model=model,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    response_mime_type="application/json",
+                    temperature=0.2
+                )
+            )
+
+app\ai\client.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\google\genai\models.py:6270: in generate_content
+    response = self._generate_content(
+..\.venv\Lib\site-packages\google\genai\models.py:4707: in _generate_content
+    response = self._api_client.request(
+..\.venv\Lib\site-packages\google\genai\_api_client.py:1747: in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\google\genai\_api_client.py:1534: in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:470: in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:371: in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:413: in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\tenacity\__init__.py:184: in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:447: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:396: in __get_result
+    raise self._exception
+..\.venv\Lib\site-packages\tenacity\__init__.py:473: in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+..\.venv\Lib\site-packages\google\genai\_api_client.py:1511: in _request_once
+    errors.APIError.raise_for_response(response)
+..\.venv\Lib\site-packages\google\genai\errors.py:173: in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+cls = &lt;class 'google.genai.errors.APIError'&gt;, status_code = 429
+response_json = {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For m...imensions': {...}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '28s'}]}}
+response = &lt;Response [429 Too Many Requests]&gt;
+
+    @classmethod
+    def raise_error(
+        cls,
+        status_code: int,
+        response_json: Any,
+        response: Optional[
+            Union[
+                'ReplayResponse',
+                httpx.Response,
+                'requests.Response',
+            ]
+        ],
+    ) -&gt; None:
+      """Raises an appropriate APIError subclass based on the status code.
+    
+      Args:
+        status_code: The HTTP status code of the response.
+        response_json: The JSON body of the response, or a dict containing error
+          details.
+        response: The original response object.
+    
+      Raises:
+        ClientError: If the status code is in the 4xx range.
+        ServerError: If the status code is in the 5xx range.
+        APIError: For other error status codes.
+      """
+      if 400 &lt;= status_code &lt; 500:
+&gt;       raise ClientError(status_code, response_json, response)
+E       google.genai.errors.ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 28.178711168s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '28s'}]}}
+
+..\.venv\Lib\site-packages\google\genai\errors.py:202: ClientError
+
+The above exception was the direct cause of the following exception:
+
+&gt;   ???
+
+C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_ai_evidence_package.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+evidence_package = {'incident': {'id': 1, 'type': 'CrashLoopBackOff', 'service': 'frontend', 'severity': 'high', ...}, 'evidence': [{'id'... 'observed_fact', 'content': {'log': 'OOMKilled process', 'source': 'kubectl'}, 'created_at': '2026-01-01T10:05:00Z'}]}
+
+    def call_rca_model(evidence_package: dict) -&gt; dict:
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise AICallError("GEMINI_API_KEY environment variable is missing or empty.")
+    
+        client = genai.Client(api_key=api_key)
+        model = os.getenv("AI_MODEL", "gemini-2.5-flash")
+    
+        system_prompt = build_system_prompt()
+        user_prompt = build_rca_prompt(evidence_package)
+    
+        try:
+            response = client.models.generate_content(
+                model=model,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    response_mime_type="application/json",
+                    temperature=0.2
+                )
+            )
+        except Exception as e:
+&gt;           raise AICallError(f"Failed to call Gemini API: {str(e)}") from e
+E           app.ai.client.AICallError: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\nPlease retry in 28.178711168s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.5-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '28s'}]}}
+
+app\ai\client.py:49: AICallError</failure></testcase><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_returns_404_for_unknown_incident" time="0.046" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_returns_409_for_non_investigated_incident" time="0.043" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_returns_409_for_duplicate_rca" time="0.050" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_validate_rca_output_rejects_hallucinated_evidence_id" time="0.021" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_validate_rca_output_rejects_invalid_remediation_type" time="0.019" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_validate_rca_output_accepts_valid_response" time="0.017" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_engine_retry_then_fail_on_hallucinated_response" time="0.076" /><testcase classname="backend.tests.test_ai_rca_engine" name="test_rca_happy_path_real_ai" time="0.498"><failure message="AssertionError: Expected 200, got 502: {&quot;detail&quot;:&quot;AI call failed: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 26.057046575s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '26s'}]}}&quot;}&#10;assert 502 == 200&#10; +  where 502 = &lt;Response [502 Bad Gateway]&gt;.status_code">&gt;   ???
+E   AssertionError: Expected 200, got 502: {"detail":"AI call failed: Failed to call Gemini API: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-2.5-flash\\nPlease retry in 26.057046575s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '26s'}]}}"}
+E   assert 502 == 200
+E    +  where 502 = &lt;Response [502 Bad Gateway]&gt;.status_code
+
+C:\Users\HP\Desktop\.vscode\Argus man\Argus-main\ai-reliability-engineer\backend\tests\test_ai_rca_engine.py:325: AssertionError</failure></testcase><testcase classname="backend.tests.test_demo_reset" name="test_demo_reset_403_when_disabled" time="0.122" /><testcase classname="backend.tests.test_demo_reset" name="test_demo_reset_clears_data" time="1.437" /><testcase classname="backend.tests.test_demo_reset" name="test_simulator_warm_up" time="0.793" /><testcase time="0.037" /></testsuite></testsuites>

@@ -52,10 +52,18 @@ async def detection_poll_loop():
         except Exception as e:
             logger.error(f"Error in background detection loop: {e}")
 
+poll_task = None
+
 @app.on_event("startup")
 async def startup_event():
-    if os.getenv("DEMO_MODE", "").lower() == "true":
-        logger.warning("DEMO_MODE=true is enabled! /demo routes are exposed. Do not use in production.")
+    global poll_task
+    if os.getenv("DEMO_MODE", "").lower() != "true":
+        logger.warning("DEMO_MODE is not true: destructive rehearsal/reset endpoint exists but is disabled.")
         
-    asyncio.create_task(detection_poll_loop())
+    poll_task = asyncio.create_task(detection_poll_loop())
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    if poll_task:
+        poll_task.cancel()
 

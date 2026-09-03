@@ -15,3 +15,7 @@ node_modules/
 /prometheus.zip
 /prometheus/
 /data/
+
+*.exe
+*.zip
+*.log

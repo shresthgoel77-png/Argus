@@ -100,6 +100,14 @@ def run_rca(incident_id: int, db_session: Session) -> dict:
     Raises IncidentNotFoundError / RCAStateError / AIServiceError.
     """
 
+    logger.info("🔍 Initiating AI Root Cause Analysis for incident #%s...", incident_id)
+
+    # 0. Early env-var check for demo clarity
+    import os
+    if not os.getenv("GEMINI_API_KEY"):
+        logger.error("❌ GEMINI_API_KEY is not set — cannot run AI RCA")
+        raise AIServiceError("GEMINI_API_KEY environment variable is missing or empty.")
+
     # 1. Fetch incident
     incident = db_session.query(Incident).filter(Incident.id == incident_id).first()
     if incident is None:
@@ -124,9 +132,11 @@ def run_rca(incident_id: int, db_session: Session) -> dict:
         )
 
     # 4. Build evidence package
+    logger.info("📦 Building evidence package for incident #%s...", incident_id)
     evidence_package = build_evidence_package(incident, db_session)
 
     # 5. Call AI model
+    logger.info("🤖 Calling Gemini AI model for RCA...", )
     try:
         raw_response = call_rca_model(evidence_package)
     except (AICallError, AIResponseParseError) as exc:
@@ -138,7 +148,7 @@ def run_rca(incident_id: int, db_session: Session) -> dict:
         validated = validate_rca_output(raw_response, evidence_package)
     except RCAValidationError as first_error:
         logger.warning(
-            "RCA validation failed for incident %s (attempt 1): %s",
+            "⚠️ RCA validation failed for incident #%s (attempt 1): %s",
             incident_id, first_error,
         )
         _persist_error(
@@ -148,6 +158,7 @@ def run_rca(incident_id: int, db_session: Session) -> dict:
         )
 
         # Retry ONCE with a stricter prompt including the exact error
+        logger.info("🔄 Retrying AI call with stricter prompt for incident #%s...", incident_id)
         retry_prompt = build_rca_retry_prompt(
             evidence_package, str(first_error), raw_response,
         )
@@ -163,7 +174,7 @@ def run_rca(incident_id: int, db_session: Session) -> dict:
             validated = validate_rca_output(raw_response_2, evidence_package)
         except RCAValidationError as second_error:
             logger.warning(
-                "RCA validation failed for incident %s (attempt 2): %s",
+                "❌ RCA validation failed for incident #%s (attempt 2, final): %s",
                 incident_id, second_error,
             )
             _persist_error(
@@ -176,10 +187,12 @@ def run_rca(incident_id: int, db_session: Session) -> dict:
             ) from second_error
 
     # 7. Success — persist validated RCA
+    logger.info("✨ AI RCA validated successfully for incident #%s!", incident_id)
     rca_dict = validated.model_dump()
     evidence_row = _persist_success(db_session, incident, rca_dict)
 
     # 8. Return result
+    logger.info("✅ RCA complete — incident #%s status → rca_complete (evidence_id=%s)", incident_id, evidence_row.id)
     return {
         "incident_id": incident.id,
         "rca": rca_dict,

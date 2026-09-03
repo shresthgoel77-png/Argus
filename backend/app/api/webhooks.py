@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 import os
 import datetime
 from collections import OrderedDict
@@ -10,6 +11,8 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models import Incident
 from app.github.engine import auto_create_incident_issue
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
@@ -31,57 +34,71 @@ async def razorpay_webhook(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
-    raw_body = await request.body()
-    signature_header = request.headers.get("X-Razorpay-Signature")
-    secret = os.getenv("RAZORPAY_WEBHOOK_SECRET", "test_webhook_secret_change_me")
-    
-    if not verify_signature(secret, raw_body, signature_header):
-        # Create incident
-        incident = Incident(
-            type="webhook_failure",
-            service="simulator",
-            severity="high",
-            timestamp=datetime.datetime.now(datetime.timezone.utc),
-            trigger="tampered_signature",
-            status="open",
-            initial_metrics={"firing": True, "value": 1.0, "type": "webhook_failure"}
-        )
-        db.add(incident)
-        db.commit()
-        db.refresh(incident)
-        
-        background_tasks.add_task(auto_create_incident_issue, incident.id)
-        return JSONResponse(status_code=400, content={"status": "invalid_signature"})
-
+    logger.info("📨 Razorpay webhook received — processing...")
     try:
-        body = json.loads(raw_body)
-    except (json.JSONDecodeError, UnicodeDecodeError, TypeError):
-        return JSONResponse(status_code=400, content={"status": "invalid_payload"})
+        raw_body = await request.body()
+        signature_header = request.headers.get("X-Razorpay-Signature")
+        secret = os.getenv("RAZORPAY_WEBHOOK_SECRET", "test_webhook_secret_change_me")
 
-    event_id = body.get("id") if isinstance(body, dict) else None
-    if not isinstance(event_id, str) or not event_id:
-        return JSONResponse(status_code=400, content={"status": "missing_event_id"})
+        if not verify_signature(secret, raw_body, signature_header):
+            logger.warning("🚨 Signature verification FAILED — creating tampered-signature incident")
+            # Create incident
+            incident = Incident(
+                type="webhook_failure",
+                service="simulator",
+                severity="high",
+                timestamp=datetime.datetime.now(datetime.timezone.utc),
+                trigger="tampered_signature",
+                status="open",
+                initial_metrics={"firing": True, "value": 1.0, "type": "webhook_failure"}
+            )
+            db.add(incident)
+            db.commit()
+            db.refresh(incident)
 
-    if event_id in _seen_razorpay_event_ids:
-        # Create incident
-        incident = Incident(
-            type="webhook_failure",
-            service="simulator",
-            severity="high",
-            timestamp=datetime.datetime.now(datetime.timezone.utc),
-            trigger="duplicate_event",
-            status="open",
-            initial_metrics={"firing": True, "value": 1.0, "type": "webhook_failure"}
-        )
-        db.add(incident)
-        db.commit()
-        db.refresh(incident)
-        
-        background_tasks.add_task(auto_create_incident_issue, incident.id)
-        return JSONResponse(status_code=200, content={"status": "duplicate_ignored", "event_id": event_id})
+            background_tasks.add_task(auto_create_incident_issue, incident.id)
+            return JSONResponse(status_code=400, content={"status": "invalid_signature"})
 
-    _seen_razorpay_event_ids[event_id] = None
-    if len(_seen_razorpay_event_ids) > MAX_SEEN_EVENTS:
-        _seen_razorpay_event_ids.popitem(last=False)
+        logger.info("🔐 Signature verified successfully")
 
-    return JSONResponse(status_code=200, content={"status": "received", "event_id": event_id})
+        try:
+            body = json.loads(raw_body)
+        except (json.JSONDecodeError, UnicodeDecodeError, TypeError):
+            logger.warning("⚠️ Invalid JSON payload received")
+            return JSONResponse(status_code=400, content={"status": "invalid_payload"})
+
+        event_id = body.get("id") if isinstance(body, dict) else None
+        if not isinstance(event_id, str) or not event_id:
+            logger.warning("⚠️ Payload missing event ID")
+            return JSONResponse(status_code=400, content={"status": "missing_event_id"})
+
+        if event_id in _seen_razorpay_event_ids:
+            logger.warning("🔁 Duplicate event detected: %s — creating incident", event_id)
+            # Create incident
+            incident = Incident(
+                type="webhook_failure",
+                service="simulator",
+                severity="high",
+                timestamp=datetime.datetime.now(datetime.timezone.utc),
+                trigger="duplicate_event",
+                status="open",
+                initial_metrics={"firing": True, "value": 1.0, "type": "webhook_failure"}
+            )
+            db.add(incident)
+            db.commit()
+            db.refresh(incident)
+
+            background_tasks.add_task(auto_create_incident_issue, incident.id)
+            return JSONResponse(status_code=200, content={"status": "duplicate_ignored", "event_id": event_id})
+
+        _seen_razorpay_event_ids[event_id] = None
+        if len(_seen_razorpay_event_ids) > MAX_SEEN_EVENTS:
+            _seen_razorpay_event_ids.popitem(last=False)
+
+        event_type = body.get("event", "unknown")
+        logger.info("✅ Webhook processed — event_id=%s  type=%s", event_id, event_type)
+        return JSONResponse(status_code=200, content={"status": "received", "event_id": event_id})
+
+    except Exception as exc:
+        logger.exception("💥 Unexpected error processing Razorpay webhook: %s", exc)
+        return JSONResponse(status_code=500, content={"status": "internal_error", "detail": str(exc)})

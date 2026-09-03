@@ -1,10 +1,13 @@
 import datetime
+import logging
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
 from app.models import Incident, Evidence, RemediationAction, VerificationResult
 from app.github.client import get_github_status, create_github_issue, GitHubUnconfiguredError, GitHubAPIError
 from app.github.report_builder import build_rca_report
+
+logger = logging.getLogger(__name__)
 
 def create_incident_issue(incident_id: int, db: Session) -> dict:
     """
@@ -54,6 +57,7 @@ def create_incident_issue(incident_id: int, db: Session) -> dict:
     title = f"[AI-RCA] {incident.type} in {incident.service} ({incident.severity}) — {id_prefix}"
     
     # 7. Call client with error handling
+    logger.info("📤 Creating GitHub issue for incident #%s...", incident_id)
     try:
         result = create_github_issue(title, report_markdown)
     except GitHubAPIError as e:
@@ -81,7 +85,8 @@ def create_incident_issue(incident_id: int, db: Session) -> dict:
     )
     db.add(success_evidence)
     db.commit()
-    
+
+    logger.info("✅ GitHub issue #%s created: %s", result["issue_number"], result["issue_url"])
     return result
 
 def auto_create_incident_issue(incident_id: int) -> dict:
@@ -94,27 +99,31 @@ def auto_create_incident_issue(incident_id: int) -> dict:
     try:
         incident = db.query(Incident).filter(Incident.id == incident_id).first()
         if not incident:
+            logger.warning("⚠️ auto_create_incident_issue: incident #%s not found, skipping", incident_id)
             return {}
 
         status = get_github_status()
         if not status["configured"]:
+            logger.info("ℹ️ GitHub not configured — skipping auto-issue for incident #%s", incident_id)
             return {}
-            
+
         evidence_rows = db.query(Evidence).filter(Evidence.incident_id == incident_id).all()
-        
+
         report_markdown = build_rca_report(
             incident=incident,
             evidence_rows=evidence_rows,
             remediation_action=None,
             verification_result=None
         )
-        
+
         id_prefix = str(incident.id)[:8]
         title = f"[AI-RCA] {incident.type} in {incident.service} ({incident.severity}) — {id_prefix}"
-        
+
+        logger.info("📤 Auto-creating GitHub issue for incident #%s...", incident_id)
         try:
             result = create_github_issue(title, report_markdown)
         except GitHubAPIError as e:
+            logger.error("❌ GitHub API error for incident #%s: %s", incident_id, e)
             error_evidence = Evidence(
                 incident_id=incident.id,
                 category="github_issue_error",
@@ -124,7 +133,7 @@ def auto_create_incident_issue(incident_id: int) -> dict:
             db.add(error_evidence)
             db.commit()
             return {}
-            
+
         success_evidence = Evidence(
             incident_id=incident.id,
             category="github_issue",
@@ -137,7 +146,10 @@ def auto_create_incident_issue(incident_id: int) -> dict:
         )
         db.add(success_evidence)
         db.commit()
+        logger.info("✅ Auto-created GitHub issue #%s: %s", result["issue_number"], result["issue_url"])
         return result
+    except Exception as exc:
+        logger.exception("💥 Unexpected error in auto_create_incident_issue for incident #%s: %s", incident_id, exc)
+        return {}
     finally:
         db.close()
-

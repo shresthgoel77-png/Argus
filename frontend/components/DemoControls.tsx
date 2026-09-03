@@ -7,6 +7,7 @@ type Props = { onCompleted: () => void };
 export default function DemoControls({ onCompleted }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [resetConfirm, setResetConfirm] = useState(false);
 
   async function perform(action: "bad-deployment" | "reset" | "detection") {
     setBusy(action); setMessage(null);
@@ -99,9 +100,12 @@ export default function DemoControls({ onCompleted }: Props) {
 
   async function performRehearsal(action: "warm-up" | "reset-demo") {
     if (action === "reset-demo") {
-      if (!window.confirm("WARNING: This will destructively delete all demo data from the database. Are you sure?")) {
+      if (!resetConfirm) {
+        setResetConfirm(true);
+        setTimeout(() => setResetConfirm(false), 3000);
         return;
       }
+      setResetConfirm(false);
     }
     setBusy(`rehearsal-${action}`);
     setMessage(null);
@@ -166,7 +170,7 @@ export default function DemoControls({ onCompleted }: Props) {
           {busy === "rehearsal-warm-up" ? "Warming Up…" : "Warm Up Traffic"}
         </button>
         <button disabled={busy !== null} onClick={() => performRehearsal("reset-demo")} className="rounded bg-rose-900 border border-rose-500 px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-rose-800">
-          {busy === "rehearsal-reset-demo" ? "Resetting Demo…" : "Reset Demo Data"}
+          {busy === "rehearsal-reset-demo" ? "Resetting Demo…" : (resetConfirm ? "Click Again to Confirm" : "Reset Demo Data")}
         </button>
       </div>
 

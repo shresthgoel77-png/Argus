@@ -3,8 +3,8 @@ import time
 import httpx
 import os
 
-# Force alternative model for testing to avoid 429 quotas on gemini-2.5-flash
-os.environ["AI_MODEL"] = "gemini-1.5-flash"
+# Set model for testing
+os.environ["AI_MODEL"] = "gemini-2.5-flash"
 
 @pytest.fixture
 def SIMULATOR_URL():

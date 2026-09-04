@@ -24,6 +24,7 @@ export default function VerificationPanel({ incidentId, incidentStatus, evidence
             setRemediation(remAction);
         } catch (err: any) {
             console.error("Error fetching verification data:", err);
+            setErrorMsg(err.message || String(err));
         }
     }, [incidentId]);
 
@@ -49,7 +50,7 @@ export default function VerificationPanel({ incidentId, incidentStatus, evidence
     };
 
     // Render state: incident not yet remediated
-    if (incidentStatus === "open" || incidentStatus === "investigating" || 
+    if (incidentStatus === "open" || incidentStatus === "investigating" ||
         incidentStatus === "investigated" || incidentStatus === "rca_complete" ||
         incidentStatus === "remediation_proposed" || incidentStatus === "remediating" ||
         incidentStatus === "execution_failed") {
@@ -82,7 +83,7 @@ export default function VerificationPanel({ incidentId, incidentStatus, evidence
                 <p className="text-rose-300">
                     Remediation did not resolve the incident — recovery was not verified within the wait window.
                 </p>
-                
+
                 {verificationResult && verificationResult.after_metrics && (
                     <div className="mt-4 pt-4 border-t border-rose-900">
                         <h4 className="text-sm font-semibold text-rose-400 uppercase tracking-wide mb-3">Observed State</h4>
@@ -167,7 +168,7 @@ export default function VerificationPanel({ incidentId, incidentStatus, evidence
     if (incidentStatus === "resolved" && verificationResult && verificationResult.recovered) {
         const beforeMetrics = verificationResult.before_metrics;
         const afterMetrics = verificationResult.after_metrics;
-        const finalDetectorResult = afterMetrics && typeof afterMetrics === 'object' && 'final_detector_result' in afterMetrics 
+        const finalDetectorResult = afterMetrics && typeof afterMetrics === 'object' && 'final_detector_result' in afterMetrics
             ? (afterMetrics.final_detector_result as any)
             : null;
         const finalHealthStatus = afterMetrics && typeof afterMetrics === 'object' && 'final_health_status' in afterMetrics
@@ -239,7 +240,7 @@ export default function VerificationPanel({ incidentId, incidentStatus, evidence
     // Fallback
     return (
         <div className="mt-4 p-4 border border-slate-700 bg-slate-900 rounded text-slate-400">
-            Verification data unavailable
+            {errorMsg ? `Verification data unavailable: ${errorMsg}` : "Verification data unavailable"}
         </div>
     );
 }

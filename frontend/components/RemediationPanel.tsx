@@ -24,6 +24,9 @@ export default function RemediationPanel({ incidentId, incidentStatus, evidenceR
         } catch (err: any) {
             // Could be 404 which is fine (no action proposed yet)
             console.error(err);
+            if (!String(err).includes("404")) {
+                setErrorMsg(err.message || String(err));
+            }
         }
     }, [incidentId]);
 
@@ -104,8 +107,9 @@ export default function RemediationPanel({ incidentId, incidentStatus, evidenceR
                     <button
                         onClick={handlePropose}
                         disabled={loading}
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded font-medium disabled:opacity-50"
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded font-medium disabled:opacity-50 flex items-center gap-2"
                     >
+                        {loading && <div className="animate-spin h-4 w-4 border-2 border-slate-300 border-t-transparent rounded-full"></div>}
                         {loading ? "Proposing..." : "Propose Remediation"}
                     </button>
                 )}
@@ -123,15 +127,17 @@ export default function RemediationPanel({ incidentId, incidentStatus, evidenceR
                             <button
                                 onClick={handleApprove}
                                 disabled={loading || !nameInput.trim()}
-                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded font-medium disabled:opacity-50 text-sm"
+                                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded font-medium disabled:opacity-50 text-sm flex items-center gap-2"
                             >
+                                {loading && <div className="animate-spin h-3 w-3 border-2 border-slate-300 border-t-transparent rounded-full"></div>}
                                 Approve
                             </button>
                             <button
                                 onClick={handleReject}
                                 disabled={loading || !nameInput.trim()}
-                                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 rounded font-medium disabled:opacity-50 text-sm"
+                                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 rounded font-medium disabled:opacity-50 text-sm flex items-center gap-2"
                             >
+                                {loading && <div className="animate-spin h-3 w-3 border-2 border-slate-300 border-t-transparent rounded-full"></div>}
                                 Reject
                             </button>
                         </div>
@@ -142,8 +148,9 @@ export default function RemediationPanel({ incidentId, incidentStatus, evidenceR
                     <button
                         onClick={handleExecute}
                         disabled={loading}
-                        className="px-4 py-2 bg-amber-600 hover:bg-amber-700 rounded font-medium disabled:opacity-50 text-slate-950"
+                        className="px-4 py-2 bg-amber-600 hover:bg-amber-700 rounded font-medium disabled:opacity-50 text-slate-950 flex items-center gap-2"
                     >
+                        {loading && <div className="animate-spin h-4 w-4 border-2 border-slate-900 border-t-transparent rounded-full"></div>}
                         {loading ? "Executing..." : "Execute Remediation"}
                     </button>
                 )}

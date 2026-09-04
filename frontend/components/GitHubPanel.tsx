@@ -48,8 +48,9 @@ export default function GitHubPanel({ incidentId, incidentStatus }: Props) {
                 const issue = await getGitHubIssue(incidentId);
                 setGithubIssue(issue);
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Failed to fetch GitHub data:", err);
+            setIssueError(err.message || String(err));
         }
     }, [incidentId]);
 
@@ -190,6 +191,7 @@ export default function GitHubPanel({ incidentId, incidentStatus }: Props) {
                                 disabled={creatingIssue}
                                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded shadow transition flex items-center gap-2"
                             >
+                                {creatingIssue && <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>}
                                 {creatingIssue ? "Creating Issue..." : "Create GitHub Issue"}
                             </button>
                             {issueError && (
@@ -204,7 +206,7 @@ export default function GitHubPanel({ incidentId, incidentStatus }: Props) {
                         </div>
                     )
                 ) : (
-                    <div className="text-sm text-slate-500 italic">Checking GitHub configuration...</div>
+                    <div className="text-sm text-slate-500 italic">{issueError ? `Checking GitHub configuration failed: ${issueError}` : "Checking GitHub configuration..."}</div>
                 )}
             </div>
         </div>

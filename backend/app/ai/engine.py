@@ -207,26 +207,27 @@ def _call_retry(evidence_package: dict, retry_prompt: str) -> dict:
     from google import genai
     from google.genai import types
     from app.ai.prompt_builder import build_system_prompt
-    from app.ai.client import AICallError, AIResponseParseError, _clean_json_response
+    from app.ai.client import AICallError, AIResponseParseError, _clean_json_response, _GEMINI_SEMAPHORE
 
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise AICallError("GEMINI_API_KEY environment variable is missing or empty.")
 
     client = genai.Client(api_key=api_key)
-    model = os.getenv("AI_MODEL", "gemini-2.5-flash")
+    model = os.getenv("AI_MODEL", "gemini-3.6-flash")
     system_prompt = build_system_prompt()
 
     try:
-        response = client.models.generate_content(
-            model=model,
-            contents=retry_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=system_prompt,
-                response_mime_type="application/json",
-                temperature=0.1  # Lower temp for stricter adherence
+        with _GEMINI_SEMAPHORE:
+            response = client.models.generate_content(
+                model=model,
+                contents=retry_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    response_mime_type="application/json",
+                    temperature=0.1  # Lower temp for stricter adherence
+                )
             )
-        )
     except Exception as e:
         raise AICallError(f"Failed to call Gemini API (retry): {str(e)}") from e
 

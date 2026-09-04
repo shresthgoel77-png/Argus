@@ -46,9 +46,13 @@ async def detection_poll_loop():
     while True:
         await asyncio.sleep(poll_interval)
         try:
-            db = SessionLocal()
-            run_detection_pass(db, service="simulator")
-            db.close()
+            def sync_pass():
+                db = SessionLocal()
+                try:
+                    run_detection_pass(db, service="simulator")
+                finally:
+                    db.close()
+            await asyncio.to_thread(sync_pass)
         except Exception as e:
             logger.error(f"Error in background detection loop: {e}")
 

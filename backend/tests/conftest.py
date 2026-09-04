@@ -4,7 +4,7 @@ import httpx
 import os
 
 # Set model for testing
-os.environ["AI_MODEL"] = "gemini-2.5-flash"
+os.environ["AI_MODEL"] = "gemini-3.6-flash"
 
 @pytest.fixture
 def SIMULATOR_URL():

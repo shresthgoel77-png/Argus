@@ -3,6 +3,9 @@ import json
 from google import genai
 from google.genai import types
 from .prompt_builder import build_system_prompt, build_rca_prompt
+import threading
+
+_GEMINI_SEMAPHORE = threading.Semaphore(3)
 
 class AICallError(Exception):
     """Raised when the AI API call fails (timeout, auth, non-200, missing API key)."""
@@ -30,21 +33,22 @@ def call_rca_model(evidence_package: dict) -> dict:
         raise AICallError("GEMINI_API_KEY environment variable is missing or empty.")
         
     client = genai.Client(api_key=api_key)
-    model = os.getenv("AI_MODEL", "gemini-2.5-flash")
+    model = os.getenv("AI_MODEL", "gemini-3.6-flash")
     
     system_prompt = build_system_prompt()
     user_prompt = build_rca_prompt(evidence_package)
     
     try:
-        response = client.models.generate_content(
-            model=model,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=system_prompt,
-                response_mime_type="application/json",
-                temperature=0.2
+        with _GEMINI_SEMAPHORE:
+            response = client.models.generate_content(
+                model=model,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    response_mime_type="application/json",
+                    temperature=0.2
+                )
             )
-        )
     except Exception as e:
         raise AICallError(f"Failed to call Gemini API: {str(e)}") from e
         

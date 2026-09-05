@@ -1,4 +1,4 @@
-# 🛡️ AI Reliability Engineer
+# 🛡️ ARGUS 
 
 > **A closed-loop, automated reliability workflow: Detect, Investigate, Root-Cause, Auto-Remediate, and Verify.**
 

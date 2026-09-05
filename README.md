@@ -1,14 +1,18 @@
-# AI Reliability Engineer
+# 🛡️ AI Reliability Engineer
 
-The AI Reliability Engineer detects a real regression, investigates with real evidence, gets a validated AI root-cause analysis, executes a human-approved fix, and proves recovery. This is not a chatbot; it is a full, automated reliability workflow.
+> **A closed-loop, automated reliability workflow: Detect, Investigate, Root-Cause, Auto-Remediate, and Verify.**
 
-## Why this exists
+The AI Reliability Engineer detects a real regression, investigates with real evidence, gets a validated AI root-cause analysis, executes a human-approved fix, and proves recovery. This is **not** a chatbot; it is a full, automated reliability engineering workflow.
 
-While most "AI monitoring" demos stop at detection and anomaly alerts, this system closes the loop through verified recovery. It proves that an AI agent workflow can end with a safely executed remediation that demonstrably restores system health.
+## ✨ Why this exists
 
-## Architecture
+While most "AI monitoring" demos stop at detection and anomaly alerts, this system **closes the loop** through verified recovery. It proves that an AI agent workflow can end with a safely executed remediation that demonstrably restores system health.
 
-This project is structured as a locally-run hackathon demonstration. It uses Docker Compose for generic telemetry infrastructure and FastAPI for the core logic layer, prioritizing a fast, self-contained golden path over distributed environment scaffolding.
+---
+
+## 🏗️ Architecture & Component Responsibilities
+
+This project prioritizes a fast, self-contained **golden path** optimized for hackathon demonstration. It uses Docker Compose for generic telemetry infrastructure and FastAPI for the core logic layer.
 
 ```text
 +-------------------+       +-----------------------+       +-------------------+
@@ -24,136 +28,169 @@ This project is structured as a locally-run hackathon demonstration. It uses Doc
                         +-------------+ +-------------+         +-------------+
 ```
 
-*Note: Kubernetes, cloud deployment, and microservices were deliberately out of scope for this build to keep the focus tight and optimize for hackathon demonstration speed.*
+### 📁 Project Structure
 
-## Quick Start
-Run these commands locally from a clean clone:
+- **`/frontend`** (Next.js 15, React 19, Tailwind v4): The modern, reactive dashboard for operators to oversee the incident lifecycle, review evidence, and approve auto-remediations.
+- **`/backend`** (FastAPI, SQLite, google-genai): The core orchestration layer. Manages thresholds, collects telemetry, calls the Gemini LLM for RCA, and handles human-in-the-loop remediation and verification.
+- **`/simulator`** (FastAPI): Injects synthetic workloads, generates failures (latency, errors), and simulates webhook integrations (like Razorpay) for the backend to monitor.
+- **`/infrastructure`**: Contains Docker Compose configuration for a local `Prometheus` and `Loki` telemetry stack.
 
-**1. Start the telemetry infrastructure:**
+*(Note: Kubernetes, cloud deployment, and microservices were deliberately out of scope for this build to keep the focus tight and optimize for demonstration speed.)*
+
+---
+
+## 🔄 End-to-End Workflow
+
+The system facilitates a completely observable lifecycle for every incident:
+
+1. **Failure Injection**: Inject a simulated failure via the dashboard into the environment (e.g., bad deployment, external API outage).
+2. **Detection**: Deterministic thresholds trigger an incident based on real telemetry (no LLM).
+3. **Investigation & Evidence Collection**: The system autonomously gathers metrics, logs, git commits, and webhook data. It keeps observations strictly objective (facts vs. hypothesis).
+4. **AI Root Cause Analysis (RCA)**: Google Gemini analyzes the collected evidence. Its output is heavily validated against real facts to reject hallucinations.
+5. **Human Approval**: The AI proposes a remediation (e.g., `rollback_deployment`). A human must explicitly sign off on the UI.
+6. **Remediation Execution**: The backend executes the approved fix (e.g., initiating a rollback script).
+7. **Verification**: The system actively polls metrics *after* remediation to mathematically prove the incident is no longer firing.
+8. **Reporting & Recovery**: An automated Root Cause markdown report is generated and can be pushed as a real GitHub Issue.
+
+---
+
+## 🧠 AI Utilization & Safeguards
+
+The AI (Gemini) is treated as untrusted. Output is independently checked against the system's real evidence before being offered to users.
+
+- **Strict Pydantic Schemas**: LLM responses must strictly adhere to the `RCAOutput` schema (summary, impact, affected components, confidence, evidence, remediation).
+- **Hallucination Rejection**: Any claim made by the AI must map logically to the gathered evidence.
+- **Bounded Retries**: If the AI schema fails validation, the system automatically asks the model to correct itself within a bounded limit.
+- **No Direct Execution**: The LLM *cannot* directly mutate the system. It only proposes remediations from a strict allowlist.
+
+---
+
+## 🔌 Core Integrations
+
+- **Razorpay**: Provides a test-mode webhook layer to exercise external integration failures. Uses real signature validation (HMAC), payload idempotency, and correlation to test webhook outage detection. No real payments are processed.
+- **GitHub**: Supports real markdown report generation containing incident facts and RCA summaries. Optionally creates real GitHub issues. Fails gracefully if not configured.
+- **Google Gemini**: Powers the Root Cause Analysis engine.
+
+---
+
+## 🚀 Quick Start / Setup
+
+### ⚙️ Prerequisites
+- Docker & Docker Compose
+- Python 3.10+
+- Node.js 20+
+
+### 1. Environment Setup
+
+Copy `.env.example` to `.env` in the root (or `backend/`) and populate the core variables:
+
+```ini
+# Core Configuration
+DATABASE_URL=sqlite:///./app.db         # Local SQLite DB
+AI_API_KEY=your_gemini_api_key          # Gemini Execution
+
+# Telemetry
+PROMETHEUS_URL=http://localhost:9090
+LOKI_URL=http://localhost:3100
+
+# Optional Integrations
+GITHUB_TOKEN=your_github_token          # Issue write access
+GITHUB_REPO=owner/repo                  # Target repo to push reports
+RAZORPAY_KEY_ID=test_...                # Razorpay public key
+RAZORPAY_KEY_SECRET=...                 # Razorpay secret
+RAZORPAY_WEBHOOK_SECRET=your_secret     # Webhook signing secret
+```
+
+### 2. Start Services
+
+Open separate terminal windows/tabs for the following commands from a clean clone:
+
+**A. Telemetry Infrastructure:**
 ```bash
+cd infrastructure
 docker compose up -d
 ```
 
-**2. Start the Backend:**
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # Or .venv\Scripts\activate on Windows
-pip install -r requirements.txt
-python -m uvicorn app.main:app --port 8000
-```
-
-**3. Start the Simulator:**
+**B. Simulator System:**
 ```bash
 cd simulator
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python -m uvicorn app.main:app --port 8001
 ```
 
-**4. Start the Frontend:**
+**C. Core Backend:**
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python -m uvicorn app.main:app --port 8000
+```
+
+**D. Frontend Dashboard:**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-**5. Environment Setup:**
-Copy `.env.example` to `.env` in the root (or `backend/`) and populate the real variables used by the codebase:
-- `DATABASE_URL`: Connection string for the local SQLite database.
-- `GITHUB_TOKEN`: Target repo access token (only needs Issues: write).
-- `GITHUB_REPO`: Target repository to push incident reports (e.g., owner/repo).
-- `AI_API_KEY`: API key for Gemini execution.
-- `RAZORPAY_KEY_ID`: Razorpay public key for live checkout.
-- `RAZORPAY_KEY_SECRET`: Razorpay secret for checkout verification.
-- `RAZORPAY_WEBHOOK_SECRET`: Signing secret for validating incoming Razorpay webhooks.
-- `PROMETHEUS_URL`: Internal URL for the Prometheus instance.
-- `LOKI_URL`: Internal URL for the Loki logging instance.
+---
 
-## Running the demo golden path
+## 🎯 Running the Demo Golden Path
 
-Use the frontend dashboard to run the full incident lifecycle. For a timed recording, see [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+Access the main dashboard at `http://localhost:3000` to run the incident lifecycle.
 
-1. Click **"Trigger Bad Deployment"** to inject a simulated failure into the environment. 
-2. Wait a moment, then click **"Run Detection Pass"** to surface the incident.
-3. Open the newly detected incident from the incident list.
-4. Run the investigation pipeline to gather evidence. 
-5. Run the Root Cause Analysis (RCA).
-6. Click **"Propose Remediation"** based on the RCA findings.
-7. Enter your name and click **"Approve"** to sign off on the proposed fix.
-8. Click **"Execute Remediation"** to trigger the rollback.
-9. Wait for the system to settle, then click **"Run Verification"** to confirm recovery.
-10. Navigate to the GitHub panel to view and optionally publish the final incident report.
+1. Click **"Trigger Bad Deployment"** (or other failure scenario) to inject failure into the backend infrastructure simulator.
+2. Click **"Run Detection Pass"** (surfaces the incident based on the 1-minute `DETECTION_WINDOW` thresholds like Error Rate or Latency).
+3. Open the newly detected incident.
+4. Click **"Run Investigation"** to construct the chronological evidence timeline.
+5. Click **"Run Root Cause Analysis"** to prompt Gemini for its validated findings.
+6. Click **"Propose Remediation"**.
+7. Provide an explicit sign-off in the **Approval** step.
+8. Click **"Execute Remediation"**. The system executes the rollback.
+9. Wait for the system to settle, then click **"Run Verification"** to confirm recovery via telemetry.
+10. Review the final generated report via the GitHub integration panel.
 
-## How detection works
+### 🎭 Rehearsal tooling
+To ensure hackathon or live demonstrations are snappy, setting `DEMO_MODE=true` inside a `.env` file exposes endpoints to immediately inject traffic ("Warm Up Traffic") and securely flush databases ("Reset Demo Data"), while bypassing standard cooldown delays.
 
-Detection exclusively uses deterministic thresholds against real telemetry. No LLM is used for the detection phase. The system relies on a 1-minute `DETECTION_WINDOW` with deduplication and cooldown behavior. 
+---
 
-There are three detectors and thresholds configured by default:
-- **Error Rate**: Fires if the rate exceeds `0.05` (medium severity) or `0.15` (high severity).
-- **Latency (p95)**: Fires if latency exceeds `500ms` (medium) or `1500ms` (high).
-- **Webhook Failure**: Fires if Razorpay webhook failure rate exceeds `0.10` (medium) or `0.25` (high).
+## 🧪 Testing
 
-## How evidence is collected
+Comprehensive unit and integration tests are strictly separated into two domains:
 
-The system collects active signals from metrics, logs, git commits, and Razorpay webhook collectors. A core design decision limits the evidence layer to reporting an explicit separation of `observed_fact` and `hypothesis`. This layer never states a root cause directly, ensuring that data gathering remains objective for the downstream AI.
-
-## How AI RCA works
-
-RCA relies on a single model call utilizing a strict pydantic schema (`RCAOutput`) encompassing summary, impact, affected components, confidence, evidence, and an explicit `RemediationRecommendation`. AI output is heavily scrutinized: the system uses validation, hallucination rejection against observed facts, and bounded retries. The AI is treated as untrusted; its output is independently checked against the system's real evidence before being offered to users.
-
-## How remediation works
-
-Remediation uses a strict allowlist from schema configurations containing three possible types:
-- `rollback_deployment`
-- `restart_service`
-- `restart_container`
-
-Currently, **only `rollback_deployment` has a real execution handler** in this build. Attempting to execute `restart_service` or `restart_container` will return a 501 ("This remediation type isn't implemented in this build"). Remediations require a mandatory human-approval gate prior to execution; there is no auto-approve path.
-
-## How verification works
-
-Verification performs a real before-and-after comparison of the system components, applying bounded polling of the incident metrics. A `resolved` state means the detector explicitly confirmed the incident is no longer firing, whereas a `remediation_failed` result indicates the rollback was executed but system health did not recover within the designated window structure.
-
-## Razorpay relevance
-
-The Razorpay integration provides a test-mode webhook layer to exercise external integration failures. It encompasses real signature validation, payload idempotency, and correlation into evidence specifically for `webhook_failure` incidents. No real payment processing happens in this application, and no real credentials are required.
-
-## GitHub integration
-
-The backend supports real markdown report generation containing incident facts and RCA summaries, and provides real, optional GitHub issue creation. The GitHub integration degrades gracefully, meaning the core reliability workflow never fails if the GitHub API is unavailable or unconfigured.
-
-## Security model
-
-The codebase isolates credentials and critical paths using:
-- Pure environment-based secrets (none leaked in API or UI).
-- Remediation allowlists enforced at multiple system boundaries.
-- Tight AI output validation to safely ignore injected nonsense.
-- Complete lack of shell or subprocess exposure to AI prompts or request endpoints.
-- Constant-time signature comparison for webhook validation.
-
-The system security model is explicitly validated by `tests/test_security.py`.
-
-## Testing
-
-Fast unit/integration tests can be run via pytest:
 ```bash
+# Run all standard backend unit tests (no AI required)
 pytest backend/tests/
+
+# Run End-to-End simulation tests explicitly covering AI / Gemini execution
+pytest backend/tests/ -m e2e
 ```
-Tests explicitly validating AI and E2E mechanics are protected by the `@pytest.mark.e2e` marker. They can be triggered via `pytest -m e2e` and will automatically skip rather than fail if an `AI_API_KEY` is not present, ensuring clean CI boundaries.
+*Note: Back-end tests protected by the E2E marker fail gracefully or skip if the `AI_API_KEY` is not present, maintaining green core CI boundaries.*
 
-## Rehearsal tooling
+---
 
-The repository contains specific dev tooling to ensure live demonstrations are fast and flawless. A `.env.demo.example` file is included, which sets `DEMO_MODE=true` to decrease polling intervals and expose endpoints to inject traffic (**"Warm Up Traffic"**) and clear databases (**"Reset Demo Data"**). These features are heavily gated intentionally for rehearsal, non-production environments.
+## 🛡️ Security Model
 
-## Future extensions
+The system protects against runaway agents and credential spraying:
+- **Pure Environment Variables**: Secrets exist only in environment variables; zero leakages onto APIs or the UI.
+- **Remediation Allowlist**: The LLM cannot invent scripts. It must choose from `rollback_deployment`, `restart_service`, or `restart_container`.
+- **Validation-first**: Complete lack of shell/subprocess exposure to AI prompts or request endpoints.
+- **Cryptographic Validation**: Constant-time signature comparison for webhook validation prevents timing attacks.
+*(This model is continuously verified by `tests/test_security.py`)*
 
-As an optimized showcase architecture, several features were intentionally deferred and may be built in future updates:
-- Actual execution handlers for `restart_service` and `restart_container`.
-- Additional detector types (e.g., infrastructure saturation, complex SLI definitions). 
-- Diverse failure scenario injection.
-- Kubernetes-native bindings and cloud deployment.
-- Semantic incident-memory retrieval (e.g., "how did we fix this last time?").
-- Enterprise authentication, RBAC, and granular permissions.
-- Automatic or manual retry paths following an initial remediation failure.
+---
+
+## 🚧 Design Decisions & Limitations
+
+As an optimized showcase architecture, several features were intentionally deferred for speed and scope:
+
+- **Handler Execution**: Currently, only `rollback_deployment` has an actual underlying execution layer. Attempting to run `restart_service` results in a polite 501 ("Not Implemented").
+- **Local SQLite**: Optimizing for setup speed means relying on local `.db` files rather than Postgres.
+- **Single-Node**: Telemetry points locally; kubernetes/multi-node scaling bindings are deferred.
+- **Human-in-the-Middle limitation**: The system deliberately forces human approval for remediation. Future versions might offer automated fallback recovery policies.
+
+---

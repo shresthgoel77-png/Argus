@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
     database_url: str
+    log_level: str = "INFO"
     cors_origins: Union[List[str], str] = ["http://localhost:3000"]
 
     @field_validator("cors_origins", mode="before")

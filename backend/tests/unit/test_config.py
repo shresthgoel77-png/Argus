@@ -1,0 +1,41 @@
+import pytest
+from pydantic import ValidationError
+from app.core.config import Settings
+
+def test_config_loads_valid_values(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    
+    settings = Settings(_env_file=None)
+    assert settings.app_env == "test"
+    assert settings.database_url == "sqlite:///test.db"
+
+def test_config_invalid_app_env_fails(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "invalid_env")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    
+    with pytest.raises(ValidationError) as exc_info:
+        Settings(_env_file=None)
+    
+    assert "app_env" in str(exc_info.value)
+    
+def test_config_cors_origins_parsing(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.setenv("CORS_ORIGINS", "http://localhost:3000, http://localhost:8080")
+    
+    settings = Settings(_env_file=None)
+    
+    assert settings.cors_origins == ["http://localhost:3000", "http://localhost:8080"]
+
+def test_config_non_dev_requires_db(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("DATABASE_URL", "")
+    monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    
+    with pytest.raises(ValueError) as exc_info:
+        Settings(_env_file=None)
+        
+    assert "DATABASE_URL is required and must not be empty in non-development environments" in str(exc_info.value)

@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: repomedic-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: repomedic_user
+      POSTGRES_PASSWORD: repomedic_password
+      POSTGRES_DB: repomedic_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -27,3 +27,17 @@ Start the application with Uvicorn in development mode:
 ```bash
 uvicorn app.main:app --reload
 ```
+
+## Database Migrations
+
+This project uses Alembic for database migrations.
+
+To apply migrations:
+```bash
+alembic upgrade head
+```
+
+To autogenerate a new migration after updating models:
+```bash
+alembic revision --autogenerate -m "description of changes"
+```

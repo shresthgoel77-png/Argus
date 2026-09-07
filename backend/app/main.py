@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.health import router as health_router
+from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
 from app.api.errors import app_error_handler, global_exception_handler
@@ -31,4 +31,4 @@ app.add_middleware(
 def read_root():
     return {"service": "repomedic-backend", "status": "ok"}
 
-app.include_router(health_router, prefix="/api/v1")
+app.include_router(api_router, prefix="/api/v1")

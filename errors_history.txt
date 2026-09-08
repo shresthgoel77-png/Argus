@@ -1,0 +1,36 @@
+commit 4c5923841e9db74c721581ba73bafcbc22714e89
+Author: shresthgoel77-png <shresthgoel77@gmail.com>
+Date:   Mon Sep 7 23:21:01 2026 +0530
+
+    Standardized fastapi error handling
+
+diff --git a/backend/app/api/errors.py b/backend/app/api/errors.py
+new file mode 100644
+index 0000000..e76f18a
+--- /dev/null
++++ b/backend/app/api/errors.py
+@@ -0,0 +1,24 @@
++from fastapi import Request
++from fastapi.responses import JSONResponse
++from app.core.exceptions import AppError
++from app.core.logging import get_logger
++
++logger = get_logger(__name__)
++
++async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
++    """Handles expected AppError subclasses and returns a standardized JSON response."""
++    return JSONResponse(
++        status_code=exc.status_code,
++        content={"error": {"code": exc.code, "message": exc.message}},
++    )
++
++async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
++    """Fallback handler for unhandled exceptions to prevent stack trace leaks and return a 500."""
++    # Log the full traceback internally
++    logger.error(f"Unhandled server error: {str(exc)}", exc_info=exc)
++    
++    # Return a generic, safe response to the client
++    return JSONResponse(
++        status_code=500,
++        content={"error": {"code": "internal_server_error", "message": "An unexpected error occurred."}},
++    )

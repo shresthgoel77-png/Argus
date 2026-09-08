@@ -13,6 +13,13 @@ class Settings(BaseSettings):
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> Any:
         if isinstance(v, str):
+            v_stripped = v.strip()
+            if v_stripped.startswith("[") and v_stripped.endswith("]"):
+                import json
+                try:
+                    return json.loads(v_stripped)
+                except ValueError:
+                    pass
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
 

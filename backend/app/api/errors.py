@@ -17,6 +17,10 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
     # Log the full traceback internally
     logger.error(f"Unhandled server error: {str(exc)}", exc_info=exc)
     
+    # Do not return HTTP response for websocket connections
+    if request.scope.get("type") == "websocket":
+        raise exc
+    
     # Return a generic, safe response to the client
     return JSONResponse(
         status_code=500,

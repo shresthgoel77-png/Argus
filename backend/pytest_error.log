@@ -1,0 +1,40 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1
+collecting ... collected 2 items
+
+tests/unit/test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 50%]
+tests/unit/test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [100%]
+
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\main.py:16
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:16: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 2 passed, 4 warnings in 0.06s ========================

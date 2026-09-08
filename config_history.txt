@@ -1,0 +1,104 @@
+commit 7a47ee403fa26f8c3f9d6880e52693213a362b23
+Author: shresthgoel77-png <shresthgoel77@gmail.com>
+Date:   Mon Sep 7 23:28:45 2026 +0530
+
+    Implemented Integration Testing Foundation with Real Test Database
+
+diff --git a/backend/app/core/config.py b/backend/app/core/config.py
+index a35ae25..fb69cb6 100644
+--- a/backend/app/core/config.py
++++ b/backend/app/core/config.py
+@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
+ class Settings(BaseSettings):
+     app_env: Literal["development", "test", "production"] = "development"
+     database_url: str
++    test_database_url: str | None = None
+     log_level: str = "INFO"
+     cors_origins: Union[List[str], str] = ["http://localhost:3000"]
+ 
+
+commit 4e43f913c84e86d64f66511bcc83543bc043dfe9
+Author: shresthgoel77-png <shresthgoel77@gmail.com>
+Date:   Sun Sep 6 21:05:43 2026 +0530
+
+    Implemented Structured Logging Setup
+
+diff --git a/backend/app/core/config.py b/backend/app/core/config.py
+index 7867220..a35ae25 100644
+--- a/backend/app/core/config.py
++++ b/backend/app/core/config.py
+@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
+ class Settings(BaseSettings):
+     app_env: Literal["development", "test", "production"] = "development"
+     database_url: str
++    log_level: str = "INFO"
+     cors_origins: Union[List[str], str] = ["http://localhost:3000"]
+ 
+     @field_validator("cors_origins", mode="before")
+
+commit 37fa3423ec2fbfdb9064cd40e0dcd6ef33874e6e
+Author: shresthgoel77-png <shresthgoel77@gmail.com>
+Date:   Sun Sep 6 20:57:28 2026 +0530
+
+    Configuration Hardening: CORS & Environment Validation
+
+diff --git a/backend/app/core/config.py b/backend/app/core/config.py
+index c232cf4..7867220 100644
+--- a/backend/app/core/config.py
++++ b/backend/app/core/config.py
+@@ -1,11 +1,26 @@
+-from pydantic_settings import BaseSettings
++from typing import Literal, Any, List, Union
++from pydantic import field_validator, model_validator
++from pydantic_settings import BaseSettings, SettingsConfigDict
+ 
+ class Settings(BaseSettings):
+-    app_env: str = "development"
++    app_env: Literal["development", "test", "production"] = "development"
+     database_url: str
++    cors_origins: Union[List[str], str] = ["http://localhost:3000"]
+ 
+-    class Config:
+-        env_file = ".env"
+-        env_file_encoding = 'utf-8'
++    @field_validator("cors_origins", mode="before")
++    @classmethod
++    def assemble_cors_origins(cls, v: Any) -> Any:
++        if isinstance(v, str):
++            return [i.strip() for i in v.split(",") if i.strip()]
++        return v
++
++    @model_validator(mode="after")
++    def validate_requirements_for_env(self) -> 'Settings':
++        if self.app_env != "development":
++            if not self.database_url:
++                raise ValueError("DATABASE_URL is required and must not be empty in non-development environments")
++        return self
++
++    model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')
+ 
+ settings = Settings()
+
+commit 90beeae64b249a0881c9ace0214bca281ba35c98
+Author: shresthgoel77-png <shresthgoel77@gmail.com>
+Date:   Sun Sep 6 19:40:30 2026 +0530
+
+    PostgreSQL Local Development Integration
+
+diff --git a/backend/app/core/config.py b/backend/app/core/config.py
+new file mode 100644
+index 0000000..c232cf4
+--- /dev/null
++++ b/backend/app/core/config.py
+@@ -0,0 +1,11 @@
++from pydantic_settings import BaseSettings
++
++class Settings(BaseSettings):
++    app_env: str = "development"
++    database_url: str
++
++    class Config:
++        env_file = ".env"
++        env_file_encoding = 'utf-8'
++
++settings = Settings()

@@ -39,3 +39,17 @@ def test_global_exception_handler_returns_safe_500():
     # Ensure internals are not leaked in the content
     assert "ValueError" not in response.text
     assert "Some unexpected value error test message" not in response.text
+
+from fastapi import WebSocket
+
+@app_test.websocket("/test-ws")
+async def websocket_test(websocket: WebSocket):
+    await websocket.accept()
+    raise ValueError("WebSocket error test message")
+
+def test_global_exception_handler_ignores_websocket():
+    # WebSocket exceptions should NOT return JSONResponse, they should raise (and let ASGI server handle disconnect)
+    with pytest.raises(ValueError, match="WebSocket error test message"):
+        with client.websocket_connect("/test-ws"):
+            pass
+

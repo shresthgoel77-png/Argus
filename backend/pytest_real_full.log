@@ -1,0 +1,50 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1
+collecting ... collected 12 items
+
+tests/integration/test_migrations.py::test_alembic_upgrade_head_completes PASSED [  8%]
+tests/test_db_connection.py::test_connection PASSED                      [ 16%]
+tests/unit/test_config.py::test_config_loads_valid_values PASSED         [ 25%]
+tests/unit/test_config.py::test_config_invalid_app_env_fails PASSED      [ 33%]
+tests/unit/test_config.py::test_config_cors_origins_parsing PASSED       [ 41%]
+tests/unit/test_config.py::test_config_non_dev_requires_db PASSED        [ 50%]
+tests/unit/test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 58%]
+tests/unit/test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [ 66%]
+tests/unit/test_health.py::test_health_endpoint PASSED                   [ 75%]
+tests/unit/test_logging.py::test_configure_logging_development PASSED    [ 83%]
+tests/unit/test_logging.py::test_configure_logging_production PASSED     [ 91%]
+tests/unit/test_logging.py::test_get_logger PASSED                       [100%]
+
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\main.py:16
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:16: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 12 passed, 4 warnings in 8.48s ========================

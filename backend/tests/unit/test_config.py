@@ -30,6 +30,16 @@ def test_config_cors_origins_parsing(monkeypatch):
     
     assert settings.cors_origins == ["http://localhost:3000", "http://localhost:8080"]
 
+def test_config_cors_origins_json_parsing(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.setenv("CORS_ORIGINS", '["http://localhost:3000", "http://localhost:8080"]')
+    
+    settings = Settings(_env_file=None)
+    
+    assert settings.cors_origins == ["http://localhost:3000", "http://localhost:8080"]
+
+
 def test_config_non_dev_requires_db(monkeypatch):
     monkeypatch.setenv("APP_ENV", "production")
     monkeypatch.setenv("DATABASE_URL", "")

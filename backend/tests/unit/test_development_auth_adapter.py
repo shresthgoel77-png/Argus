@@ -1,5 +1,5 @@
 import pytest
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -28,13 +28,13 @@ def test_app(auth_provider):
         }
 
     @app.post("/login")
-    async def do_login(request: Request, response: Response):
-        await auth_provider.login(request, response)
+    async def do_login(request: Request):
+        await auth_provider.login(request)
         return {"ok": True}
 
     @app.post("/logout")
-    async def do_logout(request: Request, response: Response):
-        await auth_provider.logout(request, response)
+    async def do_logout(request: Request):
+        await auth_provider.logout(request)
         return {"ok": True}
 
     return app

@@ -25,7 +25,7 @@ class DevelopmentAuthProvider(AuthProvider):
             )
         return None
 
-    async def login(self, request: Request, response: Response, data: Optional[Dict[str, Any]] = None) -> Any:
+    async def login(self, request: Request, data: Optional[Dict[str, Any]] = None) -> Any:
         """
         Writes the signed session identifying the deterministic dev user.
         Takes no real credentials since there is exactly one identity.
@@ -33,7 +33,7 @@ class DevelopmentAuthProvider(AuthProvider):
         request.session["dev_auth_active"] = True
         return {"status": "success", "message": "Development session started"}
 
-    async def logout(self, request: Request, response: Response) -> Any:
+    async def logout(self, request: Request) -> Any:
         """
         Clears the session cookie identifying the deterministic dev user.
         """

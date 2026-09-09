@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
@@ -9,6 +10,8 @@ from app.core.exceptions import AppError
 logger = get_logger(__name__)
 
 app = FastAPI(title="RepoMedic Backend")
+
+app.add_middleware(SessionMiddleware, secret_key=settings.session_secret_key)
 
 app.add_exception_handler(AppError, app_error_handler)
 app.add_exception_handler(Exception, global_exception_handler)

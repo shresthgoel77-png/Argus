@@ -1,0 +1,306 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.14.1, langsmith-0.9.2, asyncio-1.4.0, timeout-2.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 22 items
+
+backend\tests\unit\test_auth_config_safety.py::test_settings_development_auth PASSED [  4%]
+backend\tests\unit\test_auth_config_safety.py::test_settings_test_env_auth PASSED [  9%]
+backend\tests\unit\test_auth_config_safety.py::test_settings_production_auth_safety PASSED [ 13%]
+backend\tests\unit\test_auth_factory_safety.py::test_factory_returns_dev_in_non_prod PASSED [ 18%]
+backend\tests\unit\test_auth_factory_safety.py::test_factory_raises_on_dev_in_production PASSED [ 22%]
+backend\tests\unit\test_auth_factory_safety.py::test_factory_raises_on_unrecognized PASSED [ 27%]
+backend\tests\unit\test_config.py::test_config_loads_valid_values PASSED [ 31%]
+backend\tests\unit\test_config.py::test_config_invalid_app_env_fails PASSED [ 36%]
+backend\tests\unit\test_config.py::test_config_cors_origins_parsing PASSED [ 40%]
+backend\tests\unit\test_config.py::test_config_cors_origins_json_parsing PASSED [ 45%]
+backend\tests\unit\test_config.py::test_config_non_dev_requires_db PASSED [ 50%]
+backend\tests\unit\test_development_auth_adapter.py::test_unauthenticated PASSED [ 54%]
+backend\tests\unit\test_development_auth_adapter.py::test_login_and_resolve FAILED [ 59%]
+backend\tests\unit\test_development_auth_adapter.py::test_logout FAILED  [ 63%]
+backend\tests\unit\test_development_auth_adapter.py::test_invalid_tampered_cookie PASSED [ 68%]
+backend\tests\unit\test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 72%]
+backend\tests\unit\test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [ 77%]
+backend\tests\unit\test_error_handling.py::test_global_exception_handler_ignores_websocket PASSED [ 81%]
+backend\tests\unit\test_health.py::test_health_endpoint PASSED           [ 86%]
+backend\tests\unit\test_logging.py::test_configure_logging_development PASSED [ 90%]
+backend\tests\unit\test_logging.py::test_configure_logging_production PASSED [ 95%]
+backend\tests\unit\test_logging.py::test_get_logger PASSED               [100%]
+
+================================== FAILURES ===================================
+___________________________ test_login_and_resolve ____________________________
+
+client = <starlette.testclient.TestClient object at 0x000001855CE3E210>
+
+    def test_login_and_resolve(client):
+        # Login sets the cookie
+        login_resp = client.post("/login")
+        assert login_resp.status_code == 200
+        assert "session" in login_resp.cookies
+    
+        # Resolving identity with the cookie
+>       me_resp = client.get("/me")
+                  ^^^^^^^^^^^^^^^^^
+
+backend\tests\unit\test_development_auth_adapter.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:482: in get
+    return super().get(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1053: in get
+    return self.request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:454: in request
+    return super().request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:356: in handle_request
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:353: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:338: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:454: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:396: in __get_result
+    raise self._exception
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:263: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\sessions.py:88: in __call__
+    await self.app(scope, receive, send_wrapper)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:2531: in app
+    await route.handle(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:1241: in handle
+    await super().handle(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:150: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:136: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:690: in app
+    raw_response = await run_endpoint_function(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:344: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\unit\test_development_auth_adapter.py:20: in get_me
+    ctx = await auth_provider.resolve_identity(request)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.auth.development.adapter.DevelopmentAuthProvider object at 0x000001855CE3E490>
+request = <starlette.requests.Request object at 0x000001855CD3AD50>
+
+    async def resolve_identity(self, request: Request) -> AuthContext | None:
+        """
+        Reads the signed session cookie data from request.session.
+        If populated with the dev marker, returns the deterministic dev identity.
+        Otherwise, returns None.
+        """
+        if request.session.get("dev_auth_active"):
+>           return AuthContext(
+                email=DEV_USER_EMAIL,
+                display_name=DEV_USER_DISPLAY_NAME,
+                external_auth_id=DEV_USER_EXTERNAL_ID
+            )
+E           pydantic_core._pydantic_core.ValidationError: 2 validation errors for AuthContext
+E           external_id
+E             Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+E               For further information visit https://errors.pydantic.dev/2.13/v/missing
+E           provider
+E             Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+E               For further information visit https://errors.pydantic.dev/2.13/v/missing
+
+backend\app\auth\development\adapter.py:21: ValidationError
+_________________________________ test_logout _________________________________
+
+client = <starlette.testclient.TestClient object at 0x000001855DF0C9D0>
+
+    def test_logout(client):
+        client.post("/login")
+>       me1 = client.get("/me")
+              ^^^^^^^^^^^^^^^^^
+
+backend\tests\unit\test_development_auth_adapter.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:482: in get
+    return super().get(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1053: in get
+    return self.request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:454: in request
+    return super().request(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:914: in send
+    response = self._send_handling_auth(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\httpx\_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:356: in handle_request
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\testclient.py:353: in handle_request
+    portal.call(self.app, scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:338: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:454: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:396: in __get_result
+    raise self._exception
+..\..\..\AppData\Roaming\Python\Python314\site-packages\anyio\from_thread.py:263: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\applications.py:90: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\sessions.py:88: in __call__
+    await self.app(scope, receive, send_wrapper)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:660: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:2531: in app
+    await route.handle(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:1241: in handle
+    await super().handle(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\routing.py:276: in handle
+    await self.app(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:150: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\..\AppData\Roaming\Python\Python314\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:136: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:690: in app
+    raw_response = await run_endpoint_function(
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\routing.py:344: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\unit\test_development_auth_adapter.py:20: in get_me
+    ctx = await auth_provider.resolve_identity(request)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.auth.development.adapter.DevelopmentAuthProvider object at 0x000001855DF0C050>
+request = <starlette.requests.Request object at 0x000001855CE09F40>
+
+    async def resolve_identity(self, request: Request) -> AuthContext | None:
+        """
+        Reads the signed session cookie data from request.session.
+        If populated with the dev marker, returns the deterministic dev identity.
+        Otherwise, returns None.
+        """
+        if request.session.get("dev_auth_active"):
+>           return AuthContext(
+                email=DEV_USER_EMAIL,
+                display_name=DEV_USER_DISPLAY_NAME,
+                external_auth_id=DEV_USER_EXTERNAL_ID
+            )
+E           pydantic_core._pydantic_core.ValidationError: 2 validation errors for AuthContext
+E           external_id
+E             Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+E               For further information visit https://errors.pydantic.dev/2.13/v/missing
+E           provider
+E             Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+E               For further information visit https://errors.pydantic.dev/2.13/v/missing
+
+backend\app\auth\development\adapter.py:21: ValidationError
+============================== warnings summary ===============================
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+backend\app\main.py:19
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:19: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\unit\test_development_auth_adapter.py::test_login_and_resolve - pydantic_core._pydantic_core.ValidationError: 2 validation errors for AuthContext
+external_id
+  Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+provider
+  Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+FAILED backend\tests\unit\test_development_auth_adapter.py::test_logout - pydantic_core._pydantic_core.ValidationError: 2 validation errors for AuthContext
+external_id
+  Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+provider
+  Field required [type=missing, input_value={'email': 'dev@repomedic....th_id': 'dev_local_123'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.13/v/missing
+================== 2 failed, 20 passed, 3 warnings in 1.26s ===================

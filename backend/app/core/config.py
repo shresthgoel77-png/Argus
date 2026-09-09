@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
     # To be extended with "clerk" etc. later
     auth_provider: Literal["development"] = "development"
+    session_secret_key: str = "dev_secret_key_change_me_in_production"
     database_url: str
     test_database_url: str | None = None
     log_level: str = "INFO"
@@ -31,9 +32,12 @@ class Settings(BaseSettings):
             if not self.database_url:
                 raise ValueError("DATABASE_URL is required and must not be empty in non-development environments")
         
-        if self.app_env == "production" and self.auth_provider == "development":
-            raise ValueError("Development auth provider cannot be used in production environment")
-            
+        if self.app_env == "production":
+            if self.auth_provider == "development":
+                raise ValueError("Development auth provider cannot be used in production environment")
+            if self.session_secret_key == "dev_secret_key_change_me_in_production":
+                raise ValueError("SESSION_SECRET_KEY must be overridden in production environment")
+                
         return self
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')

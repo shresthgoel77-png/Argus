@@ -1,5 +1,5 @@
-from typing import Protocol, Any, Dict
-from fastapi import Request
+from typing import Protocol, Any, Dict, Optional
+from fastapi import Request, Response
 from app.auth.context import AuthContext
 
 class AuthProvider(Protocol):
@@ -10,10 +10,10 @@ class AuthProvider(Protocol):
         """Resolve the authenticated identity from the given request."""
         ...
         
-    async def login(self, data: Dict[str, Any]) -> Any:
-        """Process a login request."""
+    async def login(self, request: Request, response: Response, data: Optional[Dict[str, Any]] = None) -> Any:
+        """Process a login request. Extended to support request/response mutation for cookies."""
         ...
         
-    async def logout(self, request: Request) -> Any:
-        """Process a logout request."""
+    async def logout(self, request: Request, response: Response) -> Any:
+        """Process a logout request. Extended to support request/response mutation for cookies."""
         ...

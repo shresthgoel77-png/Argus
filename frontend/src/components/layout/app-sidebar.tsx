@@ -22,7 +22,7 @@ type NavItem = {
 };
 
 const mainNavItems: NavItem[] = [
-    { label: "Overview", href: "/app", icon: LayoutDashboard },
+    { label: "Overview", href: "/overview", icon: LayoutDashboard },
     { label: "Repositories", href: "/app/repositories", icon: GitFork },
     { label: "Findings", href: "/app/findings", icon: Search },
     { label: "Pull Requests", href: "/app/pull-requests", icon: GitPullRequest },
@@ -36,8 +36,8 @@ const bottomNavItems: NavItem[] = [
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
     const isActive =
-        item.href === "/app"
-            ? pathname === "/app"
+        item.href === "/overview"
+            ? pathname === "/overview"
             : pathname.startsWith(item.href);
 
     return (

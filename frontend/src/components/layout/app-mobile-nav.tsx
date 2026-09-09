@@ -25,8 +25,8 @@ type AppMobileNavProps = {
 
 function MobileNavLink({ item, pathname }: { item: NavItem; pathname: string }) {
     const isActive =
-        item.href === "/app"
-            ? pathname === "/app"
+        item.href === "/overview"
+            ? pathname === "/overview"
             : pathname.startsWith(item.href);
 
     return (

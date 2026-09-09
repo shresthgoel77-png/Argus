@@ -14,14 +14,14 @@ export default function LoginPage() {
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
-            router.replace("/app");
+            router.replace("/overview");
         }
     }, [isAuthenticated, isLoading, router]);
 
     async function handleLogin() {
         setIsLoggingIn(true);
         await login();
-        router.replace("/app");
+        router.replace("/overview");
     }
 
     if (isLoading || isAuthenticated) {

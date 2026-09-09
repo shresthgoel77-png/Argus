@@ -34,8 +34,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = useCallback(async () => {
         try {
-            // For Phase 2/4 we use the devLogin fetch wrapper.
-            // In a later phase, this will be swapped for the Clerk/production logic.
             await devLogin();
             await refresh();
         } catch (error) {
@@ -54,6 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Determine initial auth state on mount
     useEffect(() => {
+        // The refresh function synchronizes the initial auth state with the API.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         refresh();
     }, [refresh]);
 

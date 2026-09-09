@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { MobileNav, type SiteNavItem } from "@/components/layout/mobile-nav";
 
 const navItems: SiteNavItem[] = [
@@ -35,8 +35,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost">Sign in</Button>
-          <Button>Get started</Button>
+          <Link href="/login" className={buttonVariants({ variant: "ghost" })}>Sign in</Link>
+          <Link href="/login" className={buttonVariants()}>Get started</Link>
         </div>
         <MobileNav items={navItems} />
       </div>

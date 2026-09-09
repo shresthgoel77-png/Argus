@@ -13,3 +13,7 @@ class NotFoundError(AppError):
 class ValidationAppError(AppError):
     def __init__(self, message: str = "Validation failed"):
         super().__init__(code="validation_error", message=message, status_code=422)
+
+class NotAuthenticatedError(AppError):
+    def __init__(self, message: str = "Not authenticated"):
+        super().__init__(code="not_authenticated", message=message, status_code=401)

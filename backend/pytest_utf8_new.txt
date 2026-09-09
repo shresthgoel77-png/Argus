@@ -6,37 +6,157 @@ configfile: pytest.ini
 plugins: anyio-4.15.1
 collecting ... collected 2 items
 
-tests/unit/test_user_model.py::test_create_user ERROR                    [ 50%]
-tests/unit/test_user_model.py::test_email_uniqueness ERROR               [100%]
+backend\tests\integration\test_auth_flow.py::test_auth_flow_e2e ERROR    [ 50%]
+backend\tests\integration\test_auth_flow.py::test_dev_login_fails_non_development_provider ERROR [100%]
 
 =================================== ERRORS ====================================
-_____________________ ERROR at setup of test_create_user ______________________
-file C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_user_model.py, line 6
-  def test_create_user(db_session):
-E       fixture 'db_session' not found
->       available fixtures: anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
->       use 'pytest --fixtures [testpath]' for help on them.
+____________________ ERROR at setup of test_auth_flow_e2e _____________________
 
-C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_user_model.py:6
-___________________ ERROR at setup of test_email_uniqueness ___________________
-file C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_user_model.py, line 26
-  def test_email_uniqueness(db_session):
-E       fixture 'db_session' not found
->       available fixtures: anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
->       use 'pytest --fixtures [testpath]' for help on them.
+    @pytest.fixture(scope="session")
+    def engine():
+        # Setup test engine
+        test_engine = create_engine(settings.database_url, pool_pre_ping=True)
+    
+        # Run alembic upgrade head using programmatic API
+        alembic_cfg = alembic.config.Config("alembic.ini")
+        alembic_cfg.set_main_option("script_location", "alembic")
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
+    
+>       alembic.command.upgrade(alembic_cfg, "head")
 
-C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_user_model.py:26
+backend\tests\integration\conftest.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <alembic.script.base.ScriptDirectory object at 0x00000138F1C71D30>
+dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+
+backend\venv\Lib\site-packages\alembic\script\base.py:99: CommandError
+_______ ERROR at setup of test_dev_login_fails_non_development_provider _______
+
+    @pytest.fixture(scope="session")
+    def engine():
+        # Setup test engine
+        test_engine = create_engine(settings.database_url, pool_pre_ping=True)
+    
+        # Run alembic upgrade head using programmatic API
+        alembic_cfg = alembic.config.Config("alembic.ini")
+        alembic_cfg.set_main_option("script_location", "alembic")
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
+    
+>       alembic.command.upgrade(alembic_cfg, "head")
+
+backend\tests\integration\conftest.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <alembic.script.base.ScriptDirectory object at 0x00000138F1C71D30>
+dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: str | os.PathLike[str],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: int | None = 40,
+        version_locations: None | (Sequence[str | os.PathLike[str]]) = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: str | None = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+
+backend\venv\Lib\site-packages\alembic\script\base.py:99: CommandError
 ============================== warnings summary ===============================
-venv\Lib\site-packages\fastapi\testclient.py:1
+backend\venv\Lib\site-packages\fastapi\testclient.py:1
   C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
     from starlette.testclient import TestClient as TestClient  # noqa
 
-venv\Lib\site-packages\starlette\testclient.py:53
+backend\venv\Lib\site-packages\starlette\testclient.py:53
   C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
     _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
 
-app\main.py:16
-  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:16: DeprecationWarning: 
+backend\app\main.py:19
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:19: DeprecationWarning: 
           on_event is deprecated, use lifespan event handlers instead.
   
           Read more about it in the
@@ -44,7 +164,7 @@ app\main.py:16
           
     @app.on_event("startup")
 
-venv\Lib\site-packages\fastapi\applications.py:4681
+backend\venv\Lib\site-packages\fastapi\applications.py:4681
   C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
           on_event is deprecated, use lifespan event handlers instead.
   
@@ -55,6 +175,6 @@ venv\Lib\site-packages\fastapi\applications.py:4681
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 =========================== short test summary info ===========================
-ERROR tests/unit/test_user_model.py::test_create_user
-ERROR tests/unit/test_user_model.py::test_email_uniqueness
-======================== 4 warnings, 2 errors in 0.35s ========================
+ERROR backend\tests\integration\test_auth_flow.py::test_auth_flow_e2e - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_auth_flow.py::test_dev_login_fails_non_development_provider - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+======================== 4 warnings, 2 errors in 0.25s ========================

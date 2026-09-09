@@ -4,6 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
+    # To be extended with "clerk" etc. later
+    auth_provider: Literal["development"] = "development"
     database_url: str
     test_database_url: str | None = None
     log_level: str = "INFO"
@@ -28,6 +30,10 @@ class Settings(BaseSettings):
         if self.app_env != "development":
             if not self.database_url:
                 raise ValueError("DATABASE_URL is required and must not be empty in non-development environments")
+        
+        if self.app_env == "production" and self.auth_provider == "development":
+            raise ValueError("Development auth provider cannot be used in production environment")
+            
         return self
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')

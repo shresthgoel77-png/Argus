@@ -59,3 +59,12 @@ npm run dev
 Once all three systems are running:
 - Open `http://localhost:3000` to review the frontend placeholder.
 - Open `http://localhost:8000/api/v1/health` to confirm the backend's database connectivity returns `"database": "connected"`.
+
+## 4. End-to-End Testing (Playwright)
+Once the database, backend, and frontend are running concurrently as described above, you can execute the E2E test suite. The E2E tests use Playwright to simulate browser flows, including programmatic dev logins and protected route bounds.
+
+### Running Tests
+```bash
+cd frontend
+npm run test:e2e
+```

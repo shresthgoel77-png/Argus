@@ -17,4 +17,18 @@ export default defineConfig({
             use: { ...devices['Desktop Chrome'] },
         },
     ],
+    webServer: [
+        {
+            command: 'cd ../backend && .\\venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8000',
+            url: 'http://localhost:8000/api/v1/health',
+            reuseExistingServer: true,
+            timeout: 120000,
+        },
+        {
+            command: 'npm run dev',
+            url: 'http://localhost:3000',
+            reuseExistingServer: true,
+            timeout: 120000,
+        }
+    ],
 });

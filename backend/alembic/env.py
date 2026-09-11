@@ -23,6 +23,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from app.db.base_class import Base
 from app.core.config import settings
 from app.models.user import User
+from app.models.github_connection import GitHubConnection
+from app.models.repository import Repository
 target_metadata = Base.metadata
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

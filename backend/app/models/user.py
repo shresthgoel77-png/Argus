@@ -1,8 +1,12 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import TYPE_CHECKING
 from app.db.base_class import Base
+
+if TYPE_CHECKING:
+    from app.models.github_connection import GitHubConnection
 
 class User(Base):
     __tablename__ = "users"
@@ -19,3 +23,5 @@ class User(Base):
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False
     )
+
+    github_connections: Mapped[list["GitHubConnection"]] = relationship(back_populates="user", cascade="all, delete-orphan")

@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+import { buttonVariants } from "@/components/ui/button";
 
 export function HeroSection() {
     return (
@@ -16,12 +18,12 @@ export function HeroSection() {
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-                <Button size="lg" disabled aria-disabled="true">
+                <Link href="/login" className={buttonVariants({ size: "lg" })}>
                     Get started free
-                </Button>
-                <Button variant="outline" size="lg" disabled aria-disabled="true">
+                </Link>
+                <Link href="#how-it-works" className={buttonVariants({ variant: "outline", size: "lg" })}>
                     See how it works
-                </Button>
+                </Link>
             </div>
         </section>
     );

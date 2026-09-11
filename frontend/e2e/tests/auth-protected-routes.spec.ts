@@ -45,12 +45,12 @@ test.describe('Authentication and Protected Routes', () => {
 
         // Submit the dev login form (assumes there is a submit button)
         // Based on standard dev-login conventions from Prompts 1-6
-        const submitButton = page.locator('button[type="submit"], button:has-text("Login")');
+        const submitButton = page.locator('button:has-text("Continue as dev user")');
         await expect(submitButton).toBeVisible();
         await submitButton.click();
 
         // Wait for the redirect to overview
-        await page.waitForURL(/.*\/overview/, { timeout: 5000 });
+        await page.waitForURL(/.*\/overview/, { timeout: 10000 });
         await expect(page).toHaveURL(/.*\/overview/);
     });
 

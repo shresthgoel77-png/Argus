@@ -46,7 +46,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
  */
 export async function devLogin(): Promise<AuthUser | null> {
     try {
-        const res = await fetchClient("/api/v1/dev-login", { method: "POST" });
+        const res = await fetchClient("/api/v1/auth/dev-login", { method: "POST" });
         if (!res.ok) {
             console.error("devLogin failed with status:", res.status);
             return null;
@@ -63,7 +63,7 @@ export async function devLogin(): Promise<AuthUser | null> {
  */
 export async function logout(): Promise<void> {
     try {
-        const res = await fetchClient("/api/v1/logout", { method: "POST" });
+        const res = await fetchClient("/api/v1/auth/logout", { method: "POST" });
         if (!res.ok) {
             console.error("logout failed with status:", res.status);
         }

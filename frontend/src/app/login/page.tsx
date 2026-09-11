@@ -40,7 +40,7 @@ export default function LoginPage() {
                     <CardDescription>Use the development identity to enter the app.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button className="w-full" onClick={handleLogin} loading={isLoggingIn}>
+                    <Button type="submit" className="w-full" onClick={handleLogin} loading={isLoggingIn}>
                         Continue as dev user
                     </Button>
                 </CardContent>

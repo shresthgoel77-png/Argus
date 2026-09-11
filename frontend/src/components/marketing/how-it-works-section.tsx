@@ -30,7 +30,7 @@ const steps = [
 
 export function HowItWorksSection() {
     return (
-        <section className="border-y bg-card px-6 py-20 lg:px-8">
+        <section id="how-it-works" className="border-y bg-card px-6 py-20 lg:px-8">
             <div className="mx-auto max-w-5xl">
                 <SectionHeading
                     eyebrow="How it works"

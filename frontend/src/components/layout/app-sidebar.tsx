@@ -23,15 +23,15 @@ type NavItem = {
 
 const mainNavItems: NavItem[] = [
     { label: "Overview", href: "/overview", icon: LayoutDashboard },
-    { label: "Repositories", href: "/app/repositories", icon: GitFork },
-    { label: "Findings", href: "/app/findings", icon: Search },
-    { label: "Pull Requests", href: "/app/pull-requests", icon: GitPullRequest },
-    { label: "Issues", href: "/app/issues", icon: CircleDot },
-    { label: "Activity", href: "/app/activity", icon: Activity },
+    { label: "Repositories", href: "/overview/repositories", icon: GitFork },
+    { label: "Findings", href: "/overview/findings", icon: Search },
+    { label: "Pull Requests", href: "/overview/pull-requests", icon: GitPullRequest },
+    { label: "Issues", href: "/overview/issues", icon: CircleDot },
+    { label: "Activity", href: "/overview/activity", icon: Activity },
 ];
 
 const bottomNavItems: NavItem[] = [
-    { label: "Settings", href: "/app/settings", icon: Settings },
+    { label: "Settings", href: "/overview/settings", icon: Settings },
 ];
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {

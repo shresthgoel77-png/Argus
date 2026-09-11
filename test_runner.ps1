@@ -6,8 +6,8 @@ docker compose up -d postgres
 Write-Host "Starting Backend..."
 $backendJob = Start-Job -ScriptBlock {
     cd backend
-    .\venv\Scripts\activate
-    uvicorn app.main:app --port 8000
+    .\venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
+
 }
 
 Write-Host "Starting Frontend..."

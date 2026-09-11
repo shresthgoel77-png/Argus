@@ -49,3 +49,33 @@ def test_config_non_dev_requires_db(monkeypatch):
         Settings(_env_file=None)
         
     assert "DATABASE_URL is required and must not be empty in non-development environments" in str(exc_info.value)
+
+def test_config_empty_github_app_id_fails(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.setenv("GITHUB_APP_ID", "")
+    
+    with pytest.raises(ValueError) as exc_info:
+        Settings(_env_file=None)
+    
+    assert "GITHUB_APP_ID is required and must not be empty" in str(exc_info.value)
+    
+def test_config_empty_github_app_slug_fails(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.setenv("GITHUB_APP_SLUG", "")
+    
+    with pytest.raises(ValueError) as exc_info:
+        Settings(_env_file=None)
+    
+    assert "GITHUB_APP_SLUG is required and must not be empty" in str(exc_info.value)
+
+def test_config_empty_github_app_private_key_fails(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.setenv("GITHUB_APP_PRIVATE_KEY", "")
+    
+    with pytest.raises(ValueError) as exc_info:
+        Settings(_env_file=None)
+    
+    assert "GITHUB_APP_PRIVATE_KEY is required and must not be empty" in str(exc_info.value)

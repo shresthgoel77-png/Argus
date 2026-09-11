@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     test_database_url: str | None = None
     log_level: str = "INFO"
     cors_origins: Union[List[str], str] = ["http://localhost:3000"]
+    
+    github_app_id: str
+    github_app_slug: str
+    github_app_private_key: str
+    github_app_install_state_ttl_seconds: int = 600
 
     @field_validator("cors_origins", mode="before")
     @classmethod
@@ -28,6 +33,13 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_requirements_for_env(self) -> 'Settings':
+        if not self.github_app_id:
+            raise ValueError("GITHUB_APP_ID is required and must not be empty")
+        if not self.github_app_slug:
+            raise ValueError("GITHUB_APP_SLUG is required and must not be empty")
+        if not self.github_app_private_key:
+            raise ValueError("GITHUB_APP_PRIVATE_KEY is required and must not be empty")
+
         if self.app_env != "development":
             if not self.database_url:
                 raise ValueError("DATABASE_URL is required and must not be empty in non-development environments")

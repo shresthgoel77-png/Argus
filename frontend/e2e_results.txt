@@ -1,0 +1,7 @@
+﻿
+Running 2 tests using 2 workers
+
+  Γ£ô  2 [chromium] ΓÇ║ e2e\tests\repositories-page.spec.ts:9:9 ΓÇ║ Repositories Page Flow ΓÇ║ shows empty state and links to settings when no connections exist (860ms)
+  Γ£ô  1 [chromium] ΓÇ║ e2e\tests\repositories-page.spec.ts:37:9 ΓÇ║ Repositories Page Flow ΓÇ║ shows connections, adds a repository, and toggles monitoring (2.1s)
+
+  2 passed (3.6s)

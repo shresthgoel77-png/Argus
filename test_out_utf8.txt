@@ -1,0 +1,263 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.14.1, langsmith-0.9.2, asyncio-1.4.0, timeout-2.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 3 items
+
+backend\tests\integration\test_github_api.py::test_github_install_flow ERROR [ 33%]
+backend\tests\integration\test_github_api.py::test_github_install_callback_rejections ERROR [ 66%]
+backend\tests\integration\test_github_api.py::test_github_endpoints_unauthenticated ERROR [100%]
+
+=================================== ERRORS ====================================
+_________________ ERROR at setup of test_github_install_flow __________________
+
+fixturedef = <FixtureDef argname='engine' scope='session' baseid='tests/integration'>
+request = <SubRequest 'engine' for <Function test_github_install_flow>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        if (
+            fixturedef.argname == "event_loop_policy"
+            and fixturedef.func.__module__ != __name__
+        ):
+            warnings.warn(
+                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
+            )
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+..\..\..\AppData\Roaming\Python\Python314\site-packages\pytest_asyncio\plugin.py:924: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:186: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <alembic.script.base.ScriptDirectory object at 0x00000200CE2A74D0>
+dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: Union[str, os.PathLike[str]],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: Optional[int] = 40,
+        version_locations: Optional[
+            Sequence[Union[str, os.PathLike[str]]]
+        ] = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: Optional[str] = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:105: CommandError
+__________ ERROR at setup of test_github_install_callback_rejections __________
+
+    @pytest.fixture(scope="session")
+    def engine():
+        # Setup test engine
+        test_engine = create_engine(settings.database_url, pool_pre_ping=True)
+    
+        # Run alembic upgrade head using programmatic API
+        alembic_cfg = alembic.config.Config("alembic.ini")
+        alembic_cfg.set_main_option("script_location", "alembic")
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
+    
+>       alembic.command.upgrade(alembic_cfg, "head")
+
+backend\tests\integration\conftest.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:186: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <alembic.script.base.ScriptDirectory object at 0x00000200CE2A74D0>
+dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: Union[str, os.PathLike[str]],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: Optional[int] = 40,
+        version_locations: Optional[
+            Sequence[Union[str, os.PathLike[str]]]
+        ] = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: Optional[str] = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:105: CommandError
+___________ ERROR at setup of test_github_endpoints_unauthenticated ___________
+
+    @pytest.fixture(scope="session")
+    def engine():
+        # Setup test engine
+        test_engine = create_engine(settings.database_url, pool_pre_ping=True)
+    
+        # Run alembic upgrade head using programmatic API
+        alembic_cfg = alembic.config.Config("alembic.ini")
+        alembic_cfg.set_main_option("script_location", "alembic")
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
+    
+>       alembic.command.upgrade(alembic_cfg, "head")
+
+backend\tests\integration\conftest.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:470: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:186: in from_config
+    return ScriptDirectory(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <alembic.script.base.ScriptDirectory object at 0x00000200CE2A74D0>
+dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
+truncate_slug_length = None, version_locations = None, sourceless = False
+output_encoding = 'utf-8', timezone = None, hooks = []
+recursive_version_locations = False
+messaging_opts = immutabledict({'quiet': False})
+
+    def __init__(
+        self,
+        dir: Union[str, os.PathLike[str]],  # noqa: A002
+        file_template: str = _default_file_template,
+        truncate_slug_length: Optional[int] = 40,
+        version_locations: Optional[
+            Sequence[Union[str, os.PathLike[str]]]
+        ] = None,
+        sourceless: bool = False,
+        output_encoding: str = "utf-8",
+        timezone: Optional[str] = None,
+        hooks: list[PostWriteHookConfig] = [],
+        recursive_version_locations: bool = False,
+        messaging_opts: MessagingOptions = cast(
+            "MessagingOptions", util.EMPTY_DICT
+        ),
+    ) -> None:
+        self.dir = _preserving_path_as_str(dir)
+        self.version_locations = [
+            _preserving_path_as_str(p) for p in version_locations or ()
+        ]
+        self.file_template = file_template
+        self.truncate_slug_length = truncate_slug_length or 40
+        self.sourceless = sourceless
+        self.output_encoding = output_encoding
+        self.revision_map = revision.RevisionMap(self._load_revisions)
+        self.timezone = timezone
+        self.hooks = hooks
+        self.recursive_version_locations = recursive_version_locations
+        self.messaging_opts = messaging_opts
+    
+        if not os.access(dir, os.F_OK):
+>           raise util.CommandError(
+                f"Path doesn't exist: {dir}.  Please use "
+                "the 'init' command to create a new "
+                "scripts folder."
+            )
+E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+
+..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:105: CommandError
+============================== warnings summary ===============================
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+backend\app\main.py:19
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:19: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR backend\tests\integration\test_github_api.py::test_github_install_flow - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_github_api.py::test_github_install_callback_rejections - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_github_api.py::test_github_endpoints_unauthenticated - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+======================== 3 warnings, 3 errors in 0.30s ========================

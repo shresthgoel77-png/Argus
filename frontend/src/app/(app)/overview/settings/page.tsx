@@ -1,12 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SectionHeading } from "@/components/rm/section-heading";
+import { GitHubSettingsCard } from "./github-settings-card";
 
 const settingsSections = [
-    {
-        title: "GitHub configuration",
-        description: "GitHub App connection",
-        message: "Available in a future update.",
-    },
     {
         title: "AI provider and BYOK",
         description: "AI provider configuration",
@@ -28,6 +24,7 @@ export default function SettingsPage() {
                 description="Configure integrations and preferences for your RepoMedic workspace."
             />
             <div className="grid gap-4 lg:grid-cols-3">
+                <GitHubSettingsCard />
                 {settingsSections.map((section) => (
                     <Card key={section.title}>
                         <CardHeader>

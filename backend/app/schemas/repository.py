@@ -20,3 +20,12 @@ class AvailableRepository(BaseModel):
     private: bool
     default_branch: str | None = None
     already_added: bool
+
+
+class RepositoryCreate(BaseModel):
+    connection_id: uuid.UUID
+    github_repo_id: int
+
+
+class RepositoryUpdate(BaseModel):
+    monitoring_enabled: bool

@@ -6,8 +6,15 @@ from app.db.session import get_db
 from app.core.config import settings
 from app.integrations.github.install_state import generate_install_state, verify_install_state
 from app.integrations.github.client import GitHubAppClient
-from app.services.github_connection_service import upsert_connection_from_installation, list_connections_for_user
+from app.services.github_connection_service import (
+    upsert_connection_from_installation,
+    list_connections_for_user,
+    get_connection_or_404
+)
 from app.schemas.github_connection import GitHubConnectionRead
+from app.services.repository_service import list_available_repositories
+from app.schemas.repository import AvailableRepository
+import uuid
 
 router = APIRouter(prefix="/github", tags=["github"])
 
@@ -83,3 +90,19 @@ async def get_connections(
     Returns the list of GitHub App connections for the authenticated user.
     """
     return list_connections_for_user(db=db, user_id=user.id)
+
+
+@router.get("/connections/{connection_id}/repositories", response_model=list[AvailableRepository])
+async def get_available_repositories(
+    connection_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns the list of repositories available to the connection.
+    Ownership is verified.
+    """
+    connection = get_connection_or_404(db=db, user_id=user.id, connection_id=connection_id)
+    client = GitHubAppClient()
+    # List the repos against GitHub API
+    return await list_available_repositories(db=db, connection=connection, client=client)

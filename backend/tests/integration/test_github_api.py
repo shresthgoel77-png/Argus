@@ -48,6 +48,12 @@ def test_github_install_flow(client, monkeypatch):
     assert connection["account_login"] == "octocat"
     assert connection["installation_id"] == 12345
 
+    # Idempotency check: Calling it again with same params should still succeed
+    res_callback2 = client.get(
+        f"/api/v1/github/install/callback?installation_id=12345&setup_action=install&state={state}"
+    )
+    assert res_callback2.status_code == 200
+
     # 5. Get connections
     res_connections = client.get("/api/v1/github/connections")
     assert res_connections.status_code == 200
@@ -62,7 +68,11 @@ def test_github_install_callback_rejections(client):
     client.post("/api/v1/auth/dev-login")
     
     res_missing = client.get("/api/v1/github/install/callback")
-    assert res_missing.status_code == 422 
+    assert res_missing.status_code == 400
+    
+    # Missing only installation_id
+    res_missing_id = client.get("/api/v1/github/install/callback?setup_action=install&state=foo")
+    assert res_missing_id.status_code == 400 
 
     res_invalid_state = client.get(
         "/api/v1/github/install/callback?installation_id=12345&setup_action=install&state=invalid.state.sig"

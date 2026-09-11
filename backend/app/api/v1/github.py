@@ -22,19 +22,32 @@ async def start_installation(user: User = Depends(get_current_user)):
 
 @router.get("/install/callback", response_model=GitHubConnectionRead)
 async def installation_callback(
-    installation_id: int = Query(..., description="The GitHub installation ID"),
-    setup_action: str = Query(..., description="The action performed (install, update)"),
-    state: str = Query(..., description="The state token from the install/start endpoint"),
+    installation_id: str | None = None,
+    setup_action: str | None = None,
+    state: str | None = None,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Handles the GitHub App installation callback forwarding endpoint. 
     """
-    if setup_action not in ("install", "update"):
+    if not installation_id or not installation_id.isdigit():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unsupported setup_action: {setup_action}"
+            detail="Missing or malformed installation_id"
+        )
+    inst_id_int = int(installation_id)
+
+    if not setup_action or setup_action not in ("install", "update"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported or missing setup_action"
+        )
+        
+    if not state:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing state"
         )
         
     try:
@@ -55,7 +68,7 @@ async def installation_callback(
     connection = await upsert_connection_from_installation(
         db=db,
         user_id=user.id,
-        installation_id=installation_id,
+        installation_id=inst_id_int,
         client=client
     )
     

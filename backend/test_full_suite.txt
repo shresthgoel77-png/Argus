@@ -1,0 +1,121 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.14.1, langsmith-0.9.2, asyncio-1.4.0, timeout-2.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 80 items
+
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_new PASSED [  1%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_idempotent_update PASSED [  2%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_ownership_reassignment PASSED [  3%]
+tests/integration/services/test_github_connection_service.py::test_list_connections PASSED [  5%]
+tests/integration/services/test_github_connection_service.py::test_get_connection_or_404 PASSED [  6%]
+tests/integration/test_auth_flow.py::test_auth_flow_e2e PASSED           [  7%]
+tests/integration/test_auth_flow.py::test_dev_login_fails_non_development_provider PASSED [  8%]
+tests/integration/test_github_api.py::test_github_install_flow PASSED    [ 10%]
+tests/integration/test_github_api.py::test_github_install_callback_rejections PASSED [ 11%]
+tests/integration/test_github_api.py::test_github_endpoints_unauthenticated PASSED [ 12%]
+tests/integration/test_github_models.py::test_valid_connection_and_repo PASSED [ 13%]
+tests/integration/test_github_models.py::test_duplicate_connection PASSED [ 15%]
+tests/integration/test_github_models.py::test_duplicate_repo PASSED      [ 16%]
+tests/integration/test_migrations.py::test_alembic_upgrade_head_completes PASSED [ 17%]
+tests/integration/test_user_model.py::test_create_user PASSED            [ 18%]
+tests/integration/test_user_model.py::test_email_uniqueness PASSED       [ 20%]
+tests/test_db_connection.py::test_connection PASSED                      [ 21%]
+tests/unit/test_auth_config_safety.py::test_settings_development_auth PASSED [ 22%]
+tests/unit/test_auth_config_safety.py::test_settings_test_env_auth PASSED [ 23%]
+tests/unit/test_auth_config_safety.py::test_settings_production_auth_safety PASSED [ 25%]
+tests/unit/test_auth_factory_safety.py::test_factory_returns_dev_in_non_prod PASSED [ 26%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_dev_in_production PASSED [ 27%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_unrecognized PASSED [ 28%]
+tests/unit/test_config.py::test_config_loads_valid_values PASSED         [ 30%]
+tests/unit/test_config.py::test_config_invalid_app_env_fails PASSED      [ 31%]
+tests/unit/test_config.py::test_config_cors_origins_parsing PASSED       [ 32%]
+tests/unit/test_config.py::test_config_cors_origins_json_parsing PASSED  [ 33%]
+tests/unit/test_config.py::test_config_non_dev_requires_db PASSED        [ 35%]
+tests/unit/test_config.py::test_config_empty_github_app_id_fails PASSED  [ 36%]
+tests/unit/test_config.py::test_config_empty_github_app_slug_fails PASSED [ 37%]
+tests/unit/test_config.py::test_config_empty_github_app_private_key_fails PASSED [ 38%]
+tests/unit/test_development_auth_adapter.py::test_unauthenticated PASSED [ 40%]
+tests/unit/test_development_auth_adapter.py::test_login_and_resolve PASSED [ 41%]
+tests/unit/test_development_auth_adapter.py::test_logout PASSED          [ 42%]
+tests/unit/test_development_auth_adapter.py::test_invalid_tampered_cookie PASSED [ 43%]
+tests/unit/test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 45%]
+tests/unit/test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [ 46%]
+tests/unit/test_error_handling.py::test_global_exception_handler_ignores_websocket PASSED [ 47%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_is_well_formed_and_verifiable PASSED [ 48%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_iat_is_backdated PASSED [ 50%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_exp_within_10_minutes PASSED [ 51%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_uses_rs256_algorithm PASSED [ 52%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_caching_returns_same_token PASSED [ 53%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_refreshes_when_near_expiry PASSED [ 55%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_fetches_token_from_github PASSED [ 56%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_caches_token_before_expiry PASSED [ 57%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_refreshes_token_when_near_expiry PASSED [ 58%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_raises_on_github_error_response PASSED [ 60%]
+tests/unit/test_github_client.py::TestGetInstallation::test_returns_installation_dict PASSED [ 61%]
+tests/unit/test_github_client.py::TestGetInstallation::test_uses_app_jwt_auth PASSED [ 62%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_single_page PASSED [ 63%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_multi_page_pagination PASSED [ 65%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_empty_repositories PASSED [ 66%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[401-GitHubAuthError] PASSED [ 67%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[403-GitHubAuthError] PASSED [ 68%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[404-GitHubNotFoundError] PASSED [ 70%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[429-GitHubRateLimitError] PASSED [ 71%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[500-GitHubAPIError] PASSED [ 72%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_api_error_is_app_error PASSED [ 73%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_auth_error_is_github_api_error PASSED [ 75%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_not_found_error_is_github_api_error PASSED [ 76%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_rate_limit_error_is_github_api_error PASSED [ 77%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_all_are_catchable_as_app_error PASSED [ 78%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[401-GitHubAuthError-github_auth_error] PASSED [ 80%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[403-GitHubAuthError-github_auth_error] PASSED [ 81%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[404-GitHubNotFoundError-github_not_found] PASSED [ 82%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[429-GitHubRateLimitError-github_rate_limit] PASSED [ 83%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[500-GitHubAPIError-github_api_error] PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[502-GitHubAPIError-github_api_error] PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[422-GitHubAPIError-github_api_error] PASSED [ 87%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_preserves_response_status PASSED [ 88%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_handles_non_json_body PASSED [ 90%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_api_error_defaults PASSED [ 91%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_auth_error_defaults PASSED [ 92%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_not_found_defaults PASSED [ 93%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_rate_limit_defaults PASSED [ 95%]
+tests/unit/test_health.py::test_health_endpoint PASSED                   [ 96%]
+tests/unit/test_logging.py::test_configure_logging_development PASSED    [ 97%]
+tests/unit/test_logging.py::test_configure_logging_production PASSED     [ 98%]
+tests/unit/test_logging.py::test_get_logger PASSED                       [100%]
+
+============================== warnings summary ===============================
+..\..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app\main.py:19
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:19: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+..\..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/integration/test_github_models.py::test_duplicate_connection
+tests/integration/test_github_models.py::test_duplicate_repo
+tests/integration/test_user_model.py::test_email_uniqueness
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\integration\conftest.py:52: SAWarning: transaction already deassociated from connection
+    transaction.rollback()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 80 passed, 6 warnings in 1.87s ========================

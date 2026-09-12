@@ -1,0 +1,67 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 2 items
+
+tests/integration/test_finding_model.py::test_finding_insert PASSED      [ 50%]
+tests/integration/test_finding_model.py::test_finding_fk_constraint FAILED [100%]
+
+================================== FAILURES ===================================
+_________________________ test_finding_fk_constraint __________________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001DB797F0690>
+
+    def test_finding_fk_constraint(db_session):
+        # Try inserting without a valid repository_id
+        import uuid
+        finding = Finding(
+            repository_id=uuid.uuid4(),
+            category="security",
+            type="secret_leak",
+            title="Secret Found",
+            description="A secret was found.",
+            severity="critical",
+            source="scanner",
+            evidence={"foo": "bar"}
+        )
+        db_session.add(finding)
+>       with pytest.raises(IntegrityError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'sqlalchemy.exc.IntegrityError'>
+
+tests\integration\test_finding_model.py:66: Failed
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\main.py:19
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:19: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/test_finding_model.py::test_finding_fk_constraint - ...
+=================== 1 failed, 1 passed, 4 warnings in 0.30s ===================

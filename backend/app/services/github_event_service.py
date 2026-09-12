@@ -20,6 +20,7 @@ logger = get_logger(__name__)
 EVENT_TYPE_TO_ANALYZER: dict[str, str] = {
     "workflow_run": "ci",
     "pull_request": "pull_request",
+    "issues": "issue",
 }
 
 def _run_analyzer_sync(coro_func, *args, **kwargs):

@@ -1,0 +1,32 @@
+﻿diff --git a/backend/app/monitoring/analyzers/__init__.py b/backend/app/monitoring/analyzers/__init__.py
+index a1d606a..072e550 100644
+--- a/backend/app/monitoring/analyzers/__init__.py
++++ b/backend/app/monitoring/analyzers/__init__.py
+@@ -2,6 +2,7 @@ from typing import Optional
+ from app.monitoring.analyzer_base import BaseAnalyzer
+ from app.monitoring.analyzers.ci_analyzer import CIAnalyzer
+ from app.monitoring.analyzers.pull_request_analyzer import PullRequestAnalyzer
++from app.monitoring.analyzers.issue_analyzer import IssueAnalyzer
+ 
+ ANALYZER_REGISTRY: dict[str, BaseAnalyzer] = {}
+ 
+@@ -13,3 +14,4 @@ def get_analyzer(key: str) -> Optional[BaseAnalyzer]:
+ 
+ register_analyzer(CIAnalyzer())
+ register_analyzer(PullRequestAnalyzer())
++register_analyzer(IssueAnalyzer())
+diff --git a/backend/app/services/github_event_service.py b/backend/app/services/github_event_service.py
+index 3e12d38..7b2e7dc 100644
+--- a/backend/app/services/github_event_service.py
++++ b/backend/app/services/github_event_service.py
+@@ -20,6 +20,7 @@ logger = get_logger(__name__)
+ EVENT_TYPE_TO_ANALYZER: dict[str, str] = {
+     "workflow_run": "ci",
+     "pull_request": "pull_request",
++    "issues": "issue",
+ }
+ 
+ def _run_analyzer_sync(coro_func, *args, **kwargs):
+diff --git a/backend/test_out.txt b/backend/test_out.txt
+index 9eb67d4..0d121bb 100644
+Binary files a/backend/test_out.txt and b/backend/test_out.txt differ

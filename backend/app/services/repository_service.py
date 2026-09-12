@@ -160,6 +160,26 @@ def set_monitoring_enabled(
 
     return repository
 
+def get_repository_or_404(db: Session, user_id: uuid.UUID, repository_id: uuid.UUID) -> Repository:
+    """
+    Retrieves a single repository by ID, ensuring it belongs to the user_id.
+    Raises NotFoundError if it doesn't exist or belongs to another user.
+    """
+    repository = (
+        db.query(Repository)
+        .join(GitHubConnection)
+        .filter(
+            Repository.id == repository_id,
+            GitHubConnection.user_id == user_id,
+        )
+        .first()
+    )
+
+    if not repository:
+        raise NotFoundError("Repository not found or not owned by user.")
+
+    return repository
+
 def disable_monitoring_for_removed_repositories(
     db: Session, connection: GitHubConnection, removed: list[RepoRef]
 ) -> list[Repository]:

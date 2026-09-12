@@ -1,241 +1,652 @@
 ﻿============================= test session starts =============================
-platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
 cachedir: .pytest_cache
 rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
 configfile: pytest.ini
-plugins: anyio-4.14.1, langsmith-0.9.2, asyncio-1.4.0, timeout-2.4.0
+plugins: anyio-4.15.1, asyncio-1.4.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collecting ... collected 3 items
+collecting ... collected 125 items
 
-backend\tests\integration\test_github_api.py::test_github_install_flow ERROR [ 33%]
-backend\tests\integration\test_github_api.py::test_github_install_callback_rejections ERROR [ 66%]
-backend\tests\integration\test_github_api.py::test_github_endpoints_unauthenticated ERROR [100%]
+backend\tests\integration\services\test_github_connection_service.py::test_upsert_connection_new ERROR [  0%]
+backend\tests\integration\services\test_github_connection_service.py::test_upsert_connection_idempotent_update ERROR [  1%]
+backend\tests\integration\services\test_github_connection_service.py::test_upsert_connection_ownership_reassignment ERROR [  2%]
+backend\tests\integration\services\test_github_connection_service.py::test_list_connections ERROR [  3%]
+backend\tests\integration\services\test_github_connection_service.py::test_get_connection_or_404 ERROR [  4%]
+backend\tests\integration\services\test_github_connection_service.py::test_handle_installation_status_change ERROR [  4%]
+backend\tests\integration\services\test_github_event_service.py::test_record_event_success ERROR [  5%]
+backend\tests\integration\services\test_github_event_service.py::test_record_event_duplicate_returns_none ERROR [  6%]
+backend\tests\integration\services\test_github_event_service.py::test_status_transitions ERROR [  7%]
+backend\tests\integration\services\test_github_event_service.py::test_mark_failed_strips_secrets ERROR [  8%]
+backend\tests\integration\services\test_github_event_service.py::test_concurrent_insert_race ERROR [  8%]
+backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_duplicate ERROR [  9%]
+backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_unknown_installation ERROR [ 10%]
+backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_known_installation_suspend ERROR [ 11%]
+backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_removed_repos ERROR [ 12%]
+backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_reaction_failure_marks_failed ERROR [ 12%]
+backend\tests\integration\services\test_repository_service.py::test_list_available_repositories_flags_already_added ERROR [ 13%]
+backend\tests\integration\services\test_repository_service.py::test_add_repository_idempotency ERROR [ 14%]
+backend\tests\integration\services\test_repository_service.py::test_add_repository_rejects_unauthorized ERROR [ 15%]
+backend\tests\integration\services\test_repository_service.py::test_set_monitoring_enabled_ownership ERROR [ 16%]
+backend\tests\integration\services\test_repository_service.py::test_disable_monitoring_for_removed_repositories ERROR [ 16%]
+backend\tests\integration\test_auth_flow.py::test_auth_flow_e2e ERROR    [ 17%]
+backend\tests\integration\test_auth_flow.py::test_dev_login_fails_non_development_provider ERROR [ 18%]
+backend\tests\integration\test_github_api.py::test_github_install_flow ERROR [ 19%]
+backend\tests\integration\test_github_api.py::test_github_install_callback_rejections ERROR [ 20%]
+backend\tests\integration\test_github_api.py::test_github_endpoints_unauthenticated ERROR [ 20%]
+backend\tests\integration\test_github_event_model.py::test_create_github_event_required_fields_only ERROR [ 21%]
+backend\tests\integration\test_github_event_model.py::test_github_event_delivery_id_unique ERROR [ 22%]
+backend\tests\integration\test_github_models.py::test_valid_connection_and_repo ERROR [ 23%]
+backend\tests\integration\test_github_models.py::test_duplicate_connection ERROR [ 24%]
+backend\tests\integration\test_github_models.py::test_duplicate_repo ERROR [ 24%]
+backend\tests\integration\test_migrations.py::test_alembic_upgrade_head_completes ERROR [ 25%]
+backend\tests\integration\test_repositories_api.py::test_repositories_endpoints_unauthenticated ERROR [ 26%]
+backend\tests\integration\test_repositories_api.py::test_repositories_happy_path ERROR [ 27%]
+backend\tests\integration\test_repositories_api.py::test_repositories_ownership_protection ERROR [ 28%]
+backend\tests\integration\test_user_model.py::test_create_user ERROR     [ 28%]
+backend\tests\integration\test_user_model.py::test_email_uniqueness ERROR [ 29%]
+backend\tests\integration\test_webhooks_api.py::test_webhook_valid_new_delivery ERROR [ 30%]
+backend\tests\integration\test_webhooks_api.py::test_webhook_valid_duplicate_delivery ERROR [ 31%]
+backend\tests\integration\test_webhooks_api.py::test_webhook_invalid_missing_signature ERROR [ 32%]
+backend\tests\integration\test_webhooks_api.py::test_webhook_missing_delivery_or_event ERROR [ 32%]
+backend\tests\integration\test_webhooks_api.py::test_webhook_malformed_json_valid_signature ERROR [ 33%]
+backend\tests\integration\test_webhooks_api.py::test_webhook_installation_suspend ERROR [ 34%]
+backend\tests\integration\test_webhooks_api.py::test_webhook_installation_created ERROR [ 35%]
+backend\tests\test_db_connection.py::test_connection PASSED              [ 36%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_pull_request PASSED [ 36%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_issues PASSED [ 37%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_issue_comment PASSED [ 38%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_workflow_run PASSED [ 39%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_push PASSED [ 40%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_installation PASSED [ 40%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_installation_repositories PASSED [ 41%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_malformed_non_dict_payload PASSED [ 42%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_partially_malformed_repository PASSED [ 43%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_malformed_installation PASSED [ 44%]
+backend\tests\unit\integrations\github\test_webhook_events.py::test_parse_unsupported_event_with_valid_shapes PASSED [ 44%]
+backend\tests\unit\test_auth_config_safety.py::test_settings_development_auth PASSED [ 45%]
+backend\tests\unit\test_auth_config_safety.py::test_settings_test_env_auth PASSED [ 46%]
+backend\tests\unit\test_auth_config_safety.py::test_settings_production_auth_safety PASSED [ 47%]
+backend\tests\unit\test_auth_factory_safety.py::test_factory_returns_dev_in_non_prod PASSED [ 48%]
+backend\tests\unit\test_auth_factory_safety.py::test_factory_raises_on_dev_in_production PASSED [ 48%]
+backend\tests\unit\test_auth_factory_safety.py::test_factory_raises_on_unrecognized PASSED [ 49%]
+backend\tests\unit\test_config.py::test_config_loads_valid_values PASSED [ 50%]
+backend\tests\unit\test_config.py::test_config_invalid_app_env_fails PASSED [ 51%]
+backend\tests\unit\test_config.py::test_config_cors_origins_parsing PASSED [ 52%]
+backend\tests\unit\test_config.py::test_config_cors_origins_json_parsing PASSED [ 52%]
+backend\tests\unit\test_config.py::test_config_non_dev_requires_db PASSED [ 53%]
+backend\tests\unit\test_config.py::test_config_empty_github_app_id_fails PASSED [ 54%]
+backend\tests\unit\test_config.py::test_config_empty_github_app_slug_fails PASSED [ 55%]
+backend\tests\unit\test_config.py::test_config_empty_github_app_private_key_fails PASSED [ 56%]
+backend\tests\unit\test_config.py::test_config_empty_github_app_webhook_secret_fails PASSED [ 56%]
+backend\tests\unit\test_development_auth_adapter.py::test_unauthenticated PASSED [ 57%]
+backend\tests\unit\test_development_auth_adapter.py::test_login_and_resolve PASSED [ 58%]
+backend\tests\unit\test_development_auth_adapter.py::test_logout PASSED  [ 59%]
+backend\tests\unit\test_development_auth_adapter.py::test_invalid_tampered_cookie PASSED [ 60%]
+backend\tests\unit\test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 60%]
+backend\tests\unit\test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [ 61%]
+backend\tests\unit\test_error_handling.py::test_global_exception_handler_ignores_websocket PASSED [ 62%]
+backend\tests\unit\test_github_app_auth.py::TestGenerateAppJWT::test_jwt_is_well_formed_and_verifiable PASSED [ 63%]
+backend\tests\unit\test_github_app_auth.py::TestGenerateAppJWT::test_jwt_iat_is_backdated PASSED [ 64%]
+backend\tests\unit\test_github_app_auth.py::TestGenerateAppJWT::test_jwt_exp_within_10_minutes PASSED [ 64%]
+backend\tests\unit\test_github_app_auth.py::TestGenerateAppJWT::test_jwt_uses_rs256_algorithm PASSED [ 65%]
+backend\tests\unit\test_github_app_auth.py::TestGenerateAppJWT::test_jwt_caching_returns_same_token PASSED [ 66%]
+backend\tests\unit\test_github_app_auth.py::TestGenerateAppJWT::test_jwt_refreshes_when_near_expiry PASSED [ 67%]
+backend\tests\unit\test_github_app_auth.py::TestGetInstallationAccessToken::test_fetches_token_from_github PASSED [ 68%]
+backend\tests\unit\test_github_app_auth.py::TestGetInstallationAccessToken::test_caches_token_before_expiry PASSED [ 68%]
+backend\tests\unit\test_github_app_auth.py::TestGetInstallationAccessToken::test_refreshes_token_when_near_expiry PASSED [ 69%]
+backend\tests\unit\test_github_app_auth.py::TestGetInstallationAccessToken::test_raises_on_github_error_response PASSED [ 70%]
+backend\tests\unit\test_github_client.py::TestGetInstallation::test_returns_installation_dict PASSED [ 71%]
+backend\tests\unit\test_github_client.py::TestGetInstallation::test_uses_app_jwt_auth PASSED [ 72%]
+backend\tests\unit\test_github_client.py::TestListInstallationRepositories::test_single_page PASSED [ 72%]
+backend\tests\unit\test_github_client.py::TestListInstallationRepositories::test_multi_page_pagination PASSED [ 73%]
+backend\tests\unit\test_github_client.py::TestListInstallationRepositories::test_empty_repositories PASSED [ 74%]
+backend\tests\unit\test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[401-GitHubAuthError] PASSED [ 75%]
+backend\tests\unit\test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[403-GitHubAuthError] PASSED [ 76%]
+backend\tests\unit\test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[404-GitHubNotFoundError] PASSED [ 76%]
+backend\tests\unit\test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[429-GitHubRateLimitError] PASSED [ 77%]
+backend\tests\unit\test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[500-GitHubAPIError] PASSED [ 78%]
+backend\tests\unit\test_github_exceptions.py::TestInheritance::test_github_api_error_is_app_error PASSED [ 79%]
+backend\tests\unit\test_github_exceptions.py::TestInheritance::test_github_auth_error_is_github_api_error PASSED [ 80%]
+backend\tests\unit\test_github_exceptions.py::TestInheritance::test_github_not_found_error_is_github_api_error PASSED [ 80%]
+backend\tests\unit\test_github_exceptions.py::TestInheritance::test_github_rate_limit_error_is_github_api_error PASSED [ 81%]
+backend\tests\unit\test_github_exceptions.py::TestInheritance::test_all_are_catchable_as_app_error PASSED [ 82%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[401-GitHubAuthError-github_auth_error] PASSED [ 83%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[403-GitHubAuthError-github_auth_error] PASSED [ 84%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[404-GitHubNotFoundError-github_not_found] PASSED [ 84%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[429-GitHubRateLimitError-github_rate_limit] PASSED [ 85%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[500-GitHubAPIError-github_api_error] PASSED [ 86%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[502-GitHubAPIError-github_api_error] PASSED [ 87%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[422-GitHubAPIError-github_api_error] PASSED [ 88%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_preserves_response_status PASSED [ 88%]
+backend\tests\unit\test_github_exceptions.py::TestFromResponse::test_handles_non_json_body PASSED [ 89%]
+backend\tests\unit\test_github_exceptions.py::TestDefaultAttributes::test_github_api_error_defaults PASSED [ 90%]
+backend\tests\unit\test_github_exceptions.py::TestDefaultAttributes::test_github_auth_error_defaults PASSED [ 91%]
+backend\tests\unit\test_github_exceptions.py::TestDefaultAttributes::test_github_not_found_defaults PASSED [ 92%]
+backend\tests\unit\test_github_exceptions.py::TestDefaultAttributes::test_github_rate_limit_defaults PASSED [ 92%]
+backend\tests\unit\test_health.py::test_health_endpoint PASSED           [ 93%]
+backend\tests\unit\test_logging.py::test_configure_logging_development PASSED [ 94%]
+backend\tests\unit\test_logging.py::test_configure_logging_production PASSED [ 95%]
+backend\tests\unit\test_logging.py::test_get_logger PASSED               [ 96%]
+backend\tests\unit\test_webhook_security.py::test_verify_signature_correct PASSED [ 96%]
+backend\tests\unit\test_webhook_security.py::test_verify_signature_wrong_secret PASSED [ 97%]
+backend\tests\unit\test_webhook_security.py::test_verify_signature_tampered_body PASSED [ 98%]
+backend\tests\unit\test_webhook_security.py::test_verify_signature_missing_header PASSED [ 99%]
+backend\tests\unit\test_webhook_security.py::test_verify_signature_malformed_header PASSED [100%]
 
 =================================== ERRORS ====================================
-_________________ ERROR at setup of test_github_install_flow __________________
-
-fixturedef = <FixtureDef argname='engine' scope='session' baseid='tests/integration'>
-request = <SubRequest 'engine' for <Function test_github_install_flow>>
-
-    @pytest.hookimpl(wrapper=True)
-    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
-        if (
-            fixturedef.argname == "event_loop_policy"
-            and fixturedef.func.__module__ != __name__
-        ):
-            warnings.warn(
-                PytestDeprecationWarning(_EVENT_LOOP_POLICY_FIXTURE_DEPRECATION_WARNING),
-            )
-        asyncio_mode = _get_asyncio_mode(request.config)
-        if not _is_asyncio_fixture_function(fixturedef.func):
-            if asyncio_mode == Mode.STRICT:
-                # Ignore async fixtures without explicit asyncio mark in strict mode
-                # This applies to pytest_trio fixtures, for example
->               return (yield)
-                        ^^^^^
-
-..\..\..\AppData\Roaming\Python\Python314\site-packages\pytest_asyncio\plugin.py:924: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+________________ ERROR at setup of test_upsert_connection_new _________________
+backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:924: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
 backend\tests\integration\conftest.py:28: in engine
     alembic.command.upgrade(alembic_cfg, "head")
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:470: in upgrade
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
     script = ScriptDirectory.from_config(config)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:186: in from_config
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
     return ScriptDirectory(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-
-self = <alembic.script.base.ScriptDirectory object at 0x00000200CE2A74D0>
-dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
-truncate_slug_length = None, version_locations = None, sourceless = False
-output_encoding = 'utf-8', timezone = None, hooks = []
-recursive_version_locations = False
-messaging_opts = immutabledict({'quiet': False})
-
-    def __init__(
-        self,
-        dir: Union[str, os.PathLike[str]],  # noqa: A002
-        file_template: str = _default_file_template,
-        truncate_slug_length: Optional[int] = 40,
-        version_locations: Optional[
-            Sequence[Union[str, os.PathLike[str]]]
-        ] = None,
-        sourceless: bool = False,
-        output_encoding: str = "utf-8",
-        timezone: Optional[str] = None,
-        hooks: list[PostWriteHookConfig] = [],
-        recursive_version_locations: bool = False,
-        messaging_opts: MessagingOptions = cast(
-            "MessagingOptions", util.EMPTY_DICT
-        ),
-    ) -> None:
-        self.dir = _preserving_path_as_str(dir)
-        self.version_locations = [
-            _preserving_path_as_str(p) for p in version_locations or ()
-        ]
-        self.file_template = file_template
-        self.truncate_slug_length = truncate_slug_length or 40
-        self.sourceless = sourceless
-        self.output_encoding = output_encoding
-        self.revision_map = revision.RevisionMap(self._load_revisions)
-        self.timezone = timezone
-        self.hooks = hooks
-        self.recursive_version_locations = recursive_version_locations
-        self.messaging_opts = messaging_opts
-    
-        if not os.access(dir, os.F_OK):
->           raise util.CommandError(
-                f"Path doesn't exist: {dir}.  Please use "
-                "the 'init' command to create a new "
-                "scripts folder."
-            )
-E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
-
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:105: CommandError
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_________ ERROR at setup of test_upsert_connection_idempotent_update __________
+backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_______ ERROR at setup of test_upsert_connection_ownership_reassignment _______
+backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___________________ ERROR at setup of test_list_connections ___________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+________________ ERROR at setup of test_get_connection_or_404 _________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+__________ ERROR at setup of test_handle_installation_status_change ___________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_________________ ERROR at setup of test_record_event_success _________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_________ ERROR at setup of test_record_event_duplicate_returns_none __________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+__________________ ERROR at setup of test_status_transitions __________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+______________ ERROR at setup of test_mark_failed_strips_secrets ______________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+________________ ERROR at setup of test_concurrent_insert_race ________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___________ ERROR at setup of test_process_webhook_event_duplicate ____________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+______ ERROR at setup of test_process_webhook_event_unknown_installation ______
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___ ERROR at setup of test_process_webhook_event_known_installation_suspend ___
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_________ ERROR at setup of test_process_webhook_event_removed_repos __________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_ ERROR at setup of test_process_webhook_event_reaction_failure_marks_failed __
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___ ERROR at setup of test_list_available_repositories_flags_already_added ____
+backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+______________ ERROR at setup of test_add_repository_idempotency ______________
+backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_________ ERROR at setup of test_add_repository_rejects_unauthorized __________
+backend\venv\Lib\site-packages\pytest_asyncio\plugin.py:558: in setup
+    return super().setup()
+           ^^^^^^^^^^^^^^^
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___________ ERROR at setup of test_set_monitoring_enabled_ownership ___________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_____ ERROR at setup of test_disable_monitoring_for_removed_repositories ______
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+____________________ ERROR at setup of test_auth_flow_e2e _____________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_______ ERROR at setup of test_dev_login_fails_non_development_provider _______
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_________________ ERROR at setup of test_github_install_flow __________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
 __________ ERROR at setup of test_github_install_callback_rejections __________
-
-    @pytest.fixture(scope="session")
-    def engine():
-        # Setup test engine
-        test_engine = create_engine(settings.database_url, pool_pre_ping=True)
-    
-        # Run alembic upgrade head using programmatic API
-        alembic_cfg = alembic.config.Config("alembic.ini")
-        alembic_cfg.set_main_option("script_location", "alembic")
-        alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
-    
->       alembic.command.upgrade(alembic_cfg, "head")
-
-backend\tests\integration\conftest.py:28: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:470: in upgrade
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
     script = ScriptDirectory.from_config(config)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:186: in from_config
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
     return ScriptDirectory(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-
-self = <alembic.script.base.ScriptDirectory object at 0x00000200CE2A74D0>
-dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
-truncate_slug_length = None, version_locations = None, sourceless = False
-output_encoding = 'utf-8', timezone = None, hooks = []
-recursive_version_locations = False
-messaging_opts = immutabledict({'quiet': False})
-
-    def __init__(
-        self,
-        dir: Union[str, os.PathLike[str]],  # noqa: A002
-        file_template: str = _default_file_template,
-        truncate_slug_length: Optional[int] = 40,
-        version_locations: Optional[
-            Sequence[Union[str, os.PathLike[str]]]
-        ] = None,
-        sourceless: bool = False,
-        output_encoding: str = "utf-8",
-        timezone: Optional[str] = None,
-        hooks: list[PostWriteHookConfig] = [],
-        recursive_version_locations: bool = False,
-        messaging_opts: MessagingOptions = cast(
-            "MessagingOptions", util.EMPTY_DICT
-        ),
-    ) -> None:
-        self.dir = _preserving_path_as_str(dir)
-        self.version_locations = [
-            _preserving_path_as_str(p) for p in version_locations or ()
-        ]
-        self.file_template = file_template
-        self.truncate_slug_length = truncate_slug_length or 40
-        self.sourceless = sourceless
-        self.output_encoding = output_encoding
-        self.revision_map = revision.RevisionMap(self._load_revisions)
-        self.timezone = timezone
-        self.hooks = hooks
-        self.recursive_version_locations = recursive_version_locations
-        self.messaging_opts = messaging_opts
-    
-        if not os.access(dir, os.F_OK):
->           raise util.CommandError(
-                f"Path doesn't exist: {dir}.  Please use "
-                "the 'init' command to create a new "
-                "scripts folder."
-            )
-E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
-
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:105: CommandError
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
 ___________ ERROR at setup of test_github_endpoints_unauthenticated ___________
-
-    @pytest.fixture(scope="session")
-    def engine():
-        # Setup test engine
-        test_engine = create_engine(settings.database_url, pool_pre_ping=True)
-    
-        # Run alembic upgrade head using programmatic API
-        alembic_cfg = alembic.config.Config("alembic.ini")
-        alembic_cfg.set_main_option("script_location", "alembic")
-        alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
-    
->       alembic.command.upgrade(alembic_cfg, "head")
-
-backend\tests\integration\conftest.py:28: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:470: in upgrade
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
     script = ScriptDirectory.from_config(config)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:186: in from_config
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
     return ScriptDirectory(
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-
-self = <alembic.script.base.ScriptDirectory object at 0x00000200CE2A74D0>
-dir = WindowsPath('alembic'), file_template = '%(rev)s_%(slug)s'
-truncate_slug_length = None, version_locations = None, sourceless = False
-output_encoding = 'utf-8', timezone = None, hooks = []
-recursive_version_locations = False
-messaging_opts = immutabledict({'quiet': False})
-
-    def __init__(
-        self,
-        dir: Union[str, os.PathLike[str]],  # noqa: A002
-        file_template: str = _default_file_template,
-        truncate_slug_length: Optional[int] = 40,
-        version_locations: Optional[
-            Sequence[Union[str, os.PathLike[str]]]
-        ] = None,
-        sourceless: bool = False,
-        output_encoding: str = "utf-8",
-        timezone: Optional[str] = None,
-        hooks: list[PostWriteHookConfig] = [],
-        recursive_version_locations: bool = False,
-        messaging_opts: MessagingOptions = cast(
-            "MessagingOptions", util.EMPTY_DICT
-        ),
-    ) -> None:
-        self.dir = _preserving_path_as_str(dir)
-        self.version_locations = [
-            _preserving_path_as_str(p) for p in version_locations or ()
-        ]
-        self.file_template = file_template
-        self.truncate_slug_length = truncate_slug_length or 40
-        self.sourceless = sourceless
-        self.output_encoding = output_encoding
-        self.revision_map = revision.RevisionMap(self._load_revisions)
-        self.timezone = timezone
-        self.hooks = hooks
-        self.recursive_version_locations = recursive_version_locations
-        self.messaging_opts = messaging_opts
-    
-        if not os.access(dir, os.F_OK):
->           raise util.CommandError(
-                f"Path doesn't exist: {dir}.  Please use "
-                "the 'init' command to create a new "
-                "scripts folder."
-            )
-E           alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
-
-..\..\..\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:105: CommandError
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_______ ERROR at setup of test_create_github_event_required_fields_only _______
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___________ ERROR at setup of test_github_event_delivery_id_unique ____________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+______________ ERROR at setup of test_valid_connection_and_repo _______________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_________________ ERROR at setup of test_duplicate_connection _________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+____________________ ERROR at setup of test_duplicate_repo ____________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+____________ ERROR at setup of test_alembic_upgrade_head_completes ____________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+________ ERROR at setup of test_repositories_endpoints_unauthenticated ________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_______________ ERROR at setup of test_repositories_happy_path ________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+__________ ERROR at setup of test_repositories_ownership_protection ___________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_____________________ ERROR at setup of test_create_user ______________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___________________ ERROR at setup of test_email_uniqueness ___________________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+______________ ERROR at setup of test_webhook_valid_new_delivery ______________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+___________ ERROR at setup of test_webhook_valid_duplicate_delivery ___________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+__________ ERROR at setup of test_webhook_invalid_missing_signature ___________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+__________ ERROR at setup of test_webhook_missing_delivery_or_event ___________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+________ ERROR at setup of test_webhook_malformed_json_valid_signature ________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_____________ ERROR at setup of test_webhook_installation_suspend _____________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+_____________ ERROR at setup of test_webhook_installation_created _____________
+backend\tests\integration\conftest.py:28: in engine
+    alembic.command.upgrade(alembic_cfg, "head")
+backend\venv\Lib\site-packages\alembic\command.py:467: in upgrade
+    script = ScriptDirectory.from_config(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\venv\Lib\site-packages\alembic\script\base.py:180: in from_config
+    return ScriptDirectory(
+backend\venv\Lib\site-packages\alembic\script\base.py:99: in __init__
+    raise util.CommandError(
+E   alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
 ============================== warnings summary ===============================
-..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1
-  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+backend\venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
     from starlette.testclient import TestClient as TestClient  # noqa
+
+backend\venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
 
 backend\app\main.py:19
   C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:19: DeprecationWarning: 
@@ -246,8 +657,8 @@ backend\app\main.py:19
           
     @app.on_event("startup")
 
-..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675
-  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675: DeprecationWarning: 
+backend\venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
           on_event is deprecated, use lifespan event handlers instead.
   
           Read more about it in the
@@ -257,7 +668,48 @@ backend\app\main.py:19
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 =========================== short test summary info ===========================
+ERROR backend\tests\integration\services\test_github_connection_service.py::test_upsert_connection_new - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_connection_service.py::test_upsert_connection_idempotent_update - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_connection_service.py::test_upsert_connection_ownership_reassignment - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_connection_service.py::test_list_connections - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_connection_service.py::test_get_connection_or_404 - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_connection_service.py::test_handle_installation_status_change - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_record_event_success - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_record_event_duplicate_returns_none - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_status_transitions - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_mark_failed_strips_secrets - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_concurrent_insert_race - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_duplicate - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_unknown_installation - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_known_installation_suspend - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_removed_repos - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_github_event_service.py::test_process_webhook_event_reaction_failure_marks_failed - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_repository_service.py::test_list_available_repositories_flags_already_added - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_repository_service.py::test_add_repository_idempotency - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_repository_service.py::test_add_repository_rejects_unauthorized - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_repository_service.py::test_set_monitoring_enabled_ownership - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\services\test_repository_service.py::test_disable_monitoring_for_removed_repositories - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_auth_flow.py::test_auth_flow_e2e - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_auth_flow.py::test_dev_login_fails_non_development_provider - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
 ERROR backend\tests\integration\test_github_api.py::test_github_install_flow - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
 ERROR backend\tests\integration\test_github_api.py::test_github_install_callback_rejections - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
 ERROR backend\tests\integration\test_github_api.py::test_github_endpoints_unauthenticated - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
-======================== 3 warnings, 3 errors in 0.30s ========================
+ERROR backend\tests\integration\test_github_event_model.py::test_create_github_event_required_fields_only - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_github_event_model.py::test_github_event_delivery_id_unique - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_github_models.py::test_valid_connection_and_repo - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_github_models.py::test_duplicate_connection - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_github_models.py::test_duplicate_repo - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_migrations.py::test_alembic_upgrade_head_completes - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_repositories_api.py::test_repositories_endpoints_unauthenticated - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_repositories_api.py::test_repositories_happy_path - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_repositories_api.py::test_repositories_ownership_protection - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_user_model.py::test_create_user - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_user_model.py::test_email_uniqueness - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_webhooks_api.py::test_webhook_valid_new_delivery - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_webhooks_api.py::test_webhook_valid_duplicate_delivery - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_webhooks_api.py::test_webhook_invalid_missing_signature - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_webhooks_api.py::test_webhook_missing_delivery_or_event - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_webhooks_api.py::test_webhook_malformed_json_valid_signature - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_webhooks_api.py::test_webhook_installation_suspend - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+ERROR backend\tests\integration\test_webhooks_api.py::test_webhook_installation_created - alembic.util.exc.CommandError: Path doesn't exist: alembic.  Please use the 'init' command to create a new scripts folder.
+================== 81 passed, 4 warnings, 44 errors in 3.39s ==================

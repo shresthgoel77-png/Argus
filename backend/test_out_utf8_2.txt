@@ -1,0 +1,374 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 125 items
+
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_new PASSED [  0%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_idempotent_update PASSED [  1%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_ownership_reassignment PASSED [  2%]
+tests/integration/services/test_github_connection_service.py::test_list_connections PASSED [  3%]
+tests/integration/services/test_github_connection_service.py::test_get_connection_or_404 PASSED [  4%]
+tests/integration/services/test_github_connection_service.py::test_handle_installation_status_change PASSED [  4%]
+tests/integration/services/test_github_event_service.py::test_record_event_success PASSED [  5%]
+tests/integration/services/test_github_event_service.py::test_record_event_duplicate_returns_none FAILED [  6%]
+tests/integration/services/test_github_event_service.py::test_status_transitions PASSED [  7%]
+tests/integration/services/test_github_event_service.py::test_mark_failed_strips_secrets FAILED [  8%]
+tests/integration/services/test_github_event_service.py::test_concurrent_insert_race PASSED [  8%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_duplicate PASSED [  9%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_unknown_installation PASSED [ 10%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_known_installation_suspend PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_removed_repos PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_reaction_failure_marks_failed FAILED [ 12%]
+tests/integration/services/test_repository_service.py::test_list_available_repositories_flags_already_added PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_add_repository_idempotency PASSED [ 14%]
+tests/integration/services/test_repository_service.py::test_add_repository_rejects_unauthorized PASSED [ 15%]
+tests/integration/services/test_repository_service.py::test_set_monitoring_enabled_ownership PASSED [ 16%]
+tests/integration/services/test_repository_service.py::test_disable_monitoring_for_removed_repositories PASSED [ 16%]
+tests/integration/test_auth_flow.py::test_auth_flow_e2e PASSED           [ 17%]
+tests/integration/test_auth_flow.py::test_dev_login_fails_non_development_provider PASSED [ 18%]
+tests/integration/test_github_api.py::test_github_install_flow PASSED    [ 19%]
+tests/integration/test_github_api.py::test_github_install_callback_rejections PASSED [ 20%]
+tests/integration/test_github_api.py::test_github_endpoints_unauthenticated PASSED [ 20%]
+tests/integration/test_github_event_model.py::test_create_github_event_required_fields_only PASSED [ 21%]
+tests/integration/test_github_event_model.py::test_github_event_delivery_id_unique PASSED [ 22%]
+tests/integration/test_github_models.py::test_valid_connection_and_repo PASSED [ 23%]
+tests/integration/test_github_models.py::test_duplicate_connection PASSED [ 24%]
+tests/integration/test_github_models.py::test_duplicate_repo PASSED      [ 24%]
+tests/integration/test_migrations.py::test_alembic_upgrade_head_completes PASSED [ 25%]
+tests/integration/test_repositories_api.py::test_repositories_endpoints_unauthenticated PASSED [ 26%]
+tests/integration/test_repositories_api.py::test_repositories_happy_path PASSED [ 27%]
+tests/integration/test_repositories_api.py::test_repositories_ownership_protection PASSED [ 28%]
+tests/integration/test_user_model.py::test_create_user PASSED            [ 28%]
+tests/integration/test_user_model.py::test_email_uniqueness PASSED       [ 29%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_new_delivery PASSED [ 30%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_duplicate_delivery FAILED [ 31%]
+tests/integration/test_webhooks_api.py::test_webhook_invalid_missing_signature PASSED [ 32%]
+tests/integration/test_webhooks_api.py::test_webhook_missing_delivery_or_event PASSED [ 32%]
+tests/integration/test_webhooks_api.py::test_webhook_malformed_json_valid_signature PASSED [ 33%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_suspend PASSED [ 34%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_created PASSED [ 35%]
+tests/test_db_connection.py::test_connection PASSED                      [ 36%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_pull_request PASSED [ 36%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_issues PASSED [ 37%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_issue_comment PASSED [ 38%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_workflow_run PASSED [ 39%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_push PASSED [ 40%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_installation PASSED [ 40%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_installation_repositories PASSED [ 41%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_malformed_non_dict_payload PASSED [ 42%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_partially_malformed_repository PASSED [ 43%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_malformed_installation PASSED [ 44%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_unsupported_event_with_valid_shapes PASSED [ 44%]
+tests/unit/test_auth_config_safety.py::test_settings_development_auth PASSED [ 45%]
+tests/unit/test_auth_config_safety.py::test_settings_test_env_auth PASSED [ 46%]
+tests/unit/test_auth_config_safety.py::test_settings_production_auth_safety PASSED [ 47%]
+tests/unit/test_auth_factory_safety.py::test_factory_returns_dev_in_non_prod PASSED [ 48%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_dev_in_production PASSED [ 48%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_unrecognized PASSED [ 49%]
+tests/unit/test_config.py::test_config_loads_valid_values PASSED         [ 50%]
+tests/unit/test_config.py::test_config_invalid_app_env_fails PASSED      [ 51%]
+tests/unit/test_config.py::test_config_cors_origins_parsing PASSED       [ 52%]
+tests/unit/test_config.py::test_config_cors_origins_json_parsing PASSED  [ 52%]
+tests/unit/test_config.py::test_config_non_dev_requires_db PASSED        [ 53%]
+tests/unit/test_config.py::test_config_empty_github_app_id_fails PASSED  [ 54%]
+tests/unit/test_config.py::test_config_empty_github_app_slug_fails PASSED [ 55%]
+tests/unit/test_config.py::test_config_empty_github_app_private_key_fails PASSED [ 56%]
+tests/unit/test_config.py::test_config_empty_github_app_webhook_secret_fails PASSED [ 56%]
+tests/unit/test_development_auth_adapter.py::test_unauthenticated PASSED [ 57%]
+tests/unit/test_development_auth_adapter.py::test_login_and_resolve PASSED [ 58%]
+tests/unit/test_development_auth_adapter.py::test_logout PASSED          [ 59%]
+tests/unit/test_development_auth_adapter.py::test_invalid_tampered_cookie PASSED [ 60%]
+tests/unit/test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 60%]
+tests/unit/test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [ 61%]
+tests/unit/test_error_handling.py::test_global_exception_handler_ignores_websocket PASSED [ 62%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_is_well_formed_and_verifiable PASSED [ 63%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_iat_is_backdated PASSED [ 64%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_exp_within_10_minutes PASSED [ 64%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_uses_rs256_algorithm PASSED [ 65%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_caching_returns_same_token PASSED [ 66%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_refreshes_when_near_expiry PASSED [ 67%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_fetches_token_from_github PASSED [ 68%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_caches_token_before_expiry PASSED [ 68%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_refreshes_token_when_near_expiry PASSED [ 69%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_raises_on_github_error_response PASSED [ 70%]
+tests/unit/test_github_client.py::TestGetInstallation::test_returns_installation_dict PASSED [ 71%]
+tests/unit/test_github_client.py::TestGetInstallation::test_uses_app_jwt_auth PASSED [ 72%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_single_page PASSED [ 72%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_multi_page_pagination PASSED [ 73%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_empty_repositories PASSED [ 74%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[401-GitHubAuthError] PASSED [ 75%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[403-GitHubAuthError] PASSED [ 76%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[404-GitHubNotFoundError] PASSED [ 76%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[429-GitHubRateLimitError] PASSED [ 77%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[500-GitHubAPIError] PASSED [ 78%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_api_error_is_app_error PASSED [ 79%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_auth_error_is_github_api_error PASSED [ 80%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_not_found_error_is_github_api_error PASSED [ 80%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_rate_limit_error_is_github_api_error PASSED [ 81%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_all_are_catchable_as_app_error PASSED [ 82%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[401-GitHubAuthError-github_auth_error] PASSED [ 83%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[403-GitHubAuthError-github_auth_error] PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[404-GitHubNotFoundError-github_not_found] PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[429-GitHubRateLimitError-github_rate_limit] PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[500-GitHubAPIError-github_api_error] PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[502-GitHubAPIError-github_api_error] PASSED [ 87%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[422-GitHubAPIError-github_api_error] PASSED [ 88%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_preserves_response_status PASSED [ 88%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_handles_non_json_body PASSED [ 89%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_api_error_defaults PASSED [ 90%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_auth_error_defaults PASSED [ 91%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_not_found_defaults PASSED [ 92%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_rate_limit_defaults PASSED [ 92%]
+tests/unit/test_health.py::test_health_endpoint PASSED                   [ 93%]
+tests/unit/test_logging.py::test_configure_logging_development PASSED    [ 94%]
+tests/unit/test_logging.py::test_configure_logging_production PASSED     [ 95%]
+tests/unit/test_logging.py::test_get_logger PASSED                       [ 96%]
+tests/unit/test_webhook_security.py::test_verify_signature_correct PASSED [ 96%]
+tests/unit/test_webhook_security.py::test_verify_signature_wrong_secret PASSED [ 97%]
+tests/unit/test_webhook_security.py::test_verify_signature_tampered_body PASSED [ 98%]
+tests/unit/test_webhook_security.py::test_verify_signature_missing_header PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_malformed_header PASSED [100%]
+
+================================== FAILURES ===================================
+__________________ test_record_event_duplicate_returns_none ___________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000190F3C25040>
+mock_normalized_event = NormalizedWebhookEvent(delivery_id='17084773-ff0c-4c45-9c74-57b8f8ed6f83', event_type='push', action=None, installatio...count_login='test', installation_account_type='Organization', repositories_removed=[], raw_payload={'mock': 'payload'})
+
+    def test_record_event_duplicate_returns_none(db_session: Session, mock_normalized_event: NormalizedWebhookEvent):
+        repo_id = uuid.uuid4()
+    
+        event1 = record_event(db_session, mock_normalized_event, repo_id)
+        assert event1 is not None
+    
+        # Try inserting the same delivery_id again
+        event2 = record_event(db_session, mock_normalized_event, repo_id)
+    
+        # Should cleanly return None, not raise IntegrityError
+        assert event2 is None
+    
+        # Ensure only one is in the DB
+        count = db_session.query(GitHubEvent).filter_by(delivery_id=mock_normalized_event.delivery_id).count()
+>       assert count == 1
+E       assert 0 == 1
+
+tests\integration\services\test_github_event_service.py:59: AssertionError
+_______________________ test_mark_failed_strips_secrets _______________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000190F3BD6350>
+mock_normalized_event = NormalizedWebhookEvent(delivery_id='b0948f0a-abf9-4cb0-b237-a36116deadd4', event_type='push', action=None, installatio...count_login='test', installation_account_type='Organization', repositories_removed=[], raw_payload={'mock': 'payload'})
+
+    def test_mark_failed_strips_secrets(db_session: Session, mock_normalized_event: NormalizedWebhookEvent):
+        event = record_event(db_session, mock_normalized_event, None)
+    
+        # Ensure settings has a secret to strip
+>       original_secret = settings.GITHUB_WEBHOOK_SECRET
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\services\test_github_event_service.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = Settings(app_env='test', auth_provider='development', session_secret_key='dev_secret_key_change_me_in_production', dat...y=SecretStr('**********'), github_app_webhook_secret=SecretStr('**********'), github_app_install_state_ttl_seconds=600)
+item = 'GITHUB_WEBHOOK_SECRET'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'GITHUB_WEBHOOK_SECRET'
+
+venv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+__________ test_process_webhook_event_reaction_failure_marks_failed ___________
+
+args = (<sqlalchemy.orm.session.Session object at 0x00000190F3C649B0>, 33333, 'suspend')
+kwargs = {}
+
+    def fake_handler(*args, **kwargs):
+>       raise ValueError("Simulated reaction failure")
+E       ValueError: Simulated reaction failure
+
+tests\integration\services\test_github_event_service.py:239: ValueError
+
+During handling of the above exception, another exception occurred:
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000190F3C649B0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000190F3C24AF0>
+
+    def test_process_webhook_event_reaction_failure_marks_failed(db_session, monkeypatch):
+        u = User(email="t3@a.com", display_name="T3", auth_provider="o", external_auth_id="3")
+        db_session.add(u)
+        db_session.commit()
+        conn = GitHubConnection(user_id=u.id, installation_id=33333, account_login="org3", account_type="Organization", status="active")
+        db_session.add(conn)
+        db_session.commit()
+    
+        import app.services.github_event_service
+        def fake_handler(*args, **kwargs):
+            raise ValueError("Simulated reaction failure")
+    
+        monkeypatch.setattr(app.services.github_event_service, "handle_installation_status_change", fake_handler)
+    
+        mock_event = NormalizedWebhookEvent(
+            delivery_id="fail-1",
+            event_type="installation",
+            action="suspend",
+            installation_id=33333,
+            repository=None,
+            installation_account_login="org3",
+            installation_account_type="Organization",
+            repositories_removed=[],
+            raw_payload={}
+        )
+    
+>       result = process_webhook_event(db_session, mock_event, MagicMock())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\services\test_github_event_service.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+app\services\github_event_service.py:149: in process_webhook_event
+    return mark_failed(db, event, e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\github_event_service.py:79: in mark_failed
+    error_msg = _strip_secrets(error_msg)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\github_event_service.py:21: in _strip_secrets
+    secret = settings.GITHUB_WEBHOOK_SECRET
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = Settings(app_env='test', auth_provider='development', session_secret_key='dev_secret_key_change_me_in_production', dat...y=SecretStr('**********'), github_app_webhook_secret=SecretStr('**********'), github_app_install_state_ttl_seconds=600)
+item = 'GITHUB_WEBHOOK_SECRET'
+
+    def __getattr__(self, item: str) -> Any:
+        private_attributes = object.__getattribute__(self, '__private_attributes__')
+        if item in private_attributes:
+            attribute = private_attributes[item]
+            if hasattr(attribute, '__get__'):
+                return attribute.__get__(self, type(self))  # type: ignore
+    
+            try:
+                # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
+                return self.__pydantic_private__[item]  # type: ignore
+            except KeyError as exc:
+                raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}') from exc
+        else:
+            # `__pydantic_extra__` can fail to be set if the model is not yet fully initialized.
+            # See `BaseModel.__repr_args__` for more details
+            try:
+                pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
+            except AttributeError:
+                pydantic_extra = None
+    
+            if pydantic_extra and item in pydantic_extra:
+                return pydantic_extra[item]
+            else:
+                if hasattr(self.__class__, item):
+                    return super().__getattribute__(item)  # Raises AttributeError if appropriate
+                else:
+                    # this is the current error
+>                   raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+E                   AttributeError: 'Settings' object has no attribute 'GITHUB_WEBHOOK_SECRET'
+
+venv\Lib\site-packages\pydantic\main.py:1042: AttributeError
+____________________ test_webhook_valid_duplicate_delivery ____________________
+
+unauth_client = <starlette.testclient.TestClient object at 0x00000190F3C24AF0>
+db_session = <sqlalchemy.orm.session.Session object at 0x00000190F3BF2E40>
+
+    def test_webhook_valid_duplicate_delivery(unauth_client, db_session):
+        payload = {"action": "created", "installation": {"id": 222}}
+        body_bytes = json.dumps(payload).encode("utf-8")
+        sig = _sign_payload(body_bytes)
+        delivery_id = str(uuid4())
+    
+        headers = {
+            "x-github-event": "push",
+            "x-github-delivery": delivery_id,
+            "x-hub-signature-256": sig
+        }
+    
+        resp1 = unauth_client.post("/api/v1/webhooks/github", content=body_bytes, headers=headers)
+        assert resp1.status_code == 200
+    
+        resp2 = unauth_client.post("/api/v1/webhooks/github", content=body_bytes, headers=headers)
+        assert resp2.status_code == 200
+    
+        events = db_session.query(GitHubEvent).filter_by(delivery_id=delivery_id).all()
+>       assert len(events) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\integration\test_webhooks_api.py:68: AssertionError
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\main.py:19
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:19: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/integration/services/test_github_event_service.py::test_record_event_duplicate_returns_none
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_duplicate
+tests/integration/test_github_event_model.py::test_github_event_delivery_id_unique
+tests/integration/test_github_models.py::test_duplicate_connection
+tests/integration/test_github_models.py::test_duplicate_repo
+tests/integration/test_user_model.py::test_email_uniqueness
+tests/integration/test_webhooks_api.py::test_webhook_valid_duplicate_delivery
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\integration\conftest.py:52: SAWarning: transaction already deassociated from connection
+    transaction.rollback()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/services/test_github_event_service.py::test_record_event_duplicate_returns_none - assert 0 == 1
+FAILED tests/integration/services/test_github_event_service.py::test_mark_failed_strips_secrets - AttributeError: 'Settings' object has no attribute 'GITHUB_WEBHOOK_SECRET'
+FAILED tests/integration/services/test_github_event_service.py::test_process_webhook_event_reaction_failure_marks_failed - AttributeError: 'Settings' object has no attribute 'GITHUB_WEBHOOK_SECRET'
+FAILED tests/integration/test_webhooks_api.py::test_webhook_valid_duplicate_delivery - assert 0 == 1
+ +  where 0 = len([])
+================= 4 failed, 121 passed, 11 warnings in 2.74s ==================

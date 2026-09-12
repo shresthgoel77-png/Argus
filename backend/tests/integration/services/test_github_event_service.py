@@ -75,8 +75,9 @@ def test_mark_failed_strips_secrets(db_session: Session, mock_normalized_event: 
     event = record_event(db_session, mock_normalized_event, None)
     
     # Ensure settings has a secret to strip
-    original_secret = settings.GITHUB_WEBHOOK_SECRET
-    settings.GITHUB_WEBHOOK_SECRET = "super_secret_webhook_token_value"
+    original_secret = settings.github_app_webhook_secret
+    from pydantic import SecretStr
+    settings.github_app_webhook_secret = SecretStr("super_secret_webhook_token_value")
     
     try:
         error = Exception("Signature validation failed for super_secret_webhook_token_value: invalid hash")
@@ -88,7 +89,7 @@ def test_mark_failed_strips_secrets(db_session: Session, mock_normalized_event: 
         assert "super_secret_webhook_token_value" not in event_failed.error_message
         assert "***STRIPPED_SECRET***" in event_failed.error_message
     finally:
-        settings.GITHUB_WEBHOOK_SECRET = original_secret
+        settings.github_app_webhook_secret = original_secret
 
 def test_concurrent_insert_race(SessionLocal, mock_normalized_event: NormalizedWebhookEvent):
     repo_id = uuid.uuid4()

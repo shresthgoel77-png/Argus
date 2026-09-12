@@ -18,7 +18,7 @@ logger = get_logger(__name__)
 
 def _strip_secrets(error_str: str) -> str:
     """Removes sensitive webhook secrets from error messages."""
-    secret = settings.GITHUB_WEBHOOK_SECRET
+    secret = settings.github_app_webhook_secret.get_secret_value() if settings.github_app_webhook_secret else None
     if secret and secret in error_str:
         error_str = error_str.replace(secret, "***STRIPPED_SECRET***")
     return error_str
@@ -42,13 +42,12 @@ def record_event(
         payload=normalized_event.raw_payload,
         status="received"
     )
-    db.add(event)
-    
     try:
+        with db.begin_nested():
+            db.add(event)
         db.commit()
     except IntegrityError:
         # This delivery was already recorded
-        db.rollback()
         return None
         
     db.refresh(event)

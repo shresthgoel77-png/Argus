@@ -82,3 +82,29 @@ def get_connection_or_404(db: Session, user_id: uuid.UUID, connection_id: uuid.U
         raise NotFoundError("GitHub connection not found")
         
     return connection
+
+def handle_installation_status_change(db: Session, installation_id: int, action: str) -> GitHubConnection | None:
+    """
+    Updates the connection status based on the installation webhook action.
+    Returns None if the connection is not found.
+    """
+    connection = db.query(GitHubConnection).filter(
+        GitHubConnection.installation_id == installation_id
+    ).first()
+    
+    if not connection:
+        return None
+        
+    if action == "deleted":
+        connection.status = "removed"
+    elif action == "suspend":
+        connection.status = "suspended"
+    elif action == "unsuspend":
+        connection.status = "active"
+    elif action == "new_permissions_accepted":
+        pass
+        
+    db.commit()
+    db.refresh(connection)
+    
+    return connection

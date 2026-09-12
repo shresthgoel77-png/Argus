@@ -11,6 +11,9 @@ from app.models.github_event import GitHubEvent
 from app.integrations.github.webhook_events import NormalizedWebhookEvent, RepoRef
 from app.services.github_event_service import record_event, mark_processed, mark_ignored, mark_failed
 from app.core.config import settings
+from app.services.github_event_service import process_webhook_event
+from app.models.github_connection import GitHubConnection
+from unittest.mock import MagicMock
 
 @pytest.fixture
 def mock_normalized_event():
@@ -128,3 +131,128 @@ def test_concurrent_insert_race(SessionLocal, mock_normalized_event: NormalizedW
     session.commit()
     session.close()
 
+
+def test_process_webhook_event_duplicate(db_session):
+    # insert an event directly
+    event = GitHubEvent(delivery_id="dup-1", event_type="push", payload={}, status="processed")
+    db_session.add(event)
+    db_session.commit()
+    
+    mock_event = NormalizedWebhookEvent(
+        delivery_id="dup-1",
+        event_type="push",
+        action=None,
+        installation_id=None,
+        repository=None,
+        installation_account_login=None,
+        installation_account_type=None,
+        repositories_removed=[],
+        raw_payload={}
+    )
+    result = process_webhook_event(db_session, mock_event, MagicMock())
+    assert result is None
+
+def test_process_webhook_event_unknown_installation(db_session):
+    mock_event = NormalizedWebhookEvent(
+        delivery_id="unknown-1",
+        event_type="installation",
+        action="created",
+        installation_id=99999,
+        repository=None,
+        installation_account_login="org1",
+        installation_account_type="Organization",
+        repositories_removed=[],
+        raw_payload={}
+    )
+    result = process_webhook_event(db_session, mock_event, MagicMock())
+    assert result is not None
+    assert result.status == "ignored"
+
+def test_process_webhook_event_known_installation_suspend(db_session):
+    u = User(email="test@a.com", display_name="Test", auth_provider="o", external_auth_id="1")
+    db_session.add(u)
+    db_session.commit()
+    conn = GitHubConnection(user_id=u.id, installation_id=11111, account_login="org1", account_type="Organization", status="active")
+    db_session.add(conn)
+    db_session.commit()
+    
+    mock_event = NormalizedWebhookEvent(
+        delivery_id="known-1",
+        event_type="installation",
+        action="suspend",
+        installation_id=11111,
+        repository=None,
+        installation_account_login="org1",
+        installation_account_type="Organization",
+        repositories_removed=[],
+        raw_payload={}
+    )
+    
+    result = process_webhook_event(db_session, mock_event, MagicMock())
+    assert result is not None
+    assert result.status == "processed"
+    
+    db_session.refresh(conn)
+    assert conn.status == "suspended"
+
+def test_process_webhook_event_removed_repos(db_session):
+    u = User(email="t2@a.com", display_name="T2", auth_provider="o", external_auth_id="2")
+    db_session.add(u)
+    db_session.commit()
+    conn = GitHubConnection(user_id=u.id, installation_id=22222, account_login="org2", account_type="Organization", status="active")
+    db_session.add(conn)
+    db_session.commit()
+    
+    repo = Repository(connection_id=conn.id, github_repo_id=12345, full_name="org2/r", private=False, monitoring_enabled=True)
+    db_session.add(repo)
+    db_session.commit()
+    
+    mock_event = NormalizedWebhookEvent(
+        delivery_id="repo-rem-1",
+        event_type="installation_repositories",
+        action="removed",
+        installation_id=22222,
+        repository=None,
+        installation_account_login="org2",
+        installation_account_type="Organization",
+        repositories_removed=[RepoRef(github_repo_id=12345, full_name="org2/r")],
+        raw_payload={}
+    )
+    
+    result = process_webhook_event(db_session, mock_event, MagicMock())
+    assert result is not None
+    assert result.status == "processed"
+    
+    db_session.refresh(repo)
+    assert repo.monitoring_enabled is False
+
+def test_process_webhook_event_reaction_failure_marks_failed(db_session, monkeypatch):
+    u = User(email="t3@a.com", display_name="T3", auth_provider="o", external_auth_id="3")
+    db_session.add(u)
+    db_session.commit()
+    conn = GitHubConnection(user_id=u.id, installation_id=33333, account_login="org3", account_type="Organization", status="active")
+    db_session.add(conn)
+    db_session.commit()
+
+    import app.services.github_event_service
+    def fake_handler(*args, **kwargs):
+        raise ValueError("Simulated reaction failure")
+        
+    monkeypatch.setattr(app.services.github_event_service, "handle_installation_status_change", fake_handler)
+    
+    mock_event = NormalizedWebhookEvent(
+        delivery_id="fail-1",
+        event_type="installation",
+        action="suspend",
+        installation_id=33333,
+        repository=None,
+        installation_account_login="org3",
+        installation_account_type="Organization",
+        repositories_removed=[],
+        raw_payload={}
+    )
+    
+    result = process_webhook_event(db_session, mock_event, MagicMock())
+    assert result is not None
+    assert result.status == "failed"
+    assert "Simulated reaction failure" in result.error_message

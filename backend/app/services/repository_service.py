@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.repository import Repository
 from app.models.github_connection import GitHubConnection
 from app.integrations.github.client import GitHubAppClient
+from app.integrations.github.webhook_events import RepoRef
 from app.schemas.repository import AvailableRepository
 from app.core.exceptions import NotFoundError
 from app.core.logging import get_logger
@@ -158,3 +159,42 @@ def set_monitoring_enabled(
     )
 
     return repository
+
+def disable_monitoring_for_removed_repositories(
+    db: Session, connection: GitHubConnection, removed: list[RepoRef]
+) -> list[Repository]:
+    """
+    Disables monitoring for repositories removed from an installation.
+    Skips repositories not already in our database or not monitored.
+    """
+    affected_repos = []
+    
+    for repo_ref in removed:
+        repo = (
+            db.query(Repository)
+            .filter(
+                Repository.connection_id == connection.id,
+                Repository.github_repo_id == repo_ref.github_repo_id,
+            )
+            .first()
+        )
+        
+        if repo and repo.monitoring_enabled:
+            repo.monitoring_enabled = False
+            affected_repos.append(repo)
+            
+            logger.info(
+                "Repository monitoring disabled due to removal from installation.",
+                extra={
+                    "repository_id": str(repo.id),
+                    "github_repo_id": repo.github_repo_id,
+                    "connection_id": str(connection.id),
+                },
+            )
+            
+    if affected_repos:
+        db.commit()
+        for repo in affected_repos:
+            db.refresh(repo)
+            
+    return affected_repos

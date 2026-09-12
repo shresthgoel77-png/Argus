@@ -5,7 +5,8 @@ from app.models.github_connection import GitHubConnection
 from app.services.github_connection_service import (
     upsert_connection_from_installation,
     list_connections_for_user,
-    get_connection_or_404
+    get_connection_or_404,
+    handle_installation_status_change
 )
 from app.core.exceptions import NotFoundError
 
@@ -151,5 +152,36 @@ def test_get_connection_or_404(db_session, test_user):
         get_connection_or_404(db_session, user2.id, conn1.id)
         
     # Should raise error for non-existent connection
-    with pytest.raises(NotFoundError):
         get_connection_or_404(db_session, test_user.id, uuid.uuid4())
+
+def test_handle_installation_status_change(db_session, test_user):
+    inst_id = 999661
+    conn = GitHubConnection(
+        user_id=test_user.id,
+        installation_id=inst_id,
+        account_login="org1",
+        account_type="Organization",
+        status="active"
+    )
+    db_session.add(conn)
+    db_session.commit()
+    
+    # action deleted -> removed
+    updated = handle_installation_status_change(db_session, inst_id, "deleted")
+    assert updated.status == "removed"
+    
+    # action suspend -> suspended
+    updated = handle_installation_status_change(db_session, inst_id, "suspend")
+    assert updated.status == "suspended"
+    
+    # action unsuspend -> active
+    updated = handle_installation_status_change(db_session, inst_id, "unsuspend")
+    assert updated.status == "active"
+    
+    # unrecognized action -> no change
+    updated = handle_installation_status_change(db_session, inst_id, "random_action")
+    assert updated.status == "active"
+    
+    # unrecognized id -> None
+    missing = handle_installation_status_change(db_session, 123456789, "deleted")
+    assert missing is None

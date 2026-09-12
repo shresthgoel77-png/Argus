@@ -5,12 +5,14 @@ from app.services.repository_service import (
     add_repository,
     list_repositories_for_user,
     set_monitoring_enabled,
+    disable_monitoring_for_removed_repositories
 )
 from app.models.github_connection import GitHubConnection
 from app.models.repository import Repository
 from app.core.exceptions import NotFoundError
 from unittest.mock import AsyncMock, MagicMock
 from app.integrations.github.client import GitHubAppClient
+from app.integrations.github.webhook_events import RepoRef
 
 
 @pytest.fixture
@@ -140,3 +142,56 @@ def test_set_monitoring_enabled_ownership(db_session):
     # User 2 cannot toggle it
     with pytest.raises(NotFoundError):
         set_monitoring_enabled(db_session, user2_id, repo.id, False)
+
+def test_disable_monitoring_for_removed_repositories(db_session):
+    user_id = uuid.uuid4()
+    connection = GitHubConnection(
+        user_id=user_id,
+        installation_id=123,
+        account_login="testuser",
+        account_type="User",
+        status="active",
+    )
+    db_session.add(connection)
+    db_session.commit()
+
+    repo1 = Repository(
+        connection_id=connection.id,
+        github_repo_id=101,
+        full_name="testuser/repo1",
+        private=False,
+        default_branch="main",
+        monitoring_enabled=True,
+    )
+    repo2 = Repository(
+        connection_id=connection.id,
+        github_repo_id=102,
+        full_name="testuser/repo2",
+        private=False,
+        default_branch="main",
+        monitoring_enabled=True,
+    )
+    repo3 = Repository(
+        connection_id=connection.id,
+        github_repo_id=103,
+        full_name="testuser/repo3",
+        private=False,
+        default_branch="main",
+        monitoring_enabled=False,
+    )
+    db_session.add_all([repo1, repo2, repo3])
+    db_session.commit()
+    
+    removed = [
+        RepoRef(github_repo_id=101, full_name="testuser/repo1"),
+        RepoRef(github_repo_id=103, full_name="testuser/repo3"),
+        RepoRef(github_repo_id=999, full_name="testuser/repo999")
+    ]
+    
+    affected = disable_monitoring_for_removed_repositories(db_session, connection, removed)
+    
+    assert len(affected) == 1
+    assert affected[0].github_repo_id == 101
+    assert repo1.monitoring_enabled is False
+    assert repo2.monitoring_enabled is True
+    assert repo3.monitoring_enabled is False

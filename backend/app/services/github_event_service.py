@@ -1,12 +1,16 @@
 import uuid
-from typing import Optional
+from typing import Optional, Any
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
 
 from app.models.github_event import GitHubEvent
+from app.models.github_connection import GitHubConnection
+from app.models.repository import Repository
 from app.integrations.github.webhook_events import NormalizedWebhookEvent
+from app.services.github_connection_service import handle_installation_status_change
+from app.services.repository_service import disable_monitoring_for_removed_repositories
 from app.core.config import settings
 from app.core.logging import get_logger
 
@@ -83,3 +87,68 @@ def mark_failed(db: Session, event: GitHubEvent, error: Exception) -> GitHubEven
     db.commit()
     db.refresh(event)
     return event
+
+def process_webhook_event(
+    db: Session, normalized_event: NormalizedWebhookEvent, client: Any
+) -> GitHubEvent | None:
+    """
+    Main orchestration entry point for processing GitHub webhooks.
+    Records the event, attempts any configured reactions, and marks the
+    event status based on success/failure and reaction applicability.
+    """
+    repository_id = None
+    if normalized_event.repository:
+        repo = (
+            db.query(Repository)
+            .filter(
+                Repository.github_repo_id == normalized_event.repository.github_repo_id,
+                Repository.monitoring_enabled == True,
+            )
+            .first()
+        )
+        if repo:
+            repository_id = repo.id
+            
+    event = record_event(db, normalized_event, repository_id)
+    if not event:
+        return None
+        
+    is_reaction_event = False
+    if normalized_event.event_type == "installation" and normalized_event.action in {
+        "deleted", "suspend", "unsuspend", "new_permissions_accepted"
+    }:
+        is_reaction_event = True
+    elif normalized_event.event_type == "installation_repositories":
+        is_reaction_event = True
+        
+    try:
+        if (
+            normalized_event.event_type == "installation"
+            and normalized_event.action in {"deleted", "suspend", "unsuspend", "new_permissions_accepted"}
+        ):
+            if normalized_event.installation_id is not None:
+                handle_installation_status_change(
+                    db, normalized_event.installation_id, normalized_event.action
+                )
+                
+        elif (
+            normalized_event.event_type == "installation_repositories"
+            and normalized_event.installation_id is not None
+        ):
+            conn = (
+                db.query(GitHubConnection)
+                .filter(GitHubConnection.installation_id == normalized_event.installation_id)
+                .first()
+            )
+            if conn and normalized_event.repositories_removed:
+                disable_monitoring_for_removed_repositories(
+                    db, conn, normalized_event.repositories_removed
+                )
+                
+    except Exception as e:
+        return mark_failed(db, event, e)
+        
+    if is_reaction_event:
+        return mark_processed(db, event)
+    else:
+        return mark_ignored(db, event)

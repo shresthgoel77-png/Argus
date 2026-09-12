@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     github_app_id: str
     github_app_slug: str
     github_app_private_key: SecretStr
+    github_app_webhook_secret: SecretStr
     github_app_install_state_ttl_seconds: int = 600
 
     @field_validator("cors_origins", mode="before")
@@ -39,6 +40,8 @@ class Settings(BaseSettings):
             raise ValueError("GITHUB_APP_SLUG is required and must not be empty")
         if not self.github_app_private_key or not self.github_app_private_key.get_secret_value():
             raise ValueError("GITHUB_APP_PRIVATE_KEY is required and must not be empty")
+        if not self.github_app_webhook_secret or not self.github_app_webhook_secret.get_secret_value():
+            raise ValueError("GITHUB_APP_WEBHOOK_SECRET is required and must not be empty")
 
         if self.app_env != "development":
             if not self.database_url:

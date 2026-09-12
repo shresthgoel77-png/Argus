@@ -79,3 +79,13 @@ def test_config_empty_github_app_private_key_fails(monkeypatch):
         Settings(_env_file=None)
     
     assert "GITHUB_APP_PRIVATE_KEY is required and must not be empty" in str(exc_info.value)
+
+def test_config_empty_github_app_webhook_secret_fails(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "development")
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+    monkeypatch.setenv("GITHUB_APP_WEBHOOK_SECRET", "")
+    
+    with pytest.raises(ValueError) as exc_info:
+        Settings(_env_file=None)
+    
+    assert "GITHUB_APP_WEBHOOK_SECRET is required and must not be empty" in str(exc_info.value)

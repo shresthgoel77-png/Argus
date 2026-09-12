@@ -139,3 +139,30 @@ def test_parse_malformed_installation():
     assert event.repository is None
     assert event.repositories_removed == []
 
+
+def test_parse_unsupported_event_with_valid_shapes():
+    payload = {
+        "action": "completed",
+        "installation": {
+            "id": 999,
+            "account": {"login": "my-org", "type": "Organization"},
+        },
+        "repository": {"id": 100, "full_name": "octocat/hello-world"},
+        "repositories_removed": [
+            {"id": 1, "full_name": "gone/repo1"}
+        ]
+    }
+    event = parse_webhook_payload("some_random_event", "deliv", payload)
+    
+    assert event.event_type == "some_random_event"
+    assert event.action == "completed"
+    assert event.installation_id == 999
+    
+    # Should all be None/empty since this event type doesn't support them canonically:
+    assert event.installation_account_login is None
+    assert event.installation_account_type is None
+    assert event.repository is None
+    assert event.repositories_removed == []
+    assert event.raw_payload == payload
+
+

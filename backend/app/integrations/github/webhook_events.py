@@ -42,34 +42,33 @@ def parse_webhook_payload(
     if not isinstance(install_account, dict):
         install_account = {}
 
-    installation_account_login = install_account.get("login")
-    installation_account_type = install_account.get("type")
-
-    # Extract repository
-    repo = payload.get("repository")
-    if not isinstance(repo, dict):
-        repo = {}
+    installation_account_login = None
+    installation_account_type = None
+    if event_type in ("installation", "installation_repositories"):
+        installation_account_login = install_account.get("login")
+        installation_account_type = install_account.get("type")
 
     repository = None
-    repo_id = repo.get("id")
-    repo_name = repo.get("full_name")
-    if repo_id is not None and repo_name is not None:
-        repository = RepoRef(github_repo_id=repo_id, full_name=repo_name)
-
-    # Extract repositories_removed
-    removed_repos = payload.get("repositories_removed")
-    if not isinstance(removed_repos, list):
-        removed_repos = []
+    if event_type in ("pull_request", "issues", "issue_comment", "workflow_run", "push"):
+        repo = payload.get("repository")
+        if isinstance(repo, dict):
+            repo_id = repo.get("id")
+            repo_name = repo.get("full_name")
+            if repo_id is not None and repo_name is not None:
+                repository = RepoRef(github_repo_id=repo_id, full_name=repo_name)
 
     repositories_removed: list[RepoRef] = []
-    for r in removed_repos:
-        if isinstance(r, dict):
-            r_id = r.get("id")
-            r_name = r.get("full_name")
-            if r_id is not None and r_name is not None:
-                repositories_removed.append(
-                    RepoRef(github_repo_id=r_id, full_name=r_name)
-                )
+    if event_type == "installation_repositories":
+        removed_repos = payload.get("repositories_removed")
+        if isinstance(removed_repos, list):
+            for r in removed_repos:
+                if isinstance(r, dict):
+                    r_id = r.get("id")
+                    r_name = r.get("full_name")
+                    if r_id is not None and r_name is not None:
+                        repositories_removed.append(
+                            RepoRef(github_repo_id=r_id, full_name=r_name)
+                        )
 
     return NormalizedWebhookEvent(
         delivery_id=delivery_id,

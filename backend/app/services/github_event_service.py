@@ -21,6 +21,7 @@ EVENT_TYPE_TO_ANALYZER: dict[str, str] = {
     "workflow_run": "ci",
     "pull_request": "pull_request",
     "issues": "issue",
+    "push": "repository_activity",
 }
 
 def _run_analyzer_sync(coro_func, *args, **kwargs):

@@ -25,6 +25,8 @@ class NormalizedWebhookEvent:
     workflow_run_name: str | None = None
     workflow_run_conclusion: str | None = None
     workflow_run_url: str | None = None
+    ref: str | None = None
+    forced: bool | None = None
 
 
 def parse_webhook_payload(
@@ -78,6 +80,9 @@ def parse_webhook_payload(
     workflow_run_name = None
     workflow_run_conclusion = None
     workflow_run_url = None
+    ref = None
+    forced = None
+    
     if event_type == "workflow_run":
         wf_run = payload.get("workflow_run")
         if isinstance(wf_run, dict):
@@ -85,6 +90,10 @@ def parse_webhook_payload(
             workflow_run_name = wf_run.get("name")
             workflow_run_conclusion = wf_run.get("conclusion")
             workflow_run_url = wf_run.get("html_url")
+            
+    if event_type == "push":
+        ref = payload.get("ref")
+        forced = payload.get("forced")
 
     return NormalizedWebhookEvent(
         delivery_id=delivery_id,
@@ -100,4 +109,6 @@ def parse_webhook_payload(
         workflow_run_name=workflow_run_name,
         workflow_run_conclusion=workflow_run_conclusion,
         workflow_run_url=workflow_run_url,
+        ref=ref,
+        forced=forced,
     )

@@ -1,6 +1,7 @@
 from typing import Optional
 from app.monitoring.analyzer_base import BaseAnalyzer
 from app.monitoring.analyzers.ci_analyzer import CIAnalyzer
+from app.monitoring.analyzers.pull_request_analyzer import PullRequestAnalyzer
 
 ANALYZER_REGISTRY: dict[str, BaseAnalyzer] = {}
 
@@ -11,4 +12,4 @@ def get_analyzer(key: str) -> Optional[BaseAnalyzer]:
     return ANALYZER_REGISTRY.get(key)
 
 register_analyzer(CIAnalyzer())
-
+register_analyzer(PullRequestAnalyzer())

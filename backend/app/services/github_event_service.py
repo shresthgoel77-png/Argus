@@ -13,8 +13,45 @@ from app.services.github_connection_service import handle_installation_status_ch
 from app.services.repository_service import disable_monitoring_for_removed_repositories
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.monitoring import monitor_service as MonitorService
 
 logger = get_logger(__name__)
+
+EVENT_TYPE_TO_ANALYZER: dict[str, str] = {
+    "workflow_run": "ci",
+}
+
+def _run_analyzer_sync(coro_func, *args, **kwargs):
+    import asyncio
+    import threading
+    result = None
+    exc = None
+    def _run():
+        nonlocal result, exc
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(coro_func(*args, **kwargs))
+        except Exception as e:
+            exc = e
+        finally:
+            loop.close()
+            
+    try:
+        current_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        current_loop = None
+        
+    if current_loop:
+        t = threading.Thread(target=_run)
+        t.start()
+        t.join()
+        if exc:
+            raise exc
+        return result
+    else:
+        return asyncio.run(coro_func(*args, **kwargs))
+
 
 def _strip_secrets(error_str: str) -> str:
     """Removes sensitive webhook secrets from error messages."""
@@ -119,6 +156,8 @@ def process_webhook_event(
         is_reaction_event = True
     elif normalized_event.event_type == "installation_repositories":
         is_reaction_event = True
+    elif repository_id is not None and normalized_event.event_type in EVENT_TYPE_TO_ANALYZER:
+        is_reaction_event = True
         
     try:
         if (
@@ -143,6 +182,16 @@ def process_webhook_event(
                 disable_monitoring_for_removed_repositories(
                     db, conn, normalized_event.repositories_removed
                 )
+                
+        elif repository_id is not None and normalized_event.event_type in EVENT_TYPE_TO_ANALYZER:
+            analyzer_key = EVENT_TYPE_TO_ANALYZER[normalized_event.event_type]
+            _run_analyzer_sync(
+                MonitorService.run_analyzer,
+                db=db,
+                analyzer_key=analyzer_key,
+                repository=repo,
+                normalized_event=normalized_event
+            )
                 
     except Exception as e:
         return mark_failed(db, event, e)

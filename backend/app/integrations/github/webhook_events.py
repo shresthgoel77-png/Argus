@@ -21,6 +21,10 @@ class NormalizedWebhookEvent:
     installation_account_type: str | None
     repositories_removed: list[RepoRef]
     raw_payload: dict[str, Any]
+    workflow_run_id: int | None = None
+    workflow_run_name: str | None = None
+    workflow_run_conclusion: str | None = None
+    workflow_run_url: str | None = None
 
 
 def parse_webhook_payload(
@@ -70,6 +74,18 @@ def parse_webhook_payload(
                             RepoRef(github_repo_id=r_id, full_name=r_name)
                         )
 
+    workflow_run_id = None
+    workflow_run_name = None
+    workflow_run_conclusion = None
+    workflow_run_url = None
+    if event_type == "workflow_run":
+        wf_run = payload.get("workflow_run")
+        if isinstance(wf_run, dict):
+            workflow_run_id = wf_run.get("id")
+            workflow_run_name = wf_run.get("name")
+            workflow_run_conclusion = wf_run.get("conclusion")
+            workflow_run_url = wf_run.get("html_url")
+
     return NormalizedWebhookEvent(
         delivery_id=delivery_id,
         event_type=event_type,
@@ -80,4 +96,8 @@ def parse_webhook_payload(
         installation_account_type=installation_account_type,
         repositories_removed=repositories_removed,
         raw_payload=payload,
+        workflow_run_id=workflow_run_id,
+        workflow_run_name=workflow_run_name,
+        workflow_run_conclusion=workflow_run_conclusion,
+        workflow_run_url=workflow_run_url,
     )

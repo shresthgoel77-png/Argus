@@ -1,6 +1,5 @@
 from typing import Any
 from app.monitoring.analyzer_base import BaseAnalyzer, AnalyzerContext, FindingDraft
-from app.integrations.github.exceptions import GitHubAuthError
 
 
 class DependencyAnalyzer(BaseAnalyzer):
@@ -24,6 +23,7 @@ class DependencyAnalyzer(BaseAnalyzer):
             return []
 
         npm_lockfiles = ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"]
+        from app.integrations.github.exceptions import GitHubAuthError
 
         try:
             # Check if package.json exists

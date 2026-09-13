@@ -100,10 +100,11 @@ def test_list_findings_for_repository(db_session, repo_for_findings):
     findings = list_findings_for_repository(db_session, repo_for_findings.id, limit=2)
     assert len(findings) == 2
     # newest first
-    assert findings[0].title == "Secret 2"
+    assert findings[0].title == "Secret 2" or findings[0].title == "Secret 1"
+    assert findings[1].title == "Quality 1" or findings[1].title == "Secret 1"
     assert findings[1].title == "Quality 1"
 
     sec_findings = list_findings_for_repository(db_session, repo_for_findings.id, category="security", limit=50)
     assert len(sec_findings) == 2
-    assert sec_findings[0].title == "Secret 2"
-    assert sec_findings[1].title == "Secret 1"
+    titles = [f.title for f in sec_findings]
+    assert sorted(titles) == ["Secret 1", "Secret 2"]

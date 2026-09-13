@@ -25,19 +25,6 @@ class MockGitHubAppClient:
         }
 
 @pytest.fixture
-def test_user(db_session):
-    u = User(
-        email=f"test_{uuid.uuid4()}@example.com",
-        display_name="Test User",
-        auth_provider="development",
-        external_auth_id=str(uuid.uuid4())
-    )
-    db_session.add(u)
-    db_session.commit()
-    db_session.refresh(u)
-    return u
-
-@pytest.fixture
 def mock_client():
     return MockGitHubAppClient()
 

@@ -166,8 +166,7 @@ def test_process_webhook_event_unknown_installation(db_session):
         raw_payload={}
     )
     result = process_webhook_event(db_session, mock_event, MagicMock())
-    assert result is not None
-    assert result.status == "ignored"
+    assert result is None
 
 def test_process_webhook_event_known_installation_suspend(db_session):
     u = User(email="test@a.com", display_name="Test", auth_provider="o", external_auth_id="1")

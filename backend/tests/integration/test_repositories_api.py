@@ -63,7 +63,7 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
                 {"id": 1001, "full_name": "test_org/repo1", "private": True, "default_branch": "main"},
                 {"id": 1002, "full_name": "test_org/repo2", "private": False, "default_branch": "master"}
             ]
-    def mock_init():
+    def mock_init(*args, **kwargs):
         return MockClient()
         
     # We patch the creation of the client when it's instantiated inside github.py and repositories.py
@@ -141,7 +141,7 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
     class MockClient:
         async def list_installation_repositories(self):
             return [{"id": 2001, "full_name": "other_org/repo1", "private": True, "default_branch": "main"}]
-    def mock_init():
+    def mock_init(*args, **kwargs):
         return MockClient()
         
     monkeypatch.setattr("app.api.v1.repositories.GitHubAppClient", mock_init)

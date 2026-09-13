@@ -1,0 +1,38 @@
+﻿
+Running 10 tests using 8 workers
+
+  Γ£ô   6 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:89:9 ΓÇ║ GitHub Settings Flow ΓÇ║ callback page shows inline error state when completeInstall fails (10.6s)
+  Γ£ô   8 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:49:9 ΓÇ║ GitHub Settings Flow ΓÇ║ shows existing connections list when data is available (10.5s)
+  Γ£ô   3 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:72:9 ΓÇ║ GitHub Settings Flow ΓÇ║ callback page shows success state when completeInstall succeeds (10.5s)
+  Γ£ô   1 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:14:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic login allows access to protected routes (10.8s)
+  Γ£ô   5 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route (11.3s)
+  Γ£ô   7 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly (14.3s)
+  Γ£ô   4 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access (15.4s)
+  Γ£ô   9 [chromium] ΓÇ║ e2e\tests\repositories-page.spec.ts:9:9 ΓÇ║ Repositories Page Flow ΓÇ║ shows empty state and links to settings when no connections exist (5.7s)
+  Γ£ô  10 [chromium] ΓÇ║ e2e\tests\repositories-page.spec.ts:37:9 ΓÇ║ Repositories Page Flow ΓÇ║ shows connections, adds a repository, and toggles monitoring (6.1s)
+  Γ£ÿ   2 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:14:9 ΓÇ║ GitHub Settings Flow ΓÇ║ shows Connect GitHub button when no connections exist and navigates on click (22.2s)
+
+
+  1) [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:14:9 ΓÇ║ GitHub Settings Flow ΓÇ║ shows Connect GitHub button when no connections exist and navigates on click 
+
+    TimeoutError: page.waitForURL: Timeout 10000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation until "load"
+      navigated to "https://github.com/login?integration=test-app&return_to=%2Fapps%2Ftest-app%2Finstallations%2Fnew"
+      navigated to "https://github.com/login?integration=test-app&return_to=%2Fapps%2Ftest-app%2Finstallations%2Fnew"
+    ============================================================
+
+      43 |
+      44 |         // Ensure that the page redirects to the expected URL
+    > 45 |         await page.waitForURL((url) => url.href.includes('github.com/apps'), { timeout: 10000 });
+         |                    ^
+      46 |         expect(page.url()).toContain('github.com/apps');
+      47 |     });
+      48 |
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\github-settings.spec.ts:45:20
+
+    Error Context: test-results\tests-github-settings-GitH-d96b8-xist-and-navigates-on-click-chromium\error-context.md
+
+  1 failed
+    [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:14:9 ΓÇ║ GitHub Settings Flow ΓÇ║ shows Connect GitHub button when no connections exist and navigates on click 
+  9 passed (32.3s)

@@ -34,6 +34,8 @@ def test_github_install_flow(client, monkeypatch):
 
     # 3. Mock GitHubAppClient to avoid real network calls
     class MockClient:
+        def __init__(self, *args, **kwargs):
+            pass
         async def get_installation(self, installation_id):
             return {"account": {"login": "octocat", "type": "User"}}
             

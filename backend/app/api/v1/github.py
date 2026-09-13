@@ -65,13 +65,80 @@ async def installation_callback(
             detail=str(e)
         )
         
+from fastapi import APIRouter, Depends, Query, HTTPException, status
+from sqlalchemy.orm import Session
+from app.models.user import User
+from app.auth.dependencies import get_current_user
+from app.db.session import get_db
+from app.core.config import settings
+from app.integrations.github.install_state import generate_install_state, verify_install_state
+from app.integrations.github.client import GitHubAppClient
+from app.services.github_connection_service import (
+    upsert_connection_from_installation,
+    list_connections_for_user,
+    get_connection_or_404
+)
+from app.schemas.github_connection import GitHubConnectionRead
+from app.services.repository_service import list_available_repositories
+from app.schemas.repository import AvailableRepository
+import uuid
+
+router = APIRouter(prefix="/github", tags=["github"])
+
+@router.get("/install/start")
+async def start_installation(user: User = Depends(get_current_user)):
+    """
+    Generates a state token and returns the installation URL.
+    """
+    state = generate_install_state(user.id)
+    install_url = f"https://github.com/apps/{settings.github_app_slug}/installations/new?state={state}"
+    return {"install_url": install_url}
+
+@router.get("/install/callback", response_model=GitHubConnectionRead)
+async def installation_callback(
+    installation_id: str | None = None,
+    setup_action: str | None = None,
+    state: str | None = None,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Handles the GitHub App installation callback forwarding endpoint. 
+    """
+    if not installation_id or not installation_id.isdigit():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing or malformed installation_id"
+        )
+    inst_id_int = int(installation_id)
+
+    if not setup_action or setup_action not in ("install", "update"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported or missing setup_action"
+        )
+        
+    if not state:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing state"
+        )
+        
+    try:
+        payload = verify_install_state(state)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+        
     if payload.get("user_id") != str(user.id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="State token belongs to a different user"
         )
         
-    client = GitHubAppClient()
+    client = GitHubAppClient(installation_id=inst_id_int)
     connection = await upsert_connection_from_installation(
         db=db,
         user_id=user.id,
@@ -103,6 +170,6 @@ async def get_available_repositories(
     Ownership is verified.
     """
     connection = get_connection_or_404(db=db, user_id=user.id, connection_id=connection_id)
-    client = GitHubAppClient()
+    client = GitHubAppClient(installation_id=connection.installation_id)
     # List the repos against GitHub API
     return await list_available_repositories(db=db, connection=connection, client=client)

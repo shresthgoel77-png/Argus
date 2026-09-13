@@ -1,1 +1,190 @@
-backend/app/core/config.py
+﻿diff --git a/backend/.env.example b/backend/.env.example
+index abae741..059045a 100644
+--- a/backend/.env.example
++++ b/backend/.env.example
+@@ -17,3 +17,5 @@ GITHUB_APP_WEBHOOK_SECRET=my_webhook_secret_here
+ GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+ # TTL in seconds for the GitHub App installation CSRF state token
+ GITHUB_APP_INSTALL_STATE_TTL_SECONDS=600
++
++WEBHOOK_URL=https://antonym-shorts-outcome.ngrok-free.dev/api/v1/webhooks/github
+diff --git a/backend/app/api/v1/github.py b/backend/app/api/v1/github.py
+index 65baa88..e52acc0 100644
+--- a/backend/app/api/v1/github.py
++++ b/backend/app/api/v1/github.py
+@@ -18,6 +18,73 @@ import uuid
+ 
+ router = APIRouter(prefix="/github", tags=["github"])
+ 
++@router.get("/install/start")
++async def start_installation(user: User = Depends(get_current_user)):
++    """
++    Generates a state token and returns the installation URL.
++    """
++    state = generate_install_state(user.id)
++    install_url = f"https://github.com/apps/{settings.github_app_slug}/installations/new?state={state}"
++    return {"install_url": install_url}
++
++@router.get("/install/callback", response_model=GitHubConnectionRead)
++async def installation_callback(
++    installation_id: str | None = None,
++    setup_action: str | None = None,
++    state: str | None = None,
++    user: User = Depends(get_current_user),
++    db: Session = Depends(get_db)
++):
++    """
++    Handles the GitHub App installation callback forwarding endpoint. 
++    """
++    if not installation_id or not installation_id.isdigit():
++        raise HTTPException(
++            status_code=status.HTTP_400_BAD_REQUEST,
++            detail="Missing or malformed installation_id"
++        )
++    inst_id_int = int(installation_id)
++
++    if not setup_action or setup_action not in ("install", "update"):
++        raise HTTPException(
++            status_code=status.HTTP_400_BAD_REQUEST,
++            detail=f"Unsupported or missing setup_action"
++        )
++        
++    if not state:
++        raise HTTPException(
++            status_code=status.HTTP_400_BAD_REQUEST,
++            detail="Missing state"
++        )
++        
++    try:
++        payload = verify_install_state(state)
++    except ValueError as e:
++        raise HTTPException(
++            status_code=status.HTTP_400_BAD_REQUEST,
++            detail=str(e)
++        )
++        
++from fastapi import APIRouter, Depends, Query, HTTPException, status
++from sqlalchemy.orm import Session
++from app.models.user import User
++from app.auth.dependencies import get_current_user
++from app.db.session import get_db
++from app.core.config import settings
++from app.integrations.github.install_state import generate_install_state, verify_install_state
++from app.integrations.github.client import GitHubAppClient
++from app.services.github_connection_service import (
++    upsert_connection_from_installation,
++    list_connections_for_user,
++    get_connection_or_404
++)
++from app.schemas.github_connection import GitHubConnectionRead
++from app.services.repository_service import list_available_repositories
++from app.schemas.repository import AvailableRepository
++import uuid
++
++router = APIRouter(prefix="/github", tags=["github"])
++
+ @router.get("/install/start")
+ async def start_installation(user: User = Depends(get_current_user)):
+     """
+@@ -71,7 +138,7 @@ async def installation_callback(
+             detail="State token belongs to a different user"
+         )
+         
+-    client = GitHubAppClient()
++    client = GitHubAppClient(installation_id=inst_id_int)
+     connection = await upsert_connection_from_installation(
+         db=db,
+         user_id=user.id,
+@@ -103,6 +170,6 @@ async def get_available_repositories(
+     Ownership is verified.
+     """
+     connection = get_connection_or_404(db=db, user_id=user.id, connection_id=connection_id)
+-    client = GitHubAppClient()
++    client = GitHubAppClient(installation_id=connection.installation_id)
+     # List the repos against GitHub API
+     return await list_available_repositories(db=db, connection=connection, client=client)
+diff --git a/backend/app/api/v1/repositories.py b/backend/app/api/v1/repositories.py
+index ec2939f..b5768e5 100644
+--- a/backend/app/api/v1/repositories.py
++++ b/backend/app/api/v1/repositories.py
+@@ -26,7 +26,7 @@ async def create_repository(
+     Verifies that the provided connection is owned by the current user.
+     """
+     connection = get_connection_or_404(db=db, user_id=user.id, connection_id=repo_in.connection_id)
+-    client = GitHubAppClient()
++    client = GitHubAppClient(installation_id=connection.installation_id)
+     return await add_repository(db=db, connection=connection, github_repo_id=repo_in.github_repo_id, client=client)
+ 
+ @router.get("", response_model=list[RepositoryRead])
+diff --git a/backend/tests/integration/test_github_api.py b/backend/tests/integration/test_github_api.py
+index dd4ff8c..e961a31 100644
+--- a/backend/tests/integration/test_github_api.py
++++ b/backend/tests/integration/test_github_api.py
+@@ -34,6 +34,8 @@ def test_github_install_flow(client, monkeypatch):
+ 
+     # 3. Mock GitHubAppClient to avoid real network calls
+     class MockClient:
++        def __init__(self, *args, **kwargs):
++            pass
+         async def get_installation(self, installation_id):
+             return {"account": {"login": "octocat", "type": "User"}}
+             
+diff --git a/backend/tests/integration/test_repositories_api.py b/backend/tests/integration/test_repositories_api.py
+index 4718511..ddc8e8c 100644
+--- a/backend/tests/integration/test_repositories_api.py
++++ b/backend/tests/integration/test_repositories_api.py
+@@ -63,7 +63,7 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
+                 {"id": 1001, "full_name": "test_org/repo1", "private": True, "default_branch": "main"},
+                 {"id": 1002, "full_name": "test_org/repo2", "private": False, "default_branch": "master"}
+             ]
+-    def mock_init():
++    def mock_init(*args, **kwargs):
+         return MockClient()
+         
+     # We patch the creation of the client when it's instantiated inside github.py and repositories.py
+@@ -141,7 +141,7 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
+     class MockClient:
+         async def list_installation_repositories(self):
+             return [{"id": 2001, "full_name": "other_org/repo1", "private": True, "default_branch": "main"}]
+-    def mock_init():
++    def mock_init(*args, **kwargs):
+         return MockClient()
+         
+     monkeypatch.setattr("app.api.v1.repositories.GitHubAppClient", mock_init)
+diff --git a/frontend/.gitignore b/frontend/.gitignore
+index 4aa15c4..022d378 100644
+--- a/frontend/.gitignore
++++ b/frontend/.gitignore
+@@ -33,7 +33,7 @@ eslint*.log
+ 
+ # env files (can opt-in for committing if needed)
+ .env*
+-
++.pem
+ # vercel
+ .vercel
+ 
+diff --git a/frontend/e2e/tests/github-settings.spec.ts b/frontend/e2e/tests/github-settings.spec.ts
+index 9af70b6..f773c0d 100644
+--- a/frontend/e2e/tests/github-settings.spec.ts
++++ b/frontend/e2e/tests/github-settings.spec.ts
+@@ -41,9 +41,10 @@ test.describe('GitHub Settings Flow', () => {
+         // Click the button and check navigation
+         await connectButton.click();
+ 
+-        // Ensure that the page redirects to the expected URL
+-        await page.waitForURL((url) => url.href.includes('github.com/apps'), { timeout: 10000 });
+-        expect(page.url()).toContain('github.com/apps');
++        // Ensure that the page redirects to the expected URL 
++        // Note: github.com redirects unauthenticated users to the login screen
++        await page.waitForURL((url) => url.href.includes('github.com/login') || url.href.includes('github.com/apps'), { timeout: 10000 });
++        expect(page.url()).toContain('github.com');
+     });
+ 
+     test('shows existing connections list when data is available', async ({ page }) => {
+diff --git a/git_diff_out.txt b/git_diff_out.txt
+index 3001b29..a5fc3c6 100644
+--- a/git_diff_out.txt
++++ b/git_diff_out.txt
+@@ -1 +0,0 @@
+-backend/app/core/config.py

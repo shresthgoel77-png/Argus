@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import String, ForeignKey, func, JSON, Text
+from sqlalchemy import String, ForeignKey, func, JSON, Text, Index, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING, Any
 from app.db.base_class import Base
@@ -27,6 +27,23 @@ class Finding(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False
+    )
+
+    priority: Mapped[str | None] = mapped_column(String, nullable=True)
+    fingerprint: Mapped[str | None] = mapped_column(String, nullable=True)
+    acknowledged_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    resolution_source: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    __table_args__ = (
+        Index(
+            "ix_finding_repository_id_fingerprint_open",
+            "repository_id",
+            "fingerprint",
+            unique=True,
+            postgresql_where=text("status = 'open' AND fingerprint IS NOT NULL"),
+            sqlite_where=text("status = 'open' AND fingerprint IS NOT NULL"),
+        ),
     )
 
     repository: Mapped["Repository"] = relationship()

@@ -1,6 +1,8 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 from app.monitoring.analyzers.code_quality_analyzer import CodeQualityAnalyzer
 from app.monitoring.analyzer_base import AnalyzerContext
 from app.integrations.github.exceptions import GitHubAuthError
@@ -16,23 +18,26 @@ def mock_context():
     context.repository.full_name = "test/repo"
     context.repository.id = 123
     context.repository.default_branch = "main"
+    context.repository.connection.installation_id = 999
     context.client = AsyncMock()
     return context
 
 @pytest.mark.asyncio
-async def test_analyzer_branch_protected(code_quality_analyzer, mock_context):
-    mock_context.client.get_branch_protection.return_value = {
+@patch("app.monitoring.analyzers.code_quality_analyzer.get_branch_protection")
+async def test_analyzer_branch_protected(mock_get_branch_protection, code_quality_analyzer, mock_context):
+    mock_get_branch_protection.return_value = {
         "url": "https://api.github.com/...",
         "required_status_checks": {}
     }
 
     findings = await code_quality_analyzer.analyze(mock_context)
     assert len(findings) == 0
-    mock_context.client.get_branch_protection.assert_called_once_with("test/repo", "main")
+    mock_get_branch_protection.assert_called_once_with(999, "test/repo", "main")
 
 @pytest.mark.asyncio
-async def test_analyzer_branch_not_protected(code_quality_analyzer, mock_context):
-    mock_context.client.get_branch_protection.return_value = None
+@patch("app.monitoring.analyzers.code_quality_analyzer.get_branch_protection")
+async def test_analyzer_branch_not_protected(mock_get_branch_protection, code_quality_analyzer, mock_context):
+    mock_get_branch_protection.return_value = None
 
     findings = await code_quality_analyzer.analyze(mock_context)
     assert len(findings) == 1
@@ -42,12 +47,13 @@ async def test_analyzer_branch_not_protected(code_quality_analyzer, mock_context
     assert finding.severity == "medium"
     assert finding.evidence == {"default_branch": "main"}
     assert "main" in finding.title
-    mock_context.client.get_branch_protection.assert_called_once_with("test/repo", "main")
+    mock_get_branch_protection.assert_called_once_with(999, "test/repo", "main")
 
 @pytest.mark.asyncio
-async def test_analyzer_github_auth_error(code_quality_analyzer, mock_context):
-    mock_context.client.get_branch_protection.side_effect = GitHubAuthError("403 Forbidden")
+@patch("app.monitoring.analyzers.code_quality_analyzer.get_branch_protection")
+async def test_analyzer_github_auth_error(mock_get_branch_protection, code_quality_analyzer, mock_context):
+    mock_get_branch_protection.side_effect = GitHubAuthError("403 Forbidden")
 
     findings = await code_quality_analyzer.analyze(mock_context)
     assert len(findings) == 0
-    mock_context.client.get_branch_protection.assert_called_once_with("test/repo", "main")
+    mock_get_branch_protection.assert_called_once_with(999, "test/repo", "main")

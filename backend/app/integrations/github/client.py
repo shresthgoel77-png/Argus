@@ -264,3 +264,19 @@ class GitHubAppClient:
             return response.json()
         except GitHubNotFoundError:
             return None
+
+async def get_branch_protection(
+    installation_id: int, full_name: str, branch: str
+) -> dict[str, Any] | None:
+    """Fetch branch protection rules for a repository branch standalone."""
+    from app.integrations.github.exceptions import GitHubNotFoundError
+    
+    async with GitHubAppClient(installation_id) as client:
+        try:
+            response = await client._request(
+                "GET",
+                f"/repos/{full_name}/branches/{branch}/protection"
+            )
+            return response.json()
+        except GitHubNotFoundError:
+            return None

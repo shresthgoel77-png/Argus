@@ -1,6 +1,7 @@
 from typing import Any
 from app.monitoring.analyzer_base import BaseAnalyzer, AnalyzerContext, FindingDraft
 from app.integrations.github.exceptions import GitHubAuthError
+from app.integrations.github.client import get_branch_protection
 
 
 class CodeQualityAnalyzer(BaseAnalyzer):
@@ -21,10 +22,11 @@ class CodeQualityAnalyzer(BaseAnalyzer):
     async def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         if not context.client:
             return []
-
+            
         try:
-            protection = await context.client.get_branch_protection(
-                context.repository.full_name, context.repository.default_branch
+            installation_id = context.repository.connection.installation_id
+            protection = await get_branch_protection(
+                installation_id, context.repository.full_name, context.repository.default_branch
             )
         except GitHubAuthError:
             # 403 on client fetch -> treated as "skipped due to permissions," not a crash.

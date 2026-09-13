@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.268" timestamp="2026-09-13T20:17:38.302231+05:30" hostname="shresth"><testcase classname="tests.integration.test_monitoring_api" name="test_monitoring_api_dependency_analyzer" time="0.006"><failure message="AttributeError: &lt;module 'app.api.v1.monitoring' from 'C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\backend\\app\\api\\v1\\monitoring.py'&gt; does not have the attribute 'get_repository_for_user'">mock_client_class = &lt;MagicMock name='GitHubAppClient' id='2334273591616'&gt;
+
+    @pytest.mark.asyncio
+    @patch("app.monitoring.monitor_service.GitHubAppClient")
+    async def test_monitoring_api_dependency_analyzer(mock_client_class):
+        # Mock everything since the test suite fixtures are completely broken/missing
+        from unittest.mock import MagicMock, AsyncMock
+        from fastapi.testclient import TestClient
+        from app.main import app
+        from app.db.session import get_db
+        from app.auth.dependencies import get_current_user
+    
+        mock_db = MagicMock()
+        mock_repo = MagicMock()
+        mock_repo.id = str(uuid.uuid4())
+        mock_repo.monitoring_enabled = True
+        mock_repo.connection = MagicMock()
+        mock_repo.connection.installation_id = 123
+    
+        mock_user = MagicMock()
+    
+        def override_get_db():
+            yield mock_db
+    
+        app.dependency_overrides[get_db] = override_get_db
+        app.dependency_overrides[get_current_user] = lambda: mock_user
+    
+        # We must also mock `get_repository` if it's used in the route, or just intercept MonitorService
+&gt;       with patch("app.api.v1.monitoring.get_repository_for_user", return_value=mock_repo), patch("app.monitoring.monitor_service.run_analyzer", new_callable=AsyncMock) as mock_run_analyzer:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\test_monitoring_api.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\unittest\mock.py:1510: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;unittest.mock._patch object at 0x0000021F7C6CBED0&gt;
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+&gt;           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: &lt;module 'app.api.v1.monitoring' from 'C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\backend\\app\\api\\v1\\monitoring.py'&gt; does not have the attribute 'get_repository_for_user'
+
+C:\Python314\Lib\unittest\mock.py:1480: AttributeError</failure></testcase></testsuite></testsuites>

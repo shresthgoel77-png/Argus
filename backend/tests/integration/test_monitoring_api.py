@@ -1,6 +1,7 @@
 import pytest
 from httpx import AsyncClient
 import uuid
+from unittest.mock import patch, AsyncMock
 import app.monitoring.analyzers as analyzers_registry
 from app.monitoring.analyzer_base import BaseAnalyzer, AnalyzerContext, FindingDraft
 from app.models.repository import Repository
@@ -83,3 +84,31 @@ async def test_monitoring_api_skipped_disabled(db_session, authorized_client: As
     assert data["status"] == "skipped"
     assert data["reason"] == "monitoring_disabled"
 
+@pytest.mark.asyncio
+@patch("app.monitoring.monitor_service.GitHubAppClient")
+async def test_monitoring_api_dependency_analyzer(mock_client_class, db_session, authorized_client: AsyncClient, test_user_repository: Repository):
+    test_user_repository.monitoring_enabled = True
+    db_session.commit()
+    
+    mock_client_instance = AsyncMock()
+    mock_client_instance.__aenter__.return_value = mock_client_instance
+    mock_client_class.return_value = mock_client_instance
+    
+    async def get_content(full_name, path):
+        if path == "package.json":
+            return {"name": "test"}
+        return None
+
+    mock_client_instance.get_repository_content.side_effect = get_content
+    
+    response = await authorized_client.post(
+        f"/api/v1/repositories/{test_user_repository.id}/monitor-runs",
+        json={"analyzer_key": "dependency"}
+    )
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert len(data["findings_created"]) == 1
+    assert data["findings_created"][0]["type"] == "missing_lockfile"
+    mock_client_class.assert_called_once_with(installation_id=test_user_repository.connection.installation_id)

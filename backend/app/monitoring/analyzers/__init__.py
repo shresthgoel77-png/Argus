@@ -4,6 +4,7 @@ from app.monitoring.analyzers.ci_analyzer import CIAnalyzer
 from app.monitoring.analyzers.pull_request_analyzer import PullRequestAnalyzer
 from app.monitoring.analyzers.issue_analyzer import IssueAnalyzer
 from app.monitoring.analyzers.repository_activity_analyzer import RepositoryActivityAnalyzer
+from app.monitoring.analyzers.dependency_analyzer import DependencyAnalyzer
 
 ANALYZER_REGISTRY: dict[str, BaseAnalyzer] = {}
 
@@ -17,3 +18,4 @@ register_analyzer(CIAnalyzer())
 register_analyzer(PullRequestAnalyzer())
 register_analyzer(IssueAnalyzer())
 register_analyzer(RepositoryActivityAnalyzer())
+register_analyzer(DependencyAnalyzer())

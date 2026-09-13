@@ -184,3 +184,110 @@ class TestErrorMapping:
             with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
                 with pytest.raises(expected_exc):
                     await client.get_installation(99)
+
+# ---------------------------------------------------------------------------
+# Tests — get_repository_content()
+# ---------------------------------------------------------------------------
+
+class TestGetRepositoryContent:
+    @pytest.mark.asyncio
+    async def test_success(self, _patch_auth):
+        """Returns content correctly."""
+        mock_resp = _mock_response(200, json_data={"content": "base64encoded=="})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp) as mock_request:
+                result = await client.get_repository_content("org/repo", "README.md")
+        assert result == {"content": "base64encoded=="}
+        mock_request.assert_called_with("GET", "/repos/org/repo/contents/README.md", headers=mock_request.call_args[1]["headers"], params=None)
+
+    @pytest.mark.asyncio
+    async def test_returns_none_on_404(self, _patch_auth):
+        """Returns None if the file is not found (404)."""
+        mock_resp = _mock_response(404, json_data={"message": "Not Found"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                result = await client.get_repository_content("org/repo", "missing.md")
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_raises_github_auth_error_on_403(self, _patch_auth):
+        """Raises GitHubAuthError if permission is denied (403)."""
+        mock_resp = _mock_response(403, json_data={"message": "Forbidden"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                with pytest.raises(GitHubAuthError):
+                    await client.get_repository_content("org/repo", "README.md")
+
+# ---------------------------------------------------------------------------
+# Tests — list_dependabot_alerts()
+# ---------------------------------------------------------------------------
+
+class TestListDependabotAlerts:
+    @pytest.mark.asyncio
+    async def test_pagination(self, _patch_auth):
+        """Correctly limits and paginates dependabot alerts."""
+        page1_resp = _mock_response(
+            200,
+            json_data=[{"number": 1}],
+            headers={"link": '<https://api.github.com/repos/org/repo/dependabot/alerts?page=2>; rel="next"'},
+        )
+        page2_resp = _mock_response(
+            200,
+            json_data=[{"number": 2}],
+            headers={},
+        )
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, side_effect=[page1_resp, page2_resp]):
+                result = await client.list_dependabot_alerts("org/repo")
+        assert result == [{"number": 1}, {"number": 2}]
+
+    @pytest.mark.asyncio
+    async def test_returns_empty_list_on_404(self, _patch_auth):
+        """Returns empty list if dependabot alerts are disabled or repo missing (404)."""
+        mock_resp = _mock_response(404, json_data={"message": "Not Found"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                result = await client.list_dependabot_alerts("org/repo")
+        assert result == []
+
+    @pytest.mark.asyncio
+    async def test_raises_github_auth_error_on_403(self, _patch_auth):
+        """Raises GitHubAuthError if permission is denied (403)."""
+        mock_resp = _mock_response(403, json_data={"message": "Forbidden"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                with pytest.raises(GitHubAuthError):
+                    await client.list_dependabot_alerts("org/repo")
+
+# ---------------------------------------------------------------------------
+# Tests — get_branch_protection()
+# ---------------------------------------------------------------------------
+
+class TestGetBranchProtection:
+    @pytest.mark.asyncio
+    async def test_success(self, _patch_auth):
+        """Returns branch protection rule correctly."""
+        mock_resp = _mock_response(200, json_data={"required_status_checks": {}})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp) as mock_request:
+                result = await client.get_branch_protection("org/repo", "main")
+        assert result == {"required_status_checks": {}}
+        mock_request.assert_called_with("GET", "/repos/org/repo/branches/main/protection", headers=mock_request.call_args[1]["headers"], params=None)
+
+    @pytest.mark.asyncio
+    async def test_returns_none_on_404(self, _patch_auth):
+        """Returns None if branch protection is not set or repo missing (404)."""
+        mock_resp = _mock_response(404, json_data={"message": "Not Found"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                result = await client.get_branch_protection("org/repo", "main")
+        assert result is None
+
+    @pytest.mark.asyncio
+    async def test_raises_github_auth_error_on_403(self, _patch_auth):
+        """Raises GitHubAuthError if permission is denied (403)."""
+        mock_resp = _mock_response(403, json_data={"message": "Forbidden"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                with pytest.raises(GitHubAuthError):
+                    await client.get_branch_protection("org/repo", "main")

@@ -19,7 +19,10 @@ from app.integrations.github.app_auth import (
     generate_app_jwt,
     get_installation_access_token,
 )
-from app.integrations.github.exceptions import GitHubAPIError
+from app.integrations.github.exceptions import (
+    GitHubAPIError,
+    GitHubNotFoundError,
+)
 
 logger = get_logger(__name__)
 
@@ -208,3 +211,56 @@ class GitHubAppClient:
             self._installation_id,
         )
         return all_repos
+
+    async def get_repository_content(
+        self, full_name: str, path: str
+    ) -> dict[str, Any] | list[dict[str, Any]] | None:
+        """Fetch file or directory content from a repository."""
+        try:
+            response = await self._request(
+                "GET",
+                f"/repos/{full_name}/contents/{path}"
+            )
+            return response.json()
+        except GitHubNotFoundError:
+            return None
+
+    async def list_dependabot_alerts(self, full_name: str) -> list[dict[str, Any]]:
+        """List dependabot alerts for a repository with pagination."""
+        all_alerts: list[dict[str, Any]] = []
+        page = 1
+        while True:
+            try:
+                response = await self._request(
+                    "GET",
+                    f"/repos/{full_name}/dependabot/alerts",
+                    params={"per_page": _MAX_PER_PAGE, "page": page},
+                )
+                data = response.json()
+                if not isinstance(data, list):
+                    # In case the API returns an object instead of a list incorrectly, though it shouldn't
+                    break
+                all_alerts.extend(data)
+                
+                link_header = response.headers.get("link", "")
+                if 'rel="next"' not in link_header:
+                    break
+                page += 1
+            except GitHubNotFoundError:
+                # 404 indicates dependable is disabled or repo not found
+                return []
+        
+        return all_alerts
+
+    async def get_branch_protection(
+        self, full_name: str, branch: str
+    ) -> dict[str, Any] | None:
+        """Fetch branch protection rules for a repository branch."""
+        try:
+            response = await self._request(
+                "GET",
+                f"/repos/{full_name}/branches/{branch}/protection"
+            )
+            return response.json()
+        except GitHubNotFoundError:
+            return None

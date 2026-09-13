@@ -68,3 +68,11 @@ Once the database, backend, and frontend are running concurrently as described a
 cd frontend
 npm run test:e2e
 ```
+
+## GitHub App Requirements
+To successfully use the analyzers, your GitHub App must have the following exact Repository Permissions granted in the GitHub Developer Settings:
+- **Contents:** Read (Required for Code Analysis / DependencyAnalyzer)
+- **Dependabot alerts:** Read (Required for SecurityAnalyzer)
+- **Administration:** Read (Required to fetch Branch Protection rules for CodeQualityAnalyzer)
+
+If these permissions are missing, the system will gracefully catch `403 Forbidden` API errors and skip the affected findings rather than crashing.

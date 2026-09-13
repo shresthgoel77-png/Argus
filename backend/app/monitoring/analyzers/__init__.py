@@ -6,6 +6,7 @@ from app.monitoring.analyzers.issue_analyzer import IssueAnalyzer
 from app.monitoring.analyzers.repository_activity_analyzer import RepositoryActivityAnalyzer
 from app.monitoring.analyzers.dependency_analyzer import DependencyAnalyzer
 from app.monitoring.analyzers.security_analyzer import SecurityAnalyzer
+from app.monitoring.analyzers.code_quality_analyzer import CodeQualityAnalyzer
 
 ANALYZER_REGISTRY: dict[str, BaseAnalyzer] = {}
 
@@ -21,3 +22,4 @@ register_analyzer(IssueAnalyzer())
 register_analyzer(RepositoryActivityAnalyzer())
 register_analyzer(DependencyAnalyzer())
 register_analyzer(SecurityAnalyzer())
+register_analyzer(CodeQualityAnalyzer())

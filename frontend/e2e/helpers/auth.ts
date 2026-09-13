@@ -17,6 +17,12 @@ export async function login(page: Page) {
     // that cookie is natively mapped to the browser context for the same origin.
     // We can just return the data if needed.
     const data = await response.json();
+
+    // Inject the localStorage flag so the frontend knows we are authenticated
+    await page.context().addInitScript(() => {
+        window.localStorage.setItem('auth-status', 'authenticated');
+    });
+
     return data;
 }
 
@@ -26,4 +32,8 @@ export async function login(page: Page) {
 export async function logout(page: Page) {
     const response = await page.request.post('http://localhost:8000/api/v1/auth/logout');
     expect(response.status()).toBe(200);
+
+    await page.context().addInitScript(() => {
+        window.localStorage.removeItem('auth-status');
+    });
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useCallback, useEffect, useState, ReactNode } from "react";
@@ -21,11 +22,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const refresh = useCallback(async () => {
         setIsLoading(true);
+
+        // Avoid unnecessary API call if we know user is not authenticated
+        if (typeof window !== "undefined" && window.localStorage.getItem("auth-status") !== "authenticated") {
+            setUser(null);
+            setIsLoading(false);
+            return;
+        }
+
         try {
             const currentUser = await getCurrentUser();
+            if (!currentUser && typeof window !== "undefined") {
+                window.localStorage.removeItem("auth-status");
+            }
             setUser(currentUser);
         } catch (error) {
             console.error("Failed to refresh user auth state:", error);
+            if (typeof window !== "undefined") {
+                window.localStorage.removeItem("auth-status");
+            }
             setUser(null);
         } finally {
             setIsLoading(false);
@@ -35,6 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = useCallback(async () => {
         try {
             await devLogin();
+            if (typeof window !== "undefined") {
+                window.localStorage.setItem("auth-status", "authenticated");
+            }
             await refresh();
         } catch (error) {
             console.error("Failed to login:", error);
@@ -44,6 +62,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const logout = useCallback(async () => {
         try {
             await apiLogout();
+            if (typeof window !== "undefined") {
+                window.localStorage.removeItem("auth-status");
+            }
             await refresh();
         } catch (error) {
             console.error("Failed to logout:", error);

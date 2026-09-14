@@ -27,6 +27,7 @@ from app.models.github_connection import GitHubConnection
 from app.models.repository import Repository
 from app.models.github_event import GitHubEvent
 from app.models.finding import Finding
+from app.models.repository_health_snapshot import RepositoryHealthSnapshot
 target_metadata = Base.metadata
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

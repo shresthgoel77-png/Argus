@@ -1,10 +1,14 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.auth.dependencies import get_current_user
 from app.models.user import User
-from app.schemas.repository import RepositoryRead, RepositoryCreate, RepositoryUpdate
+from app.schemas.repository import (
+    RepositoryRead,
+    RepositoryCreate,
+    RepositoryUpdate,
+)
 from app.services.github_connection_service import get_connection_or_404
 from app.services.repository_service import (
     add_repository,
@@ -13,7 +17,7 @@ from app.services.repository_service import (
     get_repository_or_404
 )
 from app.integrations.github.client import GitHubAppClient
-from app.schemas.finding import FindingListResponse
+from app.schemas.finding import FindingListResponse, FindingResponse
 from app.services.finding_service import list_findings
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
@@ -25,12 +29,19 @@ async def create_repository(
     db: Session = Depends(get_db)
 ):
     """
-    Subscribes (adds) a repository for monitoring. 
+    Subscribes (adds) a repository for monitoring.
     Verifies that the provided connection is owned by the current user.
     """
-    connection = get_connection_or_404(db=db, user_id=user.id, connection_id=repo_in.connection_id)
+    connection = get_connection_or_404(
+        db=db, user_id=user.id, connection_id=repo_in.connection_id
+    )
     client = GitHubAppClient(installation_id=connection.installation_id)
-    return await add_repository(db=db, connection=connection, github_repo_id=repo_in.github_repo_id, client=client)
+    return await add_repository(
+        db=db,
+        connection=connection,
+        github_repo_id=repo_in.github_repo_id,
+        client=client
+    )
 
 @router.get("", response_model=list[RepositoryRead])
 def get_user_repositories(
@@ -55,9 +66,9 @@ def update_repository(
     Verifies ownership before updating.
     """
     return set_monitoring_enabled(
-        db=db, 
-        user_id=user.id, 
-        repository_id=repository_id, 
+        db=db,
+        user_id=user.id,
+        repository_id=repository_id,
         enabled=repo_in.monitoring_enabled
     )
 
@@ -78,7 +89,7 @@ def get_repository_findings(
     """
     # 1. Enforce ownership and existence
     get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
-    
+
     # 2. Re-use list_findings with the repository_id filter
     total, items = list_findings(
         db=db,
@@ -91,5 +102,9 @@ def get_repository_findings(
         limit=limit,
         offset=offset
     )
-    return FindingListResponse(items=items, total=total, limit=limit, offset=offset)
-
+    return FindingListResponse(
+        items=[FindingResponse.model_validate(i) for i in items],
+        total=total,
+        limit=limit,
+        offset=offset
+    )

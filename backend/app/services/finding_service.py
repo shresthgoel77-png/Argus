@@ -206,11 +206,14 @@ def list_findings(
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[int, list[Finding]]:
-    """List findings across all repositories owned by the user, with optional filters."""
+    """List findings across all repositories owned by the user."""
     query = (
         db.query(Finding)
         .join(Repository, Finding.repository_id == Repository.id)
-        .join(GitHubConnection, Repository.connection_id == GitHubConnection.id)
+        .join(
+            GitHubConnection,
+            Repository.connection_id == GitHubConnection.id
+        )
         .filter(GitHubConnection.user_id == user_id)
     )
 
@@ -226,20 +229,29 @@ def list_findings(
         query = query.filter(Finding.status == status)
 
     total = query.count()
-    
     # Cap limit to 200 as per prompt
     limit = min(limit, 200)
 
-    items = query.order_by(desc(Finding.detected_at)).offset(offset).limit(limit).all()
+    items = (
+        query.order_by(desc(Finding.detected_at))
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
     return total, items
 
 
-def get_finding_or_404(db: Session, user_id: uuid.UUID, finding_id: uuid.UUID) -> Finding:
-    """Fetch a single finding, ensuring it belongs to a repository owned by the user."""
+def get_finding_or_404(
+    db: Session, user_id: uuid.UUID, finding_id: uuid.UUID
+) -> Finding:
+    """Fetch a single finding, ensuring it belongs to user's repository."""
     finding = (
         db.query(Finding)
         .join(Repository, Finding.repository_id == Repository.id)
-        .join(GitHubConnection, Repository.connection_id == GitHubConnection.id)
+        .join(
+            GitHubConnection,
+            Repository.connection_id == GitHubConnection.id
+        )
         .filter(
             Finding.id == finding_id,
             GitHubConnection.user_id == user_id,
@@ -253,4 +265,3 @@ def get_finding_or_404(db: Session, user_id: uuid.UUID, finding_id: uuid.UUID) -
         )
         raise NotFoundError("Finding not found or not owned by user.")
     return finding
-

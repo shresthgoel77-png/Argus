@@ -17,8 +17,8 @@ settings.database_url = settings.test_database_url
 
 @pytest.fixture(scope="session")
 def engine():
-    # Setup test engine
-    test_engine = create_engine(settings.database_url, pool_pre_ping=True)
+    connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+    test_engine = create_engine(settings.database_url, pool_pre_ping=True, connect_args=connect_args)
     
     # Run alembic upgrade head using programmatic API
     alembic_cfg = alembic.config.Config("alembic.ini")
@@ -26,6 +26,15 @@ def engine():
     alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
     
     alembic.command.upgrade(alembic_cfg, "head")
+    
+    # Fallback to create_all to ensure all models are fully registered (in case migrations lag)
+    from app.db.base_class import Base
+    # import all models to register them
+    from app.models.user import User
+    from app.models.github_connection import GitHubConnection
+    from app.models.repository import Repository
+    from app.models.finding import Finding
+    Base.metadata.create_all(bind=test_engine)
     
     yield test_engine
     

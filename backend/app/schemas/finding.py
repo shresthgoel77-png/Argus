@@ -24,7 +24,7 @@ class FindingResponse(FindingBase):
     acknowledged_at: datetime | None = None
     resolved_at: datetime | None = None
     resolution_source: str | None = None
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 

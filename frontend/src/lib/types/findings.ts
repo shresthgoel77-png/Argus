@@ -1,0 +1,29 @@
+export interface FindingResponse {
+    category: string;
+    type: string;
+    title: string;
+    description: string;
+    severity: string;
+    source: string;
+    evidence: Record<string, any>;
+    id: string;
+    repository_id: string;
+    status: string;
+    detected_at: string;
+    updated_at: string;
+    priority: string | null;
+    acknowledged_at: string | null;
+    resolved_at: string | null;
+    resolution_source: string | null;
+}
+
+export interface FindingListResponse {
+    items: FindingResponse[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+
+export interface FindingStatusUpdateRequest {
+    status: "acknowledged" | "resolved" | "ignored" | "open";
+}

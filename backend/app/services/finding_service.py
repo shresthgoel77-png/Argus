@@ -271,5 +271,5 @@ def get_all_open_findings_for_repository(db: Session, repository_id: uuid.UUID) 
     """Get all open findings for a repository, returned without pagination limit for scoring."""
     return db.query(Finding).filter(
         Finding.repository_id == repository_id,
-        Finding.status == "open"
+        Finding.status.in_(["open", "acknowledged"])
     ).all()

@@ -109,3 +109,23 @@ async def test_analyzer_missing_fields_graceful(security_analyzer, mock_context)
     assert finding.severity == "low"
     assert "unknown" in finding.title
     assert finding.evidence["package_name"] == "unknown"
+
+
+@pytest.mark.asyncio
+@patch("app.monitoring.monitor_service.GitHubAppClient")
+async def test_run_analyzer_verifies_sync_path_for_security(mock_client_class):
+    db_session = MagicMock()
+    test_user_repository = MagicMock()
+    test_user_repository.monitoring_enabled = True
+    test_user_repository.connection = MagicMock()
+    test_user_repository.connection.installation_id = 999
+    
+    mock_client_instance = AsyncMock()
+    mock_client_instance.__aenter__.return_value = mock_client_instance
+    mock_client_class.return_value = mock_client_instance
+    mock_client_instance.list_dependabot_alerts.return_value = []
+    
+    result = await run_analyzer(db_session, "security", test_user_repository)
+    
+    assert result.status == "success"
+    assert result.sync_result is not None

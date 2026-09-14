@@ -97,4 +97,5 @@ async def test_run_analyzer_constructs_client(mock_client_class):
     
     # Since requires_client=True, the mock Client should have been called
     assert result.status == "success", f"Failed with: {getattr(result, 'error_message', 'unknown')}"
+    assert result.sync_result is not None
     mock_client_class.assert_called_once_with(installation_id=test_user_repository.connection.installation_id)

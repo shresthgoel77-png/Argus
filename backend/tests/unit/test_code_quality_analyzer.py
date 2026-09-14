@@ -58,3 +58,26 @@ async def test_analyzer_github_auth_error(mock_get_branch_protection, code_quali
     findings = await code_quality_analyzer.analyze(mock_context)
     assert len(findings) == 0
     mock_get_branch_protection.assert_called_once_with(999, "test/repo", "main")
+
+from app.monitoring.monitor_service import run_analyzer
+
+@pytest.mark.asyncio
+@patch("app.monitoring.monitor_service.GitHubAppClient")
+@patch("app.monitoring.analyzers.code_quality_analyzer.get_branch_protection")
+async def test_run_analyzer_verifies_sync_path_for_code_quality(mock_get_branch_protection, mock_client_class):
+    db_session = MagicMock()
+    test_user_repository = MagicMock()
+    test_user_repository.monitoring_enabled = True
+    test_user_repository.connection = MagicMock()
+    test_user_repository.connection.installation_id = 999
+    
+    mock_client_instance = AsyncMock()
+    mock_client_instance.__aenter__.return_value = mock_client_instance
+    mock_client_class.return_value = mock_client_instance
+    
+    mock_get_branch_protection.return_value = None
+    
+    result = await run_analyzer(db_session, "code_quality", test_user_repository)
+    
+    assert result.status == "success"
+    assert result.sync_result is not None

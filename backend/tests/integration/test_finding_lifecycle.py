@@ -4,10 +4,10 @@ from app.models.finding import Finding
 from app.models.repository import Repository
 from sqlalchemy.orm import Session
 
-def test_partial_unique_index_on_finding(db_session: Session, test_repository: Repository):
+def test_partial_unique_index_on_finding(db_session: Session, test_user_repository: Repository):
     # Create two findings with the same fingerprint but open status
     f1 = Finding(
-        repository_id=test_repository.id,
+        repository_id=test_user_repository.id,
         category="security",
         type="secret_leak",
         title="Test 1",
@@ -22,7 +22,7 @@ def test_partial_unique_index_on_finding(db_session: Session, test_repository: R
     db_session.commit()
 
     f2 = Finding(
-        repository_id=test_repository.id,
+        repository_id=test_user_repository.id,
         category="security",
         type="secret_leak",
         title="Test 2",
@@ -38,10 +38,10 @@ def test_partial_unique_index_on_finding(db_session: Session, test_repository: R
         db_session.commit()
     db_session.rollback()
 
-def test_partial_unique_index_allows_multiple_resolved(db_session: Session, test_repository: Repository):
+def test_partial_unique_index_allows_multiple_resolved(db_session: Session, test_user_repository: Repository):
     # Two resolved findings with the same fingerprint can coexist
     f1 = Finding(
-        repository_id=test_repository.id,
+        repository_id=test_user_repository.id,
         category="security",
         type="secret_leak",
         title="Test 1",
@@ -56,7 +56,7 @@ def test_partial_unique_index_allows_multiple_resolved(db_session: Session, test
     db_session.commit()
 
     f2 = Finding(
-        repository_id=test_repository.id,
+        repository_id=test_user_repository.id,
         category="security",
         type="secret_leak",
         title="Test 2",
@@ -70,10 +70,10 @@ def test_partial_unique_index_allows_multiple_resolved(db_session: Session, test
     db_session.add(f2)
     db_session.commit()  # Should not raise
 
-def test_partial_unique_index_ignores_null_fingerprint(db_session: Session, test_repository: Repository):
+def test_partial_unique_index_ignores_null_fingerprint(db_session: Session, test_user_repository: Repository):
     # Multiple open findings with NULL fingerprint can coexist
     f1 = Finding(
-        repository_id=test_repository.id,
+        repository_id=test_user_repository.id,
         category="security",
         type="secret_leak",
         title="Test 1",
@@ -88,7 +88,7 @@ def test_partial_unique_index_ignores_null_fingerprint(db_session: Session, test
     db_session.commit()
 
     f2 = Finding(
-        repository_id=test_repository.id,
+        repository_id=test_user_repository.id,
         category="security",
         type="secret_leak",
         title="Test 2",

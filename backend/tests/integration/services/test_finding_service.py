@@ -5,7 +5,13 @@ import random
 from app.models.user import User
 from app.models.github_connection import GitHubConnection
 from app.models.repository import Repository
-from app.services.finding_service import create_finding, list_findings_for_repository
+from app.monitoring.analyzer_base import FindingDraft
+from app.services.finding_lifecycle_service import ignore_finding
+from app.services.finding_service import (
+    create_finding,
+    list_findings_for_repository,
+    sync_findings_for_run,
+)
 
 @pytest.fixture
 def repo_for_findings(db_session):
@@ -55,6 +61,139 @@ def test_create_finding(db_session, repo_for_findings):
     assert finding.evidence == {"line": 42}
     assert finding.status == "open"
     assert finding.detected_at is not None
+    assert finding.priority == "critical"
+
+
+def test_create_finding_fingerprint_conflict_updates_existing_row(db_session, repo_for_findings):
+    first = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Original",
+        description="Original description",
+        severity="high",
+        source="scanner",
+        evidence={"count": 1},
+        fingerprint="same-fingerprint",
+    )
+    second = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Updated",
+        description="Updated description",
+        severity="high",
+        source="scanner",
+        evidence={"count": 2},
+        fingerprint="same-fingerprint",
+    )
+
+    assert second.id == first.id
+    assert second.title == "Updated"
+    assert second.description == "Updated description"
+    assert second.evidence == {"count": 2}
+    assert db_session.query(type(first)).count() == 1
+
+
+def _draft(fingerprint: str, title: str = "Finding") -> FindingDraft:
+    return FindingDraft(
+        category="security",
+        type_="dependency",
+        title=title,
+        description=f"Description for {title}",
+        severity="high",
+        evidence={"title": title},
+        fingerprint=fingerprint,
+    )
+
+
+def test_sync_findings_for_run_auto_resolves_missing(db_session, repo_for_findings):
+    missing = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Missing",
+        description="Missing",
+        severity="high",
+        source="scanner",
+        evidence={},
+        fingerprint="missing",
+    )
+
+    result = sync_findings_for_run(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        analyzer_key="security",
+        drafts=[],
+    )
+
+    assert missing.status == "resolved"
+    assert missing.resolution_source == "auto"
+    assert result.auto_resolved == 1
+
+
+def test_sync_findings_for_run_leaves_ignored_missing_finding_untouched(
+    db_session, repo_for_findings
+):
+    ignored = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Ignored",
+        description="Ignored",
+        severity="high",
+        source="scanner",
+        evidence={},
+        fingerprint="ignored",
+    )
+    ignore_finding(db_session, ignored)
+
+    result = sync_findings_for_run(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        analyzer_key="security",
+        drafts=[],
+    )
+
+    assert ignored.status == "ignored"
+    assert result.auto_resolved == 0
+    assert result.skipped_ignored == 1
+
+
+def test_sync_findings_for_run_updates_present_finding(db_session, repo_for_findings):
+    existing = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Before",
+        description="Before",
+        severity="high",
+        source="scanner",
+        evidence={"count": 1},
+        fingerprint="present",
+    )
+
+    result = sync_findings_for_run(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        analyzer_key="security",
+        drafts=[_draft("present", "After")],
+    )
+
+    assert result.created == 0
+    assert result.updated == 1
+    assert result.auto_resolved == 0
+    assert existing.id == db_session.query(type(existing)).one().id
+    assert existing.title == "After"
+    assert existing.status == "open"
 
 def test_list_findings_for_repository(db_session, repo_for_findings):
     # clear initial state if any

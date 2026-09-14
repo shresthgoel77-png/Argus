@@ -6,6 +6,7 @@ from app.models.repository import Repository
 from app.monitoring.analyzers import get_analyzer
 from app.monitoring.analyzer_base import AnalyzerContext
 from app.services import finding_service
+from app.services.health_service import compute_and_persist_health
 from app.integrations.github.client import GitHubAppClient
 from app.schemas.monitoring import (
     FindingSummary,
@@ -95,6 +96,19 @@ async def run_analyzer(
                 "findings_count": sync_result.created + sync_result.updated,
             },
         )
+        try:
+            compute_and_persist_health(db, repository.id)
+        except Exception:
+            logger.warning(
+                "Health recomputation failed after analyzer run",
+                exc_info=True,
+                extra={
+                    "repository_id": str(repository.id),
+                    "analyzer_key": analyzer_key,
+                    "correlation_id": correlation_id
+                }
+            )
+
         return MonitorRunResult(
             status="success",
             sync_result=FindingSyncSummary(**vars(sync_result)),
@@ -131,4 +145,17 @@ async def run_analyzer(
             "findings_count": len(created_findings)
         }
     )
+    try:
+        compute_and_persist_health(db, repository.id)
+    except Exception:
+        logger.warning(
+            "Health recomputation failed after analyzer run",
+            exc_info=True,
+            extra={
+                "repository_id": str(repository.id),
+                "analyzer_key": analyzer_key,
+                "correlation_id": correlation_id
+            }
+        )
+
     return MonitorRunResult(status="success", findings_created=created_findings)

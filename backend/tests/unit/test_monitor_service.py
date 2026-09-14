@@ -1,15 +1,16 @@
 import pytest
 import uuid
+from unittest.mock import patch
 from app.monitoring.monitor_service import run_analyzer
 from app.monitoring.analyzer_base import BaseAnalyzer, AnalyzerContext, FindingDraft
 from app.models.finding import Finding
+from app.models.repository_health_snapshot import RepositoryHealthSnapshot
 import app.monitoring.analyzers as analyzers_registry
 
 class DummySuccessAnalyzer(BaseAnalyzer):
     key = "dummy_success"
     category = "security"
     requires_client = False
-    
     def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         return [
             FindingDraft(
@@ -125,3 +126,46 @@ async def test_run_analyzer_full_state_uses_sync_result(db_session, test_user_re
     assert second_result.sync_result.created == 0
     assert second_result.sync_result.updated == 1
     assert db_session.query(Finding).count() == 1
+
+
+@pytest.mark.asyncio
+async def test_run_analyzer_success_computes_health(db_session, test_user_repository):
+    test_user_repository.monitoring_enabled = True
+    db_session.commit()
+    
+    # Pre-check
+    snapshots = db_session.query(RepositoryHealthSnapshot).filter_by(repository_id=test_user_repository.id).all()
+    assert len(snapshots) == 0
+
+    result = await run_analyzer(db_session, "dummy_success", test_user_repository)
+    assert result.status == "success"
+    
+    snapshots = db_session.query(RepositoryHealthSnapshot).filter_by(repository_id=test_user_repository.id).all()
+    assert len(snapshots) == 1
+
+
+@pytest.mark.asyncio
+async def test_run_analyzer_exception_no_health_recomputation(db_session, test_user_repository):
+    test_user_repository.monitoring_enabled = True
+    db_session.commit()
+    
+    result = await run_analyzer(db_session, "dummy_error", test_user_repository)
+    assert result.status == "failed"
+    
+    snapshots = db_session.query(RepositoryHealthSnapshot).filter_by(repository_id=test_user_repository.id).all()
+    assert len(snapshots) == 0
+
+
+@patch("app.monitoring.monitor_service.compute_and_persist_health")
+@pytest.mark.asyncio
+async def test_run_analyzer_health_exception_swallowed(mock_health, db_session, test_user_repository):
+    test_user_repository.monitoring_enabled = True
+    db_session.commit()
+    
+    mock_health.side_effect = Exception("Mocked health computation failure")
+    
+    result = await run_analyzer(db_session, "dummy_success", test_user_repository)
+    
+    # analyzer result shouldn't be affected
+    assert result.status == "success"
+    mock_health.assert_called_once_with(db_session, test_user_repository.id)

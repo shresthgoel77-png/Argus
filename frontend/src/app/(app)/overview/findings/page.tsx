@@ -64,7 +64,7 @@ export default function FindingsPage() {
             if (filters.category) params.category = filters.category;
             if (filters.severity) params.severity = filters.severity;
             if (filters.priority) params.priority = filters.priority;
-            if (filters.status) params.status_ = filters.status;
+            if (filters.status) params.status = filters.status;
             const response = await listFindings(params);
             if (active) { setResult(response); setError(response === null); setIsLoading(false); }
         }

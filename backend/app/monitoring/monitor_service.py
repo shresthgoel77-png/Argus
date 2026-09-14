@@ -5,9 +5,13 @@ from sqlalchemy.orm import Session
 from app.models.repository import Repository
 from app.monitoring.analyzers import get_analyzer
 from app.monitoring.analyzer_base import AnalyzerContext
-from app.services.finding_service import create_finding
+from app.services import finding_service
 from app.integrations.github.client import GitHubAppClient
-from app.schemas.monitoring import MonitorRunResult, FindingSummary
+from app.schemas.monitoring import (
+    FindingSummary,
+    FindingSyncSummary,
+    MonitorRunResult,
+)
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -74,10 +78,32 @@ async def run_analyzer(
         )
         return MonitorRunResult(status="failed", error_message=str(e))
 
+    if analyzer.full_state_sync:
+        sync_result = finding_service.sync_findings_for_run(
+            db,
+            repository_id=repository.id,
+            category=analyzer.category,
+            analyzer_key=analyzer.key,
+            drafts=findings_drafts,
+        )
+        logger.info(
+            "Analyzer run completed successfully",
+            extra={
+                "repository_id": str(repository.id),
+                "analyzer_key": analyzer_key,
+                "correlation_id": correlation_id,
+                "findings_count": sync_result.created + sync_result.updated,
+            },
+        )
+        return MonitorRunResult(
+            status="success",
+            sync_result=FindingSyncSummary(**vars(sync_result)),
+        )
+
     created_findings = []
     source = f"on_demand:{analyzer_key}" if not normalized_event else f"webhook:{normalized_event.event_type}"
     for draft in findings_drafts:
-        finding = create_finding(
+        finding = finding_service.create_finding(
             db=db,
             repository_id=repository.id,
             category=draft.category,

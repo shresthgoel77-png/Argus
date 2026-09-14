@@ -8,6 +8,12 @@ class FindingSummary(BaseModel):
     title: str
     severity: str
 
+class FindingSyncSummary(BaseModel):
+    created: int
+    updated: int
+    auto_resolved: int
+    skipped_ignored: int
+
 class MonitorRunRequest(BaseModel):
     analyzer_key: str
 
@@ -16,3 +22,4 @@ class MonitorRunResult(BaseModel):
     reason: Optional[str] = None
     error_message: Optional[str] = None
     findings_created: list[FindingSummary] = []
+    sync_result: Optional[FindingSyncSummary] = None

@@ -5,6 +5,7 @@ from unittest.mock import patch, AsyncMock
 import app.monitoring.analyzers as analyzers_registry
 from app.monitoring.analyzer_base import BaseAnalyzer, AnalyzerContext, FindingDraft
 from app.models.repository import Repository
+from app.services.finding_service import SyncResult
 
 class DummyAPIAnalyzer(BaseAnalyzer):
     key = "api_dummy"
@@ -131,14 +132,8 @@ async def test_monitoring_api_dependency_analyzer(mock_client_class):
     # If we want the real analyzer run, we can't mock run_analyzer. We only mock get_repository_for_user.
     with patch("app.api.v1.monitoring.get_repository_or_404", return_value=mock_repo):
         # We need to also mock the Finding schema or anything interacting with DB
-        with patch("app.monitoring.monitor_service.create_finding") as mock_create_finding:
-            mock_finding = MagicMock()
-            mock_finding.id = 1
-            mock_finding.category = "dependency"
-            mock_finding.type = "missing_lockfile"
-            mock_finding.title = "Missing Lockfile"
-            mock_finding.severity = "medium"
-            mock_create_finding.return_value = mock_finding
+        with patch("app.monitoring.monitor_service.finding_service.sync_findings_for_run") as mock_sync:
+            mock_sync.return_value = SyncResult(created=1)
             
             mock_client_instance = AsyncMock()
             mock_client_instance.__aenter__.return_value = mock_client_instance
@@ -161,6 +156,43 @@ async def test_monitoring_api_dependency_analyzer(mock_client_class):
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
-    assert len(data["findings_created"]) == 1
-    assert data["findings_created"][0]["type"] == "missing_lockfile"
+    assert data["findings_created"] == []
+    assert data["sync_result"]["created"] == 1
+    assert data["sync_result"]["updated"] == 0
+    assert data["sync_result"]["auto_resolved"] == 0
     mock_client_class.assert_called_once_with(installation_id=123)
+
+
+@pytest.mark.asyncio
+@patch("app.monitoring.monitor_service.GitHubAppClient")
+async def test_dependency_monitor_run_repeat_updates_existing_finding(
+    mock_client_class, db_session, authorized_client: AsyncClient, test_user_repository: Repository
+):
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value = mock_client
+
+    async def get_content(full_name, path):
+        return {"name": "test"} if path == "package.json" else None
+
+    mock_client.get_repository_content.side_effect = get_content
+    mock_client_class.return_value = mock_client
+
+    payload = {"analyzer_key": "dependency"}
+    first = await authorized_client.post(
+        f"/api/v1/repositories/{test_user_repository.id}/monitor-runs",
+        json=payload,
+    )
+    second = await authorized_client.post(
+        f"/api/v1/repositories/{test_user_repository.id}/monitor-runs",
+        json=payload,
+    )
+
+    assert first.status_code == 200
+    assert first.json()["sync_result"]["created"] == 1
+    assert second.status_code == 200
+    assert second.json()["sync_result"]["created"] == 0
+    assert second.json()["sync_result"]["updated"] == 1
+
+    from app.models.finding import Finding
+
+    assert db_session.query(Finding).count() == 1

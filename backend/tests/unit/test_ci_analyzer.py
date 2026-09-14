@@ -48,6 +48,7 @@ def test_ci_analyzer_failure_gives_high_severity():
     assert len(findings) == 1
     assert findings[0].severity == "high"
     assert findings[0].type_ == "workflow_run_failed"
+    assert findings[0].fingerprint is None
 
 def test_ci_analyzer_cancelled_gives_low_severity():
     analyzer = CIAnalyzer()
@@ -56,3 +57,4 @@ def test_ci_analyzer_cancelled_gives_low_severity():
     assert len(findings) == 1
     assert findings[0].severity == "low"
     assert findings[0].type_ == "workflow_run_cancelled"
+    assert findings[0].fingerprint is None

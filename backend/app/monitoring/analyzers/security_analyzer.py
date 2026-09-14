@@ -32,6 +32,8 @@ class SecurityAnalyzer(BaseAnalyzer):
     def requires_client(self) -> bool:
         return True
 
+    full_state_sync: bool = True
+
     async def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         """Fetch open Dependabot alerts and create findings for them.
         
@@ -78,6 +80,7 @@ class SecurityAnalyzer(BaseAnalyzer):
                         "package_name": package_name,
                         "severity": gh_severity,
                     },
+                    fingerprint=f"security:{context.repository.id}:dependabot:{alert.get('number')}",
                 )
             )
 

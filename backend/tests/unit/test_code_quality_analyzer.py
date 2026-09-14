@@ -47,6 +47,7 @@ async def test_analyzer_branch_not_protected(mock_get_branch_protection, code_qu
     assert finding.severity == "medium"
     assert finding.evidence == {"default_branch": "main"}
     assert "main" in finding.title
+    assert finding.fingerprint == "code_quality:123:branch_protection:main"
     mock_get_branch_protection.assert_called_once_with(999, "test/repo", "main")
 
 @pytest.mark.asyncio

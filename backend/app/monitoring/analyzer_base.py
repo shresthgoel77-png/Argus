@@ -20,11 +20,13 @@ class FindingDraft:
     description: str
     severity: str
     evidence: dict[str, Any]
+    fingerprint: str | None = None
 
 class BaseAnalyzer(ABC):
     key: str
     category: str
     requires_client: bool = False
+    full_state_sync: bool = False
 
     @abstractmethod
     def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:

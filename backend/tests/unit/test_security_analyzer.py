@@ -71,11 +71,13 @@ async def test_analyzer_returns_open_alerts(security_analyzer, mock_context):
         "package_name": "django",
         "severity": "critical"
     }
+    assert finding1.fingerprint == "security:123:dependabot:1"
 
     finding2 = findings[1]
     assert finding2.severity == "medium"
     assert "flask" in finding2.title
     assert finding2.evidence["package_name"] == "flask"
+    assert finding2.fingerprint == "security:123:dependabot:3"
 
 @pytest.mark.asyncio
 async def test_analyzer_no_alerts(security_analyzer, mock_context):

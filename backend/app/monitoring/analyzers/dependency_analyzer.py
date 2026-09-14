@@ -17,6 +17,8 @@ class DependencyAnalyzer(BaseAnalyzer):
     def requires_client(self) -> bool:
         return True
 
+    full_state_sync: bool = True
+
     async def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         """Check for missing lockfiles when an npm manifest is present."""
         if not context.client:
@@ -59,6 +61,7 @@ class DependencyAnalyzer(BaseAnalyzer):
                     ),
                     severity="medium",
                     evidence={"manifest": "package.json"},
+                    fingerprint=f"dependency:{context.repository.id}:package.json",
                 )
             ]
 

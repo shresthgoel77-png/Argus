@@ -35,6 +35,7 @@ async def test_analyzer_manifest_present_no_lockfile(dependency_analyzer, mock_c
     assert finding.severity == "medium"
     assert "package.json" in finding.description
     assert finding.evidence == {"manifest": "package.json"}
+    assert finding.fingerprint == "dependency:123:package.json"
 
 @pytest.mark.asyncio
 async def test_analyzer_manifest_present_has_lockfile(dependency_analyzer, mock_context):

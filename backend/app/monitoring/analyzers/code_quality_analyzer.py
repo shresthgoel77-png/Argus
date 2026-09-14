@@ -19,6 +19,8 @@ class CodeQualityAnalyzer(BaseAnalyzer):
     def requires_client(self) -> bool:
         return True
 
+    full_state_sync: bool = True
+
     async def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         if not context.client:
             return []
@@ -43,6 +45,7 @@ class CodeQualityAnalyzer(BaseAnalyzer):
                     description=f"Branch protection is not configured for the default branch '{context.repository.default_branch}'.",
                     severity="medium",
                     evidence={"default_branch": context.repository.default_branch},
+                    fingerprint=f"code_quality:{context.repository.id}:branch_protection:{context.repository.default_branch}",
                 )
             ]
 

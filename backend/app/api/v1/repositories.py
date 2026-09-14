@@ -9,9 +9,12 @@ from app.services.github_connection_service import get_connection_or_404
 from app.services.repository_service import (
     add_repository,
     list_repositories_for_user,
-    set_monitoring_enabled
+    set_monitoring_enabled,
+    get_repository_or_404
 )
 from app.integrations.github.client import GitHubAppClient
+from app.schemas.finding import FindingListResponse
+from app.services.finding_service import list_findings
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
 
@@ -57,3 +60,36 @@ def update_repository(
         repository_id=repository_id, 
         enabled=repo_in.monitoring_enabled
     )
+
+@router.get("/{repository_id}/findings", response_model=FindingListResponse)
+def get_repository_findings(
+    repository_id: uuid.UUID,
+    category: str | None = None,
+    severity: str | None = None,
+    priority: str | None = None,
+    status_: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns findings scoped to a single repository owned by the user.
+    """
+    # 1. Enforce ownership and existence
+    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    
+    # 2. Re-use list_findings with the repository_id filter
+    total, items = list_findings(
+        db=db,
+        user_id=user.id,
+        repository_id=repository_id,
+        category=category,
+        severity=severity,
+        priority=priority,
+        status=status_,
+        limit=limit,
+        offset=offset
+    )
+    return FindingListResponse(items=items, total=total, limit=limit, offset=offset)
+

@@ -8,7 +8,10 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.logging import get_logger
+from app.core.exceptions import NotFoundError
 from app.models.finding import Finding
+from app.models.repository import Repository
+from app.models.github_connection import GitHubConnection
 from app.monitoring.analyzer_base import FindingDraft
 from app.services import finding_lifecycle_service
 from app.services.priority_service import compute_priority
@@ -189,3 +192,65 @@ def list_findings_for_repository(
     if category is not None:
         query = query.filter(Finding.category == category)
     return query.order_by(desc(Finding.detected_at)).limit(limit).all()
+
+
+def list_findings(
+    db: Session,
+    user_id: uuid.UUID,
+    *,
+    repository_id: Optional[uuid.UUID] = None,
+    category: Optional[str] = None,
+    severity: Optional[str] = None,
+    priority: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> tuple[int, list[Finding]]:
+    """List findings across all repositories owned by the user, with optional filters."""
+    query = (
+        db.query(Finding)
+        .join(Repository, Finding.repository_id == Repository.id)
+        .join(GitHubConnection, Repository.connection_id == GitHubConnection.id)
+        .filter(GitHubConnection.user_id == user_id)
+    )
+
+    if repository_id is not None:
+        query = query.filter(Finding.repository_id == repository_id)
+    if category is not None:
+        query = query.filter(Finding.category == category)
+    if severity is not None:
+        query = query.filter(Finding.severity == severity)
+    if priority is not None:
+        query = query.filter(Finding.priority == priority)
+    if status is not None:
+        query = query.filter(Finding.status == status)
+
+    total = query.count()
+    
+    # Cap limit to 200 as per prompt
+    limit = min(limit, 200)
+
+    items = query.order_by(desc(Finding.detected_at)).offset(offset).limit(limit).all()
+    return total, items
+
+
+def get_finding_or_404(db: Session, user_id: uuid.UUID, finding_id: uuid.UUID) -> Finding:
+    """Fetch a single finding, ensuring it belongs to a repository owned by the user."""
+    finding = (
+        db.query(Finding)
+        .join(Repository, Finding.repository_id == Repository.id)
+        .join(GitHubConnection, Repository.connection_id == GitHubConnection.id)
+        .filter(
+            Finding.id == finding_id,
+            GitHubConnection.user_id == user_id,
+        )
+        .first()
+    )
+    if not finding:
+        logger.warning(
+            "Attempted to access non-existent or unauthorized finding.",
+            extra={"finding_id": str(finding_id), "user_id": str(user_id)},
+        )
+        raise NotFoundError("Finding not found or not owned by user.")
+    return finding
+

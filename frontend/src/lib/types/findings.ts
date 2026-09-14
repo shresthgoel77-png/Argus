@@ -5,6 +5,7 @@ export interface FindingResponse {
     description: string;
     severity: string;
     source: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     evidence: Record<string, any>;
     id: string;
     repository_id: string;

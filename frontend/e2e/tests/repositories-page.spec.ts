@@ -41,7 +41,8 @@ test.describe('Repositories Page Flow', () => {
             { id: 101, github_repo_id: 101, full_name: 'my-org/core', private: true, already_added: false }
         ];
 
-        let monitoredRepos: any[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const monitoredRepos: any[] = [];
 
         await page.route('**/api/v1/github/connections', async (route) => {
             await route.fulfill({ status: 200, json: mockConnections });

@@ -14,6 +14,7 @@ import { listFindings } from "@/lib/api/findings";
 import { getRepositories } from "@/lib/api/repositories";
 import type { FindingListResponse, FindingResponse } from "@/lib/types/findings";
 import type { Repository } from "@/lib/types/github";
+import { FindingDetailDialog } from "./finding-detail-dialog";
 
 const PAGE_SIZE = 20;
 const STATUSES: FindingStatus[] = ["open", "acknowledged", "resolved", "ignored"];
@@ -37,10 +38,10 @@ function FindingsSkeleton() {
     return <div className="space-y-3" aria-label="Loading findings" aria-busy="true">{Array.from({ length: 5 }, (_, index) => <Card key={index}><CardContent className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"><div className="space-y-3"><Skeleton className="h-5 w-3/5" /><Skeleton className="h-4 w-2/5" /><Skeleton className="h-4 w-1/3" /></div><div className="flex gap-2"><Skeleton className="h-6 w-16" /><Skeleton className="h-6 w-20" /></div></CardContent></Card>)}</div>;
 }
 
-function FindingRow({ finding, repositoryName }: { finding: FindingResponse; repositoryName: string }) {
+function FindingRow({ finding, repositoryName, onClick }: { finding: FindingResponse; repositoryName: string; onClick: () => void }) {
     const severity = SEVERITIES.includes(finding.severity as Severity) ? finding.severity as Severity : undefined;
     const status = STATUSES.includes(finding.status as FindingStatus) ? finding.status as FindingStatus : undefined;
-    return <Card><CardContent className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"><div className="min-w-0 space-y-2"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-semibold text-foreground">{finding.title}</h3><Badge variant="secondary" className="capitalize">{finding.category.replace(/[_-]/g, " ")}</Badge></div><div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground"><span>{repositoryName}</span><span>Detected {formatDetectedDate(finding.detected_at)}</span></div></div><div className="flex flex-wrap gap-2 md:justify-end"><StatusBadge severity={severity} label={displayValue(finding.severity)} /><Badge variant={finding.priority === "critical" || finding.priority === "high" ? "warning" : "secondary"} className="capitalize">Priority: {finding.priority ? displayValue(finding.priority) : "Unassigned"}</Badge><StatusBadge status={status} label={displayValue(finding.status)} /></div></CardContent></Card>;
+    return <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } }}><CardContent className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"><div className="min-w-0 space-y-2"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-semibold text-foreground">{finding.title}</h3><Badge variant="secondary" className="capitalize">{finding.category.replace(/[_-]/g, " ")}</Badge></div><div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground"><span>{repositoryName}</span><span>Detected {formatDetectedDate(finding.detected_at)}</span></div></div><div className="flex flex-wrap gap-2 md:justify-end"><StatusBadge severity={severity} label={displayValue(finding.severity)} /><Badge variant={finding.priority === "critical" || finding.priority === "high" ? "warning" : "secondary"} className="capitalize">Priority: {finding.priority ? displayValue(finding.priority) : "Unassigned"}</Badge><StatusBadge status={status} label={displayValue(finding.status)} /></div></CardContent></Card>;
 }
 
 function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: readonly string[]; onChange: (value: string) => void }) {
@@ -55,6 +56,18 @@ export default function FindingsPage() {
     const [error, setError] = React.useState(false);
     const [offset, setOffset] = React.useState(0);
     const [retryKey, setRetryKey] = React.useState(0);
+    const [selectedFinding, setSelectedFinding] = React.useState<FindingResponse | null>(null);
+
+    const handleUpdateFinding = (updated: FindingResponse) => {
+        setResult((current) => {
+            if (!current) return current;
+            return {
+                ...current,
+                items: current.items.map((item) => item.id === updated.id ? updated : item)
+            };
+        });
+        setSelectedFinding(updated);
+    };
 
     React.useEffect(() => {
         let active = true;
@@ -86,7 +99,8 @@ export default function FindingsPage() {
     return <div className="space-y-6">
         <SectionHeading eyebrow="Review" title="Findings" description="Review code health findings across your connected repositories." />
         <div className="rounded-lg border bg-card p-4 shadow-soft" aria-label="Finding filters"><div className="flex flex-wrap gap-3"><FilterSelect label="Category" value={filters.category} options={CATEGORIES} onChange={(value) => updateFilter("category", value)} /><FilterSelect label="Severity" value={filters.severity} options={SEVERITIES} onChange={(value) => updateFilter("severity", value)} /><FilterSelect label="Priority" value={filters.priority} options={PRIORITIES} onChange={(value) => updateFilter("priority", value)} /><FilterSelect label="Status" value={filters.status} options={STATUSES} onChange={(value) => updateFilter("status", value)} /></div></div>
-        {isLoading ? <FindingsSkeleton /> : error ? <EmptyState icon={<AlertTriangle className="size-6" aria-hidden="true" />} title="Findings are temporarily unavailable" description="RepoMedic could not load findings from your workspace. Try again in a moment." action={<Button variant="outline" onClick={() => setRetryKey((key) => key + 1)}>Try again</Button>} /> : result && result.items.length > 0 ? <div className="space-y-3">{result.items.map((finding) => <FindingRow key={finding.id} finding={finding} repositoryName={repositoryNames.get(finding.repository_id) ?? "Repository unavailable"} />)}</div> : <EmptyState icon={<Search className="size-6" aria-hidden="true" />} title="Your findings queue is clear" description="There are no findings matching these filters. New findings will appear here after RepoMedic analyzes a connected repository." />}
+        {isLoading ? <FindingsSkeleton /> : error ? <EmptyState icon={<AlertTriangle className="size-6" aria-hidden="true" />} title="Findings are temporarily unavailable" description="RepoMedic could not load findings from your workspace. Try again in a moment." action={<Button variant="outline" onClick={() => setRetryKey((key) => key + 1)}>Try again</Button>} /> : result && result.items.length > 0 ? <div className="space-y-3">{result.items.map((finding) => <FindingRow key={finding.id} finding={finding} repositoryName={repositoryNames.get(finding.repository_id) ?? "Repository unavailable"} onClick={() => setSelectedFinding(finding)} />)}</div> : <EmptyState icon={<Search className="size-6" aria-hidden="true" />} title="Your findings queue is clear" description="There are no findings matching these filters. New findings will appear here after RepoMedic analyzes a connected repository." />}
         {!isLoading && !error && result ? <div className="flex items-center justify-between gap-4 border-t pt-4"><p className="text-sm text-muted-foreground">{result.total === 0 ? "No findings" : `Showing ${offset + 1}–${Math.min(offset + result.items.length, result.total)} of ${result.total}`}</p><div className="flex gap-2"><Button variant="outline" size="sm" disabled={!hasPreviousPage} onClick={() => setOffset((current) => Math.max(0, current - PAGE_SIZE))}><ChevronLeft className="size-4" aria-hidden="true" /> Previous</Button><Button variant="outline" size="sm" disabled={!hasNextPage} onClick={() => setOffset((current) => current + PAGE_SIZE)}>Next <ChevronRight className="size-4" aria-hidden="true" /></Button></div></div> : null}
+        <FindingDetailDialog finding={selectedFinding} isOpen={!!selectedFinding} onOpenChange={(open) => !open && setSelectedFinding(null)} onUpdate={handleUpdateFinding} />
     </div>;
 }

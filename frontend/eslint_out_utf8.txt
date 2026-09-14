@@ -1,0 +1,233 @@
+﻿
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx
+   22:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:22:13
+  20 |     React.useEffect(() => {
+  21 |         if (isOpen) {
+> 22 |             setError(null);
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  23 |             setIsPending(false);
+  24 |         }
+  25 |     }, [isOpen, finding?.id]);                                                                                                                                                                                                                                                                                                                                    react-hooks/set-state-in-effect
+   41:18  warning  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   56:15  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+  156:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:156:30
+  154 |                     {finding.status === "open" && (
+  155 |                         <>
+> 156 |                             <StatusButton status="acknowledged" label="Acknowledge" icon={CheckCircle2} />
+      |                              ^^^^^^^^^^^^ This component is created during render
+  157 |                             <StatusButton status="resolved" label="Resolve" icon={CheckCircle2} />
+  158 |                             <StatusButton status="ignored" label="Ignore" icon={XCircle} variant="outline" />
+  159 |                         </>
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:48:26
+  46 |     };
+  47 |
+> 48 |     const StatusButton = ({
+     |                          ^^
+> 49 |         status,
+     | ^^^^^^^^^^^^^^^
+> 50 |         label,
+     ΓÇª
+     | ^^^^^^^^^^^^^^^
+> 67 |         </Button>
+     | ^^^^^^^^^^^^^^^
+> 68 |     );
+     | ^^^^^^ The component is created during render here
+  69 |
+  70 |     function displayValue(value: string) {
+  71 |         if (!value) return "";                                        react-hooks/static-components
+  157:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:157:30
+  155 |                         <>
+  156 |                             <StatusButton status="acknowledged" label="Acknowledge" icon={CheckCircle2} />
+> 157 |                             <StatusButton status="resolved" label="Resolve" icon={CheckCircle2} />
+      |                              ^^^^^^^^^^^^ This component is created during render
+  158 |                             <StatusButton status="ignored" label="Ignore" icon={XCircle} variant="outline" />
+  159 |                         </>
+  160 |                     )}
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:48:26
+  46 |     };
+  47 |
+> 48 |     const StatusButton = ({
+     |                          ^^
+> 49 |         status,
+     | ^^^^^^^^^^^^^^^
+> 50 |         label,
+     ΓÇª
+     | ^^^^^^^^^^^^^^^
+> 67 |         </Button>
+     | ^^^^^^^^^^^^^^^
+> 68 |     );
+     | ^^^^^^ The component is created during render here
+  69 |
+  70 |     function displayValue(value: string) {
+  71 |         if (!value) return "";                                                                     react-hooks/static-components
+  158:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:158:30
+  156 |                             <StatusButton status="acknowledged" label="Acknowledge" icon={CheckCircle2} />
+  157 |                             <StatusButton status="resolved" label="Resolve" icon={CheckCircle2} />
+> 158 |                             <StatusButton status="ignored" label="Ignore" icon={XCircle} variant="outline" />
+      |                              ^^^^^^^^^^^^ This component is created during render
+  159 |                         </>
+  160 |                     )}
+  161 |                     {finding.status === "acknowledged" && (
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:48:26
+  46 |     };
+  47 |
+> 48 |     const StatusButton = ({
+     |                          ^^
+> 49 |         status,
+     | ^^^^^^^^^^^^^^^
+> 50 |         label,
+     ΓÇª
+     | ^^^^^^^^^^^^^^^
+> 67 |         </Button>
+     | ^^^^^^^^^^^^^^^
+> 68 |     );
+     | ^^^^^^ The component is created during render here
+  69 |
+  70 |     function displayValue(value: string) {
+  71 |         if (!value) return "";                                    react-hooks/static-components
+  163:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:163:30
+  161 |                     {finding.status === "acknowledged" && (
+  162 |                         <>
+> 163 |                             <StatusButton status="resolved" label="Resolve" icon={CheckCircle2} />
+      |                              ^^^^^^^^^^^^ This component is created during render
+  164 |                             <StatusButton status="ignored" label="Ignore" icon={XCircle} variant="outline" />
+  165 |                             <StatusButton status="open" label="Reopen" icon={RotateCcw} variant="secondary" />
+  166 |                         </>
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:48:26
+  46 |     };
+  47 |
+> 48 |     const StatusButton = ({
+     |                          ^^
+> 49 |         status,
+     | ^^^^^^^^^^^^^^^
+> 50 |         label,
+     ΓÇª
+     | ^^^^^^^^^^^^^^^
+> 67 |         </Button>
+     | ^^^^^^^^^^^^^^^
+> 68 |     );
+     | ^^^^^^ The component is created during render here
+  69 |
+  70 |     function displayValue(value: string) {
+  71 |         if (!value) return "";                            react-hooks/static-components
+  164:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:164:30
+  162 |                         <>
+  163 |                             <StatusButton status="resolved" label="Resolve" icon={CheckCircle2} />
+> 164 |                             <StatusButton status="ignored" label="Ignore" icon={XCircle} variant="outline" />
+      |                              ^^^^^^^^^^^^ This component is created during render
+  165 |                             <StatusButton status="open" label="Reopen" icon={RotateCcw} variant="secondary" />
+  166 |                         </>
+  167 |                     )}
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:48:26
+  46 |     };
+  47 |
+> 48 |     const StatusButton = ({
+     |                          ^^
+> 49 |         status,
+     | ^^^^^^^^^^^^^^^
+> 50 |         label,
+     ΓÇª
+     | ^^^^^^^^^^^^^^^
+> 67 |         </Button>
+     | ^^^^^^^^^^^^^^^
+> 68 |     );
+     | ^^^^^^ The component is created during render here
+  69 |
+  70 |     function displayValue(value: string) {
+  71 |         if (!value) return "";                                                                 react-hooks/static-components
+  165:30  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:165:30
+  163 |                             <StatusButton status="resolved" label="Resolve" icon={CheckCircle2} />
+  164 |                             <StatusButton status="ignored" label="Ignore" icon={XCircle} variant="outline" />
+> 165 |                             <StatusButton status="open" label="Reopen" icon={RotateCcw} variant="secondary" />
+      |                              ^^^^^^^^^^^^ This component is created during render
+  166 |                         </>
+  167 |                     )}
+  168 |                     {(finding.status === "resolved" || finding.status === "ignored") && (
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:48:26
+  46 |     };
+  47 |
+> 48 |     const StatusButton = ({
+     |                          ^^
+> 49 |         status,
+     | ^^^^^^^^^^^^^^^
+> 50 |         label,
+     ΓÇª
+     | ^^^^^^^^^^^^^^^
+> 67 |         </Button>
+     | ^^^^^^^^^^^^^^^
+> 68 |     );
+     | ^^^^^^ The component is created during render here
+  69 |
+  70 |     function displayValue(value: string) {
+  71 |         if (!value) return "";  react-hooks/static-components
+  169:26  error    Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:169:26
+  167 |                     )}
+  168 |                     {(finding.status === "resolved" || finding.status === "ignored") && (
+> 169 |                         <StatusButton status="open" label="Reopen" icon={RotateCcw} variant="secondary" />
+      |                          ^^^^^^^^^^^^ This component is created during render
+  170 |                     )}
+  171 |                 </DialogFooter>
+  172 |             </DialogContent>
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\findings\finding-detail-dialog.tsx:48:26
+  46 |     };
+  47 |
+> 48 |     const StatusButton = ({
+     |                          ^^
+> 49 |         status,
+     | ^^^^^^^^^^^^^^^
+> 50 |         label,
+     ΓÇª
+     | ^^^^^^^^^^^^^^^
+> 67 |         </Button>
+     | ^^^^^^^^^^^^^^^
+> 68 |     );
+     | ^^^^^^ The component is created during render here
+  69 |
+  70 |     function displayValue(value: string) {
+  71 |         if (!value) return "";                                                                                                                                                                   react-hooks/static-components
+
+Γ£û 10 problems (9 errors, 1 warning)
+

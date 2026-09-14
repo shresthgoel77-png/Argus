@@ -265,3 +265,11 @@ def get_finding_or_404(
         )
         raise NotFoundError("Finding not found or not owned by user.")
     return finding
+
+
+def get_all_open_findings_for_repository(db: Session, repository_id: uuid.UUID) -> list[Finding]:
+    """Get all open findings for a repository, returned without pagination limit for scoring."""
+    return db.query(Finding).filter(
+        Finding.repository_id == repository_id,
+        Finding.status == "open"
+    ).all()

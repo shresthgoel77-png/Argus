@@ -1,0 +1,158 @@
+﻿node.exe : [WebServer] 
+INFO:     Started server 
+process [30304]
+At line:1 char:1
++ & "C:\users\hp\.vscode/
+node.exe" "C:\users\hp\.v
+scode/node_modules/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo       
+       : NotSpecified:   
+  ([WebServer] INF...p   
+ rocess [30304]:Strin    
+g) [], RemoteExcepti    
+on
+    + FullyQualifiedErro 
+   rId : NativeCommandE  
+  rror
+ 
+
+[WebServer] INFO:     
+Waiting for application 
+startup.
+[WebServer] 2026-09-15 
+20:00:34 - app.main - 
+INFO - Application 
+starting up...
+[WebServer] INFO:     
+Application startup 
+complete.
+[WebServer] INFO:     
+Uvicorn running on 
+http://127.0.0.1:8000 
+(Press CTRL+C to quit)
+
+
+[WebServer] (node:6028) [
+MODULE_TYPELESS_PACKAGE_J
+SON] Warning: Module 
+type of file:///C:/Users/
+HP/Desktop/.vscode/Argus%
+20%20og/frontend/tailwind
+.config.ts?id=17894826369
+11 is not specified and 
+it doesn't parse as 
+CommonJS.
+[WebServer] Reparsing as 
+ES module because module 
+syntax was detected. 
+This incurs a 
+performance overhead.
+[WebServer] To eliminate 
+this warning, add 
+"type": "module" to \\?\C
+:\Users\HP\Desktop\.vscod
+e\Argus  
+og\frontend\package.json.
+[WebServer] (Use `node 
+--trace-warnings ...` to 
+show where the warning 
+was created)
+
+Running 2 tests using 2 workers
+
+[1/2] [chromium] ΓÇ║ e2e\tests\repositories-health.spec.ts:33:9 ΓÇ║ Repositories Health Visualization Flow ΓÇ║ list displays health loading, populated, and not yet checked states
+[2/2] [chromium] ΓÇ║ e2e\tests\repositories-health.spec.ts:56:9 ΓÇ║ Repositories Health Visualization Flow ΓÇ║ health detail view and manual trigger refreshes data without page reload
+[WebServer] [browser] 
+getRepositoryHealth 
+failed with status: 404 
+[WebServer]     at 
+getRepositoryHealth (src/
+lib/api/health.ts:22:21)
+[WebServer]   20 |       
+  const res = await fetch
+Client(`/api/v1/repositor
+ies/${repositoryId}/healt
+h`);
+[WebServer]   21 |       
+  if (!res.ok) {
+[WebServer] > 22 |       
+      console.error("getR
+epositoryHealth failed 
+with status:", 
+res.status);
+[WebServer]      |       
+              ^
+[WebServer]   23 |       
+      return null;
+[WebServer]   24 |       
+  }
+[WebServer]   25 |       
+  return (await 
+res.json()) as Repository
+HealthSnapshot; (src/lib/
+api/health.ts:22:21)
+
+[WebServer] [browser] 
+getRepositoryHealth 
+failed with status: 404 
+[WebServer]     at 
+getRepositoryHealth (src/
+lib/api/health.ts:22:21)
+[WebServer]   20 |       
+  const res = await fetch
+Client(`/api/v1/repositor
+ies/${repositoryId}/healt
+h`);
+[WebServer]   21 |       
+  if (!res.ok) {
+[WebServer] > 22 |       
+      console.error("getR
+epositoryHealth failed 
+with status:", 
+res.status);
+[WebServer]      |       
+              ^
+[WebServer]   23 |       
+      return null;
+[WebServer]   24 |       
+  }
+
+[WebServer]   25 |       
+  return (await 
+res.json()) as Repository
+HealthSnapshot; (src/lib/
+api/health.ts:22:21)
+  1) [chromium] ΓÇ║ e2e\tests\repositories-health.spec.ts:56:9 ΓÇ║ Repositories Health Visualization Flow ΓÇ║ health detail view and manual trigger refreshes data without page reload 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('span:has-text("75")').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('span:has-text("75")').first() with timeout 5000ms
+      - waiting for locator('span:has-text("75")').first()
+
+
+      104 |         // Verify initial state
+      105 |         await expect(page.locator('text=Overall Health Score')).toBeVisible();
+    > 106 |         await expect(page.locator('span:has-text("75")').first()).toBeVisible();
+          |                                                                   ^
+      107 |         await expect(page.locator('text=Old dependencies')).toBeVisible();
+      108 |
+      109 |         // Click trigger button
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\repositories-health.spec.ts:106:67
+
+    Error Context: test-results\tests-repositories-health--1a4fb-es-data-without-page-reload-chromium\error-context.md
+
+
+  1 failed
+    [chromium] ΓÇ║ e2e\tests\repositories-health.spec.ts:56:9 ΓÇ║ Repositories Health Visualization Flow ΓÇ║ health detail view and manual trigger refreshes data without page reload 
+  1 passed (15.3s)
+
+[36m  Serving HTML report at http://localhost:59716. Press Ctrl+C to quit.[39m

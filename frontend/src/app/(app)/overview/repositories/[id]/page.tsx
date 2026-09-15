@@ -181,13 +181,11 @@ export default function RepositoryHealthPage(props: PageProps) {
                         <StatCard
                             className="lg:col-span-3 bg-muted/20 border-primary/20"
                             label="Overall Health Score"
-                            value={
-                                <div className="flex items-center gap-3">
-                                    <span className="text-4xl font-bold">{health.overall_score}</span>
-                                    <Badge variant={getScoreVariant(health.overall_score)}>
-                                        {health.overall_score >= 80 ? 'Healthy' : health.overall_score >= 50 ? 'Warning' : 'Critical'}
-                                    </Badge>
-                                </div>
+                            value={health.overall_score}
+                            trend={
+                                <Badge variant={getScoreVariant(health.overall_score)}>
+                                    {health.overall_score >= 80 ? 'Healthy' : health.overall_score >= 50 ? 'Warning' : 'Critical'}
+                                </Badge>
                             }
                             description={`Last computed at ${formatDate(health.computed_at)}`}
                         />
@@ -196,13 +194,11 @@ export default function RepositoryHealthPage(props: PageProps) {
                             <StatCard
                                 key={cat}
                                 label={CATEGORIES[cat] || cat}
-                                value={
-                                    <div className="flex items-center gap-2">
-                                        <span>{score}</span>
-                                        <Badge variant={getScoreVariant(score)} className="text-[10px] px-1 py-0 h-4">
-                                            {score >= 80 ? 'Good' : score >= 50 ? 'Fair' : 'Poor'}
-                                        </Badge>
-                                    </div>
+                                value={score}
+                                trend={
+                                    <Badge variant={getScoreVariant(score)} className="text-[10px] px-1 py-0 h-4">
+                                        {score >= 80 ? 'Good' : score >= 50 ? 'Fair' : 'Poor'}
+                                    </Badge>
                                 }
                             />
                         ))}

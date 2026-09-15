@@ -1,13 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SectionHeading } from "@/components/rm/section-heading";
 import { GitHubSettingsCard } from "./github-settings-card";
+import { AIConnectionSettings } from "./ai-connection-settings";
 
 const settingsSections = [
-    {
-        title: "AI provider and BYOK",
-        description: "AI provider configuration",
-        message: "Available in a future update.",
-    },
     {
         title: "Account settings",
         description: "Workspace and account preferences",
@@ -25,6 +21,7 @@ export default function SettingsPage() {
             />
             <div className="grid gap-4 lg:grid-cols-3">
                 <GitHubSettingsCard />
+                <AIConnectionSettings />
                 {settingsSections.map((section) => (
                     <Card key={section.title}>
                         <CardHeader>

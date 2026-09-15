@@ -6,6 +6,8 @@ from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
 from app.api.errors import app_error_handler, global_exception_handler
 from app.core.exceptions import AppError
+from app.integrations.ai import register_provider
+from app.integrations.ai.gemini_provider import GeminiProvider
 
 logger = get_logger(__name__)
 
@@ -20,6 +22,7 @@ app.add_exception_handler(Exception, global_exception_handler)
 async def startup_event():
 
     configure_logging()
+    register_provider(GeminiProvider.key, GeminiProvider)
     logger.info("Application starting up...")
 
 app.add_middleware(

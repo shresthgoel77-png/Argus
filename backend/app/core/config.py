@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     github_app_private_key: SecretStr
     github_app_webhook_secret: SecretStr
     github_app_install_state_ttl_seconds: int = 600
+    ai_credential_encryption_key: SecretStr
 
     @field_validator("cors_origins", mode="before")
     @classmethod
@@ -42,6 +43,15 @@ class Settings(BaseSettings):
             raise ValueError("GITHUB_APP_PRIVATE_KEY is required and must not be empty")
         if not self.github_app_webhook_secret or not self.github_app_webhook_secret.get_secret_value():
             raise ValueError("GITHUB_APP_WEBHOOK_SECRET is required and must not be empty")
+        
+        if not self.ai_credential_encryption_key or not self.ai_credential_encryption_key.get_secret_value():
+            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY is required and must not be empty")
+            
+        from cryptography.fernet import Fernet
+        try:
+            Fernet(self.ai_credential_encryption_key.get_secret_value())
+        except Exception:
+            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY is malformed, must be a valid Fernet key")
 
         if self.app_env != "development":
             if not self.database_url:

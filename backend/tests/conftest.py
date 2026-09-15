@@ -5,6 +5,7 @@ os.environ["GITHUB_APP_ID"] = "12345"
 os.environ["GITHUB_APP_SLUG"] = "test-app"
 os.environ["GITHUB_APP_PRIVATE_KEY"] = "test-pem"
 os.environ["GITHUB_APP_WEBHOOK_SECRET"] = "test-secret"
+os.environ["AI_CREDENTIAL_ENCRYPTION_KEY"] = "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
 os.environ.setdefault("DATABASE_URL", "sqlite:///test.db")
 
 from fastapi.testclient import TestClient

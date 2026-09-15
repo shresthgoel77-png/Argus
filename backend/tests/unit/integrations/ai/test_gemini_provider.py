@@ -68,3 +68,27 @@ def test_timeout_maps_to_unavailable_without_key_leak():
     with pytest.raises(AIProviderUnavailableError) as caught:
         provider.validate_api_key(SECRET_KEY)
     assert SECRET_KEY not in str(caught.value)
+
+
+def test_network_error_maps_to_unavailable_without_key_leak():
+    provider = GeminiProvider(
+        make_client(error=httpx.ConnectError("network unavailable"))
+    )
+    with pytest.raises(AIProviderUnavailableError) as caught:
+        provider.validate_api_key(SECRET_KEY)
+    assert SECRET_KEY not in str(caught.value)
+
+
+def test_default_timeout_is_passed_to_request():
+    class RecordingClient:
+        def __init__(self):
+            self.timeout = None
+
+        def get(self, url, *, headers, timeout):
+            self.timeout = timeout
+            return httpx.Response(200)
+
+    http_client = RecordingClient()
+    GeminiProvider(GeminiClient(http_client=http_client)).validate_api_key(SECRET_KEY)
+
+    assert http_client.timeout == 10.0

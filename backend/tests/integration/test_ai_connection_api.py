@@ -1,6 +1,11 @@
 import pytest
 
-from app.integrations.ai.exceptions import InvalidAPIKeyError
+from app.integrations.ai.exceptions import (
+    AIProviderRateLimitedError,
+    AIProviderUnavailableError,
+    InvalidAPIKeyError,
+    UnknownProviderError,
+)
 from app.services import ai_connection_service
 
 
@@ -83,6 +88,94 @@ async def test_invalid_api_key_is_sanitized(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("provider_error", "expected_status", "expected_detail"),
+    [
+        (
+            AIProviderRateLimitedError("rate-limit-key-fragment"),
+            429,
+            "The AI provider is rate limited. Please try again later.",
+        ),
+        (
+            AIProviderUnavailableError("unavailable-key-fragment"),
+            503,
+            "The AI provider is currently unavailable. Please try again later.",
+        ),
+    ],
+)
+async def test_provider_errors_are_sanitized(
+    authorized_client,
+    monkeypatch,
+    provider_error,
+    expected_status,
+    expected_detail,
+):
+    api_key = "provider-error-key-that-must-not-leak"
+    monkeypatch.setattr(
+        ai_connection_service,
+        "get_provider",
+        lambda _: provider_class(MockProvider(provider_error)),
+    )
+
+    response = await authorized_client.post(
+        "/api/v1/ai/connection",
+        json={
+            "provider": "mock",
+            "model": "supported-model",
+            "api_key": api_key,
+        },
+    )
+
+    assert response.status_code == expected_status
+    assert response.json()["detail"] == expected_detail
+    assert_key_not_in_response(response, api_key)
+    assert_key_not_in_response(response, str(provider_error))
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("provider_setup", "model", "expected_detail"),
+    [
+        (
+            lambda _: (_ for _ in ()).throw(
+                UnknownProviderError("unknown-key-fragment")
+            ),
+            "supported-model",
+            "The selected AI provider or model is not supported.",
+        ),
+        (
+            lambda _: provider_class(MockProvider()),
+            "unsupported-model",
+            "The selected AI provider or model is not supported.",
+        ),
+    ],
+)
+async def test_unsupported_provider_or_model_is_sanitized(
+    authorized_client,
+    monkeypatch,
+    provider_setup,
+    model,
+    expected_detail,
+):
+    api_key = "unsupported-key-that-must-not-leak"
+    monkeypatch.setattr(ai_connection_service, "get_provider", provider_setup)
+
+    response = await authorized_client.post(
+        "/api/v1/ai/connection",
+        json={
+            "provider": "unsupported-provider",
+            "model": model,
+            "api_key": api_key,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == expected_detail
+    assert_key_not_in_response(response, api_key)
+    assert_key_not_in_response(response, "unknown-key-fragment")
+
+
+@pytest.mark.asyncio
 async def test_get_unconfigured_connection_returns_false(
     authorized_client,
 ):
@@ -90,6 +183,33 @@ async def test_get_unconfigured_connection_returns_false(
 
     assert response.status_code == 200
     assert response.json() == {"configured": False}
+
+
+@pytest.mark.asyncio
+async def test_get_configured_connection_returns_safe_status(
+    authorized_client, monkeypatch
+):
+    api_key = "get-key-that-must-not-leak"
+    monkeypatch.setattr(
+        ai_connection_service,
+        "get_provider",
+        lambda _: provider_class(MockProvider()),
+    )
+    await authorized_client.post(
+        "/api/v1/ai/connection",
+        json={
+            "provider": "mock",
+            "model": "supported-model",
+            "api_key": api_key,
+        },
+    )
+
+    response = await authorized_client.get("/api/v1/ai/connection")
+
+    assert response.status_code == 200
+    assert response.json()["configured"] is True
+    assert "api_key" not in response.json()
+    assert_key_not_in_response(response, api_key)
 
 
 @pytest.mark.asyncio

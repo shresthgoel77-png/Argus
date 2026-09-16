@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     ai_credential_encryption_key: SecretStr
     
     bot_mention_handle: str = "@repomedic"
+    bot_max_interactions_per_hour: int = 10
 
     @field_validator("cors_origins", mode="before")
     @classmethod

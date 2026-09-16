@@ -291,3 +291,19 @@ class TestGetBranchProtection:
             with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
                 with pytest.raises(GitHubAuthError):
                     await client.get_branch_protection("org/repo", "main")
+
+
+class TestGetCollaboratorPermission:
+    @pytest.mark.asyncio
+    async def test_returns_permission_with_installation_auth(self, _patch_auth):
+        mock_resp = _mock_response(200, json_data={"permission": "maintain"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp) as mock_request:
+                result = await client.get_collaborator_permission("org/repo", "commenter")
+
+        assert result == "maintain"
+        mock_request.assert_called_once()
+        assert mock_request.call_args.args[:2] == (
+            "GET",
+            "/repos/org/repo/collaborators/commenter/permission",
+        )

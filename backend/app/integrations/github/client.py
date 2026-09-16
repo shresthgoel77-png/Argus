@@ -225,6 +225,19 @@ class GitHubAppClient:
         except GitHubNotFoundError:
             return None
 
+    async def get_collaborator_permission(
+        self, full_name: str, username: str
+    ) -> str:
+        """Return a collaborator's effective permission on a repository."""
+        response = await self._request(
+            "GET",
+            f"/repos/{full_name}/collaborators/{username}/permission",
+        )
+        permission = response.json().get("permission")
+        if not isinstance(permission, str):
+            raise GitHubAPIError("GitHub returned no collaborator permission")
+        return permission
+
     async def list_dependabot_alerts(self, full_name: str) -> list[dict[str, Any]]:
         """List dependabot alerts for a repository with pagination."""
         all_alerts: list[dict[str, Any]] = []

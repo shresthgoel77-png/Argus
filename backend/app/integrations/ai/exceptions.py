@@ -14,6 +14,10 @@ class AIProviderRateLimitedError(AIProviderError):
     """Raised when the AI Provider rate limits the request."""
     pass
 
+class AIProviderInvalidResponseError(AIProviderError):
+    """Raised when an AI provider returns an invalid structured response."""
+    pass
+
 class UnknownProviderError(AIProviderError):
     """Raised when an unregistered AI provider key is requested."""
     pass

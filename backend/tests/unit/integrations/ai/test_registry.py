@@ -14,6 +14,9 @@ class DummyProvider(BaseAIProvider):
         if api_key != "valid_key":
             raise InvalidAPIKeyError("Invalid key")
 
+    def generate_analysis(self, context):
+        raise NotImplementedError
+
 def test_ai_provider_registry():
     # Register the provider
     register_provider("dummy", DummyProvider)

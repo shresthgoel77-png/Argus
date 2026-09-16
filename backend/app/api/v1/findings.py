@@ -12,6 +12,13 @@ from app.schemas.finding import (
 from app.services.finding_service import list_findings, get_finding_or_404
 from app.services import finding_lifecycle_service
 from app.services.finding_lifecycle_service import InvalidFindingTransition
+from app.services import ai_analysis_service
+from app.schemas.ai_analysis import (
+    AIAnalysisResponse,
+    AIAnalysisHistoryResponse,
+    AIAnalysisNotExists,
+)
+
 
 router = APIRouter(prefix="/findings", tags=["findings"])
 
@@ -89,3 +96,76 @@ def update_finding_status(
         )
 
     return finding
+
+
+@router.post("/{finding_id}/ai-analysis", response_model=AIAnalysisResponse)
+def create_finding_ai_analysis(
+    finding_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Triggers a new AI analysis for the finding synchronously.
+    Returns the resulting AIAnalysis (whether completed or failed).
+    """
+    finding = get_finding_or_404(db=db, user_id=user.id, finding_id=finding_id)
+    
+    try:
+        analysis = ai_analysis_service.request_finding_analysis(finding=finding, user=user)
+        return AIAnalysisResponse.model_validate(analysis)
+    except ai_analysis_service.AINotConfiguredError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No valid AI connection is configured. Please complete setup in the Settings AI/BYOK section."
+        ) from e
+    except ai_analysis_service.AIAnalysisFailedError as e:
+        raise HTTPException(
+            status_code=e.status_code,
+            detail=e.message
+        ) from e
+
+
+@router.get(
+    "/{finding_id}/ai-analysis", 
+    response_model=AIAnalysisResponse | AIAnalysisNotExists
+)
+def get_latest_finding_ai_analysis(
+    finding_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns the latest AIAnalysis for the finding, or {exists: false} if none exists.
+    """
+    finding = get_finding_or_404(db=db, user_id=user.id, finding_id=finding_id)
+    latest = ai_analysis_service.get_latest_analysis(finding=finding)
+    
+    if not latest:
+        return AIAnalysisNotExists()
+    return AIAnalysisResponse.model_validate(latest)
+
+
+@router.get("/{finding_id}/ai-analysis/history", response_model=AIAnalysisHistoryResponse)
+def get_finding_ai_analysis_history(
+    finding_id: uuid.UUID,
+    limit: int = 50,
+    offset: int = 0,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns a paginated list of all prior AI analyses for the finding, newest first.
+    """
+    finding = get_finding_or_404(db=db, user_id=user.id, finding_id=finding_id)
+    total, items = ai_analysis_service.list_analyses(
+        finding=finding,
+        limit=limit,
+        offset=offset
+    )
+    
+    return AIAnalysisHistoryResponse(
+        items=[AIAnalysisResponse.model_validate(i) for i in items],
+        total=total,
+        limit=limit,
+        offset=offset
+    )

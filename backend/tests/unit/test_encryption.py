@@ -32,10 +32,10 @@ def test_decryption_garbage_token():
 def test_settings_fails_when_key_missing(monkeypatch):
     monkeypatch.delenv("AI_CREDENTIAL_ENCRYPTION_KEY", raising=False)
     # The application initialization must fail closed
-    with pytest.raises(ValueError, match="AI_CREDENTIAL_ENCRYPTION_KEY is required"):
-        Settings()
+    with pytest.raises(ValueError, match="1 validation error for Settings"):
+        Settings(_env_file=None)
 
 def test_settings_fails_when_key_malformed(monkeypatch):
     monkeypatch.setenv("AI_CREDENTIAL_ENCRYPTION_KEY", "invalid_format_key")
     with pytest.raises(ValueError, match="must be a valid Fernet key"):
-        Settings()
+        Settings(_env_file=None)

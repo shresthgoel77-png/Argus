@@ -1,0 +1,5 @@
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_bot_interaction.py:177: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+====================== 355 passed, 15 warnings in 6.01s =======================

@@ -1,0 +1,22 @@
+﻿commit 468d830ef20dd99742f9874410c551d154ea2cc5
+Author: shresthgoel77-png <shresthgoel77@gmail.com>
+Date:   Wed Sep 16 20:08:20 2026 +0530
+
+    Built bot authorization service design
+
+A	backend/app/bot/authorization_service.py
+M	backend/app/core/config.py
+M	backend/app/integrations/github/client.py
+A	backend/full_test_results.txt
+A	backend/full_test_results_utf8.txt
+A	backend/prompt2_test_results.txt
+A	backend/prompt2_test_results_utf8.txt
+A	backend/tests/unit/test_authorization_service.py
+M	backend/tests/unit/test_github_client.py
+A	git_diff.txt
+A	git_diff_final.txt
+A	git_diff_final2.txt
+A	git_status.txt
+A	git_status_final.txt
+M	test_results.txt
+A	test_results_utf8.txt

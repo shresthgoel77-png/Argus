@@ -225,6 +225,24 @@ class GitHubAppClient:
         except GitHubNotFoundError:
             return None
 
+    async def get_pull_request(self, full_name: str, number: int) -> dict[str, Any] | None:
+        """Fetch one pull request resource without following related links."""
+        try:
+            response = await self._request("GET", f"/repos/{full_name}/pulls/{number}")
+            data = response.json()
+            return data if isinstance(data, dict) else None
+        except GitHubNotFoundError:
+            return None
+
+    async def get_issue(self, full_name: str, number: int) -> dict[str, Any] | None:
+        """Fetch one issue resource without following related links."""
+        try:
+            response = await self._request("GET", f"/repos/{full_name}/issues/{number}")
+            data = response.json()
+            return data if isinstance(data, dict) else None
+        except GitHubNotFoundError:
+            return None
+
     async def get_collaborator_permission(
         self, full_name: str, username: str
     ) -> str:

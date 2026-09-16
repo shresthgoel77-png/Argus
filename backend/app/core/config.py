@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     github_app_webhook_secret: SecretStr
     github_app_install_state_ttl_seconds: int = 600
     ai_credential_encryption_key: SecretStr
+    
+    bot_mention_handle: str = "@repomedic"
 
     @field_validator("cors_origins", mode="before")
     @classmethod

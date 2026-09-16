@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle2, RotateCcw, XCircle, Loader2 } from "lucide-react";
+import { AIAnalysisPanel } from "./ai-analysis-panel";
 
 const StatusButton = ({
     status,
@@ -155,6 +156,8 @@ export function FindingDetailDialog({ finding, isOpen, onOpenChange, onUpdate }:
                             {finding.resolution_source && <li><span className="font-medium text-foreground w-36 inline-block">Resolution Source:</span> {finding.resolution_source}</li>}
                         </ul>
                     </div>
+
+                    <AIAnalysisPanel findingId={finding.id} />
                 </div>
 
                 <DialogFooter className="gap-2 sm:gap-2">

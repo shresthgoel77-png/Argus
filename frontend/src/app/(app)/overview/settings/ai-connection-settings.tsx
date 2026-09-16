@@ -107,7 +107,7 @@ export function AIConnectionSettings() {
     };
 
     return (
-        <Card>
+            <Card id="ai-connection">
             <CardHeader>
                 <CardTitle>AI provider and BYOK</CardTitle>
                 <CardDescription>Validate a provider key for AI-powered workspace features.</CardDescription>

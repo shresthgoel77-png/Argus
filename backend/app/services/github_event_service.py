@@ -14,6 +14,7 @@ from app.services.repository_service import disable_monitoring_for_removed_repos
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.monitoring import monitor_service as MonitorService
+from app.bot import bot_orchestration_service
 
 logger = get_logger(__name__)
 
@@ -198,7 +199,31 @@ def process_webhook_event(
                 
     except Exception as e:
         return mark_failed(db, event, e)
-        
+
+    # ── Bot-mention orchestrator (never-propagate, independent of analyzers) ──
+    if (
+        normalized_event.event_type == "issue_comment"
+        and normalized_event.action == "created"
+        and repository_id is not None
+        and repo is not None
+        and event is not None
+    ):
+        is_reaction_event = True
+        try:
+            _run_analyzer_sync(
+                bot_orchestration_service.handle_mention,
+                db=db,
+                github_event=event,
+                repository=repo,
+                normalized_event=normalized_event,
+            )
+        except Exception:
+            logger.warning(
+                "Bot orchestration failed (never-propagate)",
+                exc_info=True,
+                extra={"delivery_id": normalized_event.delivery_id},
+            )
+
     if is_reaction_event:
         return mark_processed(db, event)
     else:

@@ -1,0 +1,174 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.14.1, langsmith-0.9.2, asyncio-1.4.0, timeout-2.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 32 items
+
+tests/integration/services/test_github_event_service.py::test_record_event_success PASSED [  3%]
+tests/integration/services/test_github_event_service.py::test_record_event_duplicate_returns_none PASSED [  6%]
+tests/integration/services/test_github_event_service.py::test_status_transitions PASSED [  9%]
+tests/integration/services/test_github_event_service.py::test_mark_failed_strips_secrets PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_concurrent_insert_race FAILED [ 15%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_duplicate PASSED [ 18%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_unknown_installation FAILED [ 21%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_known_installation_suspend PASSED [ 25%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_removed_repos PASSED [ 28%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_reaction_failure_marks_failed PASSED [ 31%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_analyzes_pull_request PASSED [ 34%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_new_delivery PASSED [ 37%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_duplicate_delivery PASSED [ 40%]
+tests/integration/test_webhooks_api.py::test_webhook_invalid_missing_signature PASSED [ 43%]
+tests/integration/test_webhooks_api.py::test_webhook_missing_delivery_or_event PASSED [ 46%]
+tests/integration/test_webhooks_api.py::test_webhook_malformed_json_valid_signature PASSED [ 50%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_suspend PASSED [ 53%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_created PASSED [ 56%]
+tests/unit/test_authorization_service.py::test_monitoring_disabled_short_circuits PASSED [ 59%]
+tests/unit/test_authorization_service.py::test_owner_unresolved_short_circuits PASSED [ 62%]
+tests/unit/test_authorization_service.py::test_ai_not_configured_short_circuits PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_insufficient_permission PASSED [ 68%]
+tests/unit/test_authorization_service.py::test_permission_check_failure_denies PASSED [ 71%]
+tests/unit/test_authorization_service.py::test_rate_limit_counts_only_trailing_hour PASSED [ 75%]
+tests/unit/test_authorization_service.py::test_rate_limit_denies_trailing_hour_interaction PASSED [ 78%]
+tests/unit/test_authorization_service.py::test_authorizes_write_permission PASSED [ 81%]
+tests/unit/test_bot_interaction.py::test_create_bot_interaction PASSED   [ 84%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_fks PASSED      [ 87%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_unique_github_event_id PASSED [ 90%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_invalid_intent_rejected PASSED [ 93%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_composite_index PASSED [ 96%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_count_query PASSED [100%]
+
+================================== FAILURES ===================================
+_________________________ test_concurrent_insert_race _________________________
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlite3.OperationalError: no such table: github_events
+
+The above exception was the direct cause of the following exception:
+tests\integration\services\test_github_event_service.py:115: in test_concurrent_insert_race
+    results.append(f.result())
+                   ^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:447: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:396: in __get_result
+    raise self._exception
+C:\Python314\Lib\concurrent\futures\thread.py:86: in run
+    result = ctx.run(self.task)
+             ^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\thread.py:73: in run
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+tests\integration\services\test_github_event_service.py:100: in insert_task
+    return record_event(session, mock_normalized_event, repo_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\github_event_service.py:87: in record_event
+    with db.begin_nested():
+         ^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\util.py:147: in __exit__
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\util.py:145: in __exit__
+    self.commit()
+<string>:2: in commit
+    ???
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:1316: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:1290: in _prepare_impl
+    self.session.flush()
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4353: in flush
+    self._flush(objects)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4449: in _flush
+    flush_context.execute()
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\unitofwork.py:465: in execute
+    rec.execute(self)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\persistence.py:94: in save_obj
+    _emit_insert_statements(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+E   sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: github_events
+E   [SQL: INSERT INTO github_events (id, delivery_id, event_type, action, installation_id, repository_github_id, repository_id, payload, status, error_message, processed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING received_at]
+E   [parameters: ('c511e96591c047ffaaed3aba3d35b7da', '0fbc41af-7414-4759-af1a-fab4283df009', 'push', None, 12345, 98765, 'c6bc05ef629e4193a09bcda591d88805', '{"mock": "payload"}', 'received', None, None)]
+E   (Background on this error at: https://sqlalche.me/e/20/e3q8)
+_______________ test_process_webhook_event_unknown_installation _______________
+tests\integration\services\test_github_event_service.py:169: in test_process_webhook_event_unknown_installation
+    assert result is None
+E   assert <app.models.github_event.GitHubEvent object at 0x0000026956DC2C10> is None
+============================== warnings summary ===============================
+..\..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+..\..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/unit/test_bot_interaction.py::test_bot_interaction_fks
+tests/unit/test_bot_interaction.py::test_bot_interaction_unique_github_event_id
+tests/unit/test_bot_interaction.py::test_bot_interaction_invalid_intent_rejected
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\integration\conftest.py:61: SAWarning: transaction already deassociated from connection
+    transaction.rollback()
+
+tests/unit/test_bot_interaction.py::test_bot_interaction_count_query
+  c:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_bot_interaction.py:177: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/services/test_github_event_service.py::test_concurrent_insert_race - sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: github_events
+[SQL: INSERT INTO github_events (id, delivery_id, event_type, action, installation_id, repository_github_id, repository_id, payload, status, error_message, processed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING received_at]
+[parameters: ('c511e96591c047ffaaed3aba3d35b7da', '0fbc41af-7414-4759-af1a-fab4283df009', 'push', None, 12345, 98765, 'c6bc05ef629e4193a09bcda591d88805', '{"mock": "payload"}', 'received', None, None)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+FAILED tests/integration/services/test_github_event_service.py::test_process_webhook_event_unknown_installation - assert <app.models.github_event.GitHubEvent object at 0x0000026956DC2C10> is None
+================== 2 failed, 30 passed, 7 warnings in 1.15s ===================

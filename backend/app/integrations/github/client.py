@@ -10,6 +10,7 @@ injectable client that can be used from background tasks, CLI tooling, etc.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 import httpx
@@ -50,6 +51,12 @@ def _raise_for_status(response: httpx.Response) -> None:
     if 200 <= response.status_code < 300:
         return
     raise GitHubAPIError.from_response(response)
+
+
+@dataclass
+class PostedComment:
+    """Represents a GitHub comment created via the API."""
+    id: int
 
 
 class GitHubAppClient:
@@ -105,6 +112,7 @@ class GitHubAppClient:
         *,
         use_app_jwt: bool = False,
         params: dict[str, Any] | None = None,
+        json: dict[str, Any] | None = None,
     ) -> httpx.Response:
         """Send a single authenticated request.
 
@@ -128,8 +136,12 @@ class GitHubAppClient:
             params,
         )
 
+        kwargs = {"headers": auth_headers, "params": params}
+        if json is not None:
+            kwargs["json"] = json
+            
         response = await self._http.request(
-            method, url, headers=auth_headers, params=params
+            method, url, **kwargs
         )
 
         logger.debug(
@@ -143,6 +155,23 @@ class GitHubAppClient:
         return response
 
     # -- Public API ---------------------------------------------------------
+
+    async def post_issue_comment(self, owner: str, repo: str, issue_number: int, body: str) -> PostedComment:
+        """Post a comment to an issue or pull request.
+
+        Defensively truncates the body to GitHub's max limit before sending.
+        Uses the installation access token.
+        """
+        # GitHub limits issue comment bodies to 65536 characters.
+        safe_body = body[:65536]
+        
+        response = await self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/issues/{issue_number}/comments",
+            json={"body": safe_body},
+        )
+        data = response.json()
+        return PostedComment(id=data["id"])
 
     async def get_installation(self, installation_id: int) -> dict[str, Any]:
         """Fetch metadata for a GitHub App installation.

@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock, patch, MagicMock
 
 import pytest
 
-from app.integrations.github.client import GitHubAppClient
+from app.integrations.github.client import GitHubAppClient, PostedComment
 from app.integrations.github.exceptions import (
     GitHubAPIError,
     GitHubAuthError,
@@ -307,3 +307,45 @@ class TestGetCollaboratorPermission:
             "GET",
             "/repos/org/repo/collaborators/commenter/permission",
         )
+
+# ---------------------------------------------------------------------------
+# Tests — post_issue_comment()
+# ---------------------------------------------------------------------------
+
+class TestPostIssueComment:
+    @pytest.mark.asyncio
+    async def test_success_and_truncation(self, _patch_auth):
+        """Correctly posts a comment and truncates if necessary."""
+        mock_resp = _mock_response(201, json_data={"id": 4242})
+        long_body = "x" * 70000
+        
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp) as mock_request:
+                result = await client.post_issue_comment("org", "repo", 1337, long_body)
+                
+        assert isinstance(result, PostedComment)
+        assert result.id == 4242
+        
+        mock_request.assert_called_once()
+        call_args, call_kwargs = mock_request.call_args
+        assert call_args[:2] == ("POST", "/repos/org/repo/issues/1337/comments")
+        assert len(call_kwargs.get("json", {}).get("body", "")) == 65536
+        assert call_kwargs["json"]["body"] == "x" * 65536
+
+    @pytest.mark.asyncio
+    async def test_returns_github_not_found(self, _patch_auth):
+        """Raises GitHubNotFoundError if issue not found or locked (404/410)."""
+        mock_resp = _mock_response(404, json_data={"message": "Not Found"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                with pytest.raises(GitHubNotFoundError):
+                    await client.post_issue_comment("org", "repo", 1, "body")
+
+    @pytest.mark.asyncio
+    async def test_raises_github_auth_error_on_403(self, _patch_auth):
+        """Raises GitHubAuthError if permission is denied (403)."""
+        mock_resp = _mock_response(403, json_data={"message": "Forbidden"})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
+                with pytest.raises(GitHubAuthError):
+                    await client.post_issue_comment("org", "repo", 1, "body")

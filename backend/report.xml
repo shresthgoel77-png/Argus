@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="371" time="22.270" timestamp="2026-09-16T21:02:23.173776+05:30" hostname="shresth"><testcase classname="tests.integration.api.v1.test_findings" name="test_get_findings_list" time="0.421" /><testcase classname="tests.integration.api.v1.test_findings" name="test_get_findings_list_filters" time="0.101" /><testcase classname="tests.integration.api.v1.test_findings" name="test_get_repository_findings" time="0.066" /><testcase classname="tests.integration.api.v1.test_findings" name="test_get_repository_findings_unowned" time="0.046" /><testcase classname="tests.integration.api.v1.test_findings" name="test_get_finding_detail" time="0.049" /><testcase classname="tests.integration.api.v1.test_findings" name="test_get_finding_detail_unowned" time="0.044" /><testcase classname="tests.integration.api.v1.test_findings" name="test_patch_finding_status" time="0.055" /><testcase classname="tests.integration.api.v1.test_findings" name="test_patch_finding_status_conflict" time="0.061" /><testcase classname="tests.integration.api.v1.test_findings" name="test_patch_finding_unowned" time="0.046" /><testcase classname="tests.integration.api.v1.test_findings" name="test_unauthenticated" time="0.046" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_trigger_analysis_success" time="0.050" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_trigger_analysis_not_configured" time="0.046" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_trigger_analysis_failed_provider" time="0.044" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_trigger_analysis_unowned_finding" time="0.044" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_get_latest_analysis_none" time="0.044" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_get_latest_analysis_success" time="0.048" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_get_latest_analysis_unowned_finding" time="0.042" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_list_analyses_history" time="0.049" /><testcase classname="tests.integration.api.v1.test_findings_ai_analysis" name="test_list_analyses_unowned_finding" time="0.046" /><testcase classname="tests.integration.services.test_finding_service" name="test_create_finding" time="0.019" /><testcase classname="tests.integration.services.test_finding_service" name="test_create_finding_fingerprint_conflict_updates_existing_row" time="0.047" /><testcase classname="tests.integration.services.test_finding_service" name="test_sync_findings_for_run_auto_resolves_missing" time="0.039" /><testcase classname="tests.integration.services.test_finding_service" name="test_sync_findings_for_run_leaves_ignored_missing_finding_untouched" time="0.031" /><testcase classname="tests.integration.services.test_finding_service" name="test_sync_findings_for_run_updates_present_finding" time="0.064" /><testcase classname="tests.integration.services.test_finding_service" name="test_list_findings_for_repository" time="0.061" /><testcase classname="tests.integration.services.test_github_connection_service" name="test_upsert_connection_new" time="0.025" /><testcase classname="tests.integration.services.test_github_connection_service" name="test_upsert_connection_idempotent_update" time="0.025" /><testcase classname="tests.integration.services.test_github_connection_service" name="test_upsert_connection_ownership_reassignment" time="0.030" /><testcase classname="tests.integration.services.test_github_connection_service" name="test_list_connections" time="0.019" /><testcase classname="tests.integration.services.test_github_connection_service" name="test_get_connection_or_404" time="0.025" /><testcase classname="tests.integration.services.test_github_connection_service" name="test_handle_installation_status_change" time="0.031" /><testcase classname="tests.integration.services.test_github_event_service" name="test_record_event_success" time="0.016" /><testcase classname="tests.integration.services.test_github_event_service" name="test_record_event_duplicate_returns_none" time="0.021" /><testcase classname="tests.integration.services.test_github_event_service" name="test_status_transitions" time="0.015" /><testcase classname="tests.integration.services.test_github_event_service" name="test_mark_failed_strips_secrets" time="0.015" /><testcase classname="tests.integration.services.test_github_event_service" name="test_concurrent_insert_race" time="0.025"><failure message="sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: github_events&#10;[SQL: INSERT INTO github_events (id, delivery_id, event_type, action, installation_id, repository_github_id, repository_id, payload, status, error_message, processed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING received_at]&#10;[parameters: ('5e19b63b88004568899782e05ec791bc', '2c672173-1359-436b-9596-c05a72da992b', 'push', None, 12345, 98765, 'c4c190ba18054dff848691a829a2d6b1', '{&quot;mock&quot;: &quot;payload&quot;}', 'received', None, None)]&#10;(Background on this error at: https://sqlalche.me/e/20/e3q8)">self = &lt;sqlalchemy.engine.base.Connection object at 0x000002A3796F5040&gt;
+dialect = &lt;sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000002A37932EC10&gt;
+context = &lt;sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x000002A379086690&gt;
+statement = &lt;sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x000002A3796D0550&gt;
+parameters = [('5e19b63b88004568899782e05ec791bc', '2c672173-1359-436b-9596-c05a72da992b', 'push', None, 12345, 98765, ...)]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -&gt; CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+&gt;                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000002A37932EC10&gt;
+cursor = &lt;sqlite3.Cursor object at 0x000002A3796C51C0&gt;
+statement = 'INSERT INTO github_events (id, delivery_id, event_type, action, installation_id, repository_github_id, repository_id, payload, status, error_message, processed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING received_at'
+parameters = ('5e19b63b88004568899782e05ec791bc', '2c672173-1359-436b-9596-c05a72da992b', 'push', None, 12345, 98765, ...)
+context = &lt;sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x000002A379086690&gt;
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+&gt;       cursor.execute(statement, parameters)
+E       sqlite3.OperationalError: no such table: github_events
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+SessionLocal = sessionmaker(class_='Session', autocommit=False, bind=Engine(sqlite:///:memory:), autoflush=False, expire_on_commit=True)
+mock_normalized_event = NormalizedWebhookEvent(delivery_id='2c672173-1359-436b-9596-c05a72da992b', event_type='push', action=None, installatio...rkflow_run_id=None, workflow_run_name=None, workflow_run_conclusion=None, workflow_run_url=None, ref=None, forced=None)
+
+    def test_concurrent_insert_race(SessionLocal, mock_normalized_event: NormalizedWebhookEvent):
+        repo_id = uuid.uuid4()
+    
+        def insert_task():
+            session = SessionLocal()
+            try:
+                return record_event(session, mock_normalized_event, repo_id)
+            finally:
+                session.close()
+    
+        # Clean up first to avoid false negatives from other tests run in the same session
+        session = SessionLocal()
+        session.query(GitHubEvent).filter_by(delivery_id=mock_normalized_event.delivery_id).delete()
+        session.commit()
+        session.close()
+    
+        # Run in parallel
+        results = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [executor.submit(insert_task) for _ in range(5)]
+            for f in concurrent.futures.as_completed(futures):
+&gt;               results.append(f.result())
+                               ^^^^^^^^^^
+
+tests\integration\services\test_github_event_service.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Python314\Lib\concurrent\futures\_base.py:447: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\_base.py:396: in __get_result
+    raise self._exception
+C:\Python314\Lib\concurrent\futures\thread.py:86: in run
+    result = ctx.run(self.task)
+             ^^^^^^^^^^^^^^^^^^
+C:\Python314\Lib\concurrent\futures\thread.py:73: in run
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+tests\integration\services\test_github_event_service.py:100: in insert_task
+    return record_event(session, mock_normalized_event, repo_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app\services\github_event_service.py:86: in record_event
+    with db.begin_nested():
+         ^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\util.py:147: in __exit__
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\util.py:145: in __exit__
+    self.commit()
+&lt;string&gt;:2: in commit
+    ???
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:1316: in commit
+    self._prepare_impl()
+&lt;string&gt;:2: in _prepare_impl
+    ???
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:1290: in _prepare_impl
+    self.session.flush()
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4353: in flush
+    self._flush(objects)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4449: in _flush
+    flush_context.execute()
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\unitofwork.py:465: in execute
+    rec.execute(self)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\persistence.py:94: in save_obj
+    _emit_insert_statements(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000002A37932EC10&gt;
+cursor = &lt;sqlite3.Cursor object at 0x000002A3796C51C0&gt;
+statement = 'INSERT INTO github_events (id, delivery_id, event_type, action, installation_id, repository_github_id, repository_id, payload, status, error_message, processed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING received_at'
+parameters = ('5e19b63b88004568899782e05ec791bc', '2c672173-1359-436b-9596-c05a72da992b', 'push', None, 12345, 98765, ...)
+context = &lt;sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x000002A379086690&gt;
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+&gt;       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: github_events
+E       [SQL: INSERT INTO github_events (id, delivery_id, event_type, action, installation_id, repository_github_id, repository_id, payload, status, error_message, processed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING received_at]
+E       [parameters: ('5e19b63b88004568899782e05ec791bc', '2c672173-1359-436b-9596-c05a72da992b', 'push', None, 12345, 98765, 'c4c190ba18054dff848691a829a2d6b1', '{"mock": "payload"}', 'received', None, None)]
+E       (Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: OperationalError</failure></testcase><testcase classname="tests.integration.services.test_github_event_service" name="test_process_webhook_event_duplicate" time="0.010" /><testcase classname="tests.integration.services.test_github_event_service" name="test_process_webhook_event_unknown_installation" time="0.015"><failure message="assert &lt;app.models.github_event.GitHubEvent object at 0x000002A37971C210&gt; is None">db_session = &lt;sqlalchemy.orm.session.Session object at 0x000002A379728AA0&gt;
+
+    def test_process_webhook_event_unknown_installation(db_session):
+        mock_event = NormalizedWebhookEvent(
+            delivery_id="unknown-1",
+            event_type="installation",
+            action="created",
+            installation_id=99999,
+            repository=None,
+            installation_account_login="org1",
+            installation_account_type="Organization",
+            repositories_removed=[],
+            raw_payload={}
+        )
+        result = process_webhook_event(db_session, mock_event, MagicMock())
+&gt;       assert result is None
+E       assert &lt;app.models.github_event.GitHubEvent object at 0x000002A37971C210&gt; is None
+
+tests\integration\services\test_github_event_service.py:169: AssertionError</failure></testcase><testcase classname="tests.integration.services.test_github_event_service" name="test_process_webhook_event_known_installation_suspend" time="0.027" /><testcase classname="tests.integration.services.test_github_event_service" name="test_process_webhook_event_removed_repos" time="0.036" /><testcase classname="tests.integration.services.test_github_event_service" name="test_process_webhook_event_reaction_failure_marks_failed" time="0.019" /><testcase classname="tests.integration.services.test_github_event_service" name="test_process_webhook_event_analyzes_pull_request" time="0.027" /><testcase classname="tests.integration.services.test_pr_integration" name="test_process_webhook_event_analyzes_pull_request" time="0.023" /><testcase classname="tests.integration.services.test_repository_service" name="test_list_available_repositories_flags_already_added" time="0.031" /><testcase classname="tests.integration.services.test_repository_service" name="test_add_repository_idempotency" time="0.033" /><testcase classname="tests.integration.services.test_repository_service" name="test_add_repository_rejects_unauthorized" time="0.020" /><testcase classname="tests.integration.services.test_repository_service" name="test_set_monitoring_enabled_ownership" time="0.017" /><testcase classname="tests.integration.services.test_repository_service" name="test_disable_monitoring_for_removed_repositories" time="0.022" /><testcase classname="tests.integration.test_ai_connection_api" name="test_create_connection_returns_safe_status" time="0.070" /><testcase classname="tests.integration.test_ai_connection_api" name="test_invalid_api_key_is_sanitized" time="0.023" /><testcase classname="tests.integration.test_ai_connection_api" name="test_provider_errors_are_sanitized[provider_error0-429-The AI provider is rate limited. Please try again later.]" time="0.025" /><testcase classname="tests.integration.test_ai_connection_api" name="test_provider_errors_are_sanitized[provider_error1-503-The AI provider is currently unavailable. Please try again later.]" time="0.023" /><testcase classname="tests.integration.test_ai_connection_api" name="test_unsupported_provider_or_model_is_sanitized[&lt;lambda&gt;-supported-model-The selected AI provider or model is not supported.]" time="0.025" /><testcase classname="tests.integration.test_ai_connection_api" name="test_unsupported_provider_or_model_is_sanitized[&lt;lambda&gt;-unsupported-model-The selected AI provider or model is not supported.]" time="0.027" /><testcase classname="tests.integration.test_ai_connection_api" name="test_get_unconfigured_connection_returns_false" time="0.034" /><testcase classname="tests.integration.test_ai_connection_api" name="test_get_configured_connection_returns_safe_status" time="0.042" /><testcase classname="tests.integration.test_ai_connection_api" name="test_delete_connection_is_idempotent_and_has_no_body" time="0.059" /><testcase classname="tests.integration.test_auth_flow" name="test_auth_flow_e2e" time="0.079" /><testcase classname="tests.integration.test_auth_flow" name="test_dev_login_fails_non_development_provider" time="0.022" /><testcase classname="tests.integration.test_finding_lifecycle" name="test_partial_unique_index_on_finding" time="0.025" /><testcase classname="tests.integration.test_finding_lifecycle" name="test_partial_unique_index_allows_multiple_resolved" time="0.024" /><testcase classname="tests.integration.test_finding_lifecycle" name="test_partial_unique_index_ignores_null_fingerprint" time="0.027" /><testcase classname="tests.integration.test_finding_model" name="test_finding_insert" time="0.018" /><testcase classname="tests.integration.test_github_api" name="test_github_install_flow" time="0.097" /><testcase classname="tests.integration.test_github_api" name="test_github_install_callback_rejections" time="0.081" /><testcase classname="tests.integration.test_github_api" name="test_github_endpoints_unauthenticated" time="0.034" /><testcase classname="tests.integration.test_github_event_model" name="test_create_github_event_required_fields_only" time="0.009" /><testcase classname="tests.integration.test_github_event_model" name="test_github_event_delivery_id_unique" time="0.008" /><testcase classname="tests.integration.test_github_models" name="test_valid_connection_and_repo" time="0.018" /><testcase classname="tests.integration.test_github_models" name="test_duplicate_connection" time="0.013" /><testcase classname="tests.integration.test_github_models" name="test_duplicate_repo" time="0.016" /><testcase classname="tests.integration.test_migrations" name="test_alembic_upgrade_head_completes" time="0.005"><failure message="sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: alembic_version&#10;[SQL: SELECT version_num FROM alembic_version]&#10;(Background on this error at: https://sqlalche.me/e/20/e3q8)">self = &lt;sqlalchemy.engine.base.Connection object at 0x000002A379CCFF20&gt;
+dialect = &lt;sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000002A37932EC10&gt;
+context = &lt;sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x000002A3797CA7A0&gt;
+statement = &lt;sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x000002A379D4A710&gt;
+parameters = [()]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -&gt; CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+&gt;                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000002A37932EC10&gt;
+cursor = &lt;sqlite3.Cursor object at 0x000002A37998F9C0&gt;
+statement = 'SELECT version_num FROM alembic_version', parameters = ()
+context = &lt;sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x000002A3797CA7A0&gt;
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+&gt;       cursor.execute(statement, parameters)
+E       sqlite3.OperationalError: no such table: alembic_version
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+db_session = &lt;sqlalchemy.orm.session.Session object at 0x000002A37A408050&gt;
+
+    def test_alembic_upgrade_head_completes(db_session):
+        """
+        Verifies that 'alembic upgrade head' applied migrations successfully.
+        Since 'conftest.py' runs the migration setup via session fixture,
+        we can query the 'alembic_version' table to ensure the database version
+        is tracked.
+        """
+&gt;       result = db_session.execute(text("SELECT version_num FROM alembic_version"))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\test_migrations.py:11: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:2280: in _execute_internal
+    result = conn.execute(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000002A37932EC10&gt;
+cursor = &lt;sqlite3.Cursor object at 0x000002A37998F9C0&gt;
+statement = 'SELECT version_num FROM alembic_version', parameters = ()
+context = &lt;sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x000002A3797CA7A0&gt;
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+&gt;       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: alembic_version
+E       [SQL: SELECT version_num FROM alembic_version]
+E       (Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: OperationalError</failure></testcase><testcase classname="tests.integration.test_migrations" name="test_alembic_downgrade_upgrade_smoke_test" time="0.020"><failure message="alembic.util.exc.CommandError: Relative revision -1 didn't produce 1 migrations">self = &lt;alembic.script.base.ScriptDirectory object at 0x000002A379D4B110&gt;
+ancestor = 'Destination %(end)s is not a valid downgrade target from current head(s)'
+multiple_heads = None, start = None, end = '-1', resolution = None
+
+    @contextmanager
+    def _catch_revision_errors(
+        self,
+        ancestor: Optional[str] = None,
+        multiple_heads: Optional[str] = None,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+        resolution: Optional[str] = None,
+    ) -&gt; Iterator[None]:
+        try:
+&gt;           yield
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:450: in _downgrade_revs
+    for script in revs
+                  ^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\revision.py:814: in iterate_revisions
+    revisions, heads = fn(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\revision.py:1339: in _collect_downgrade_revisions
+    branch_label, target_revision = self._parse_downgrade_target(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;alembic.script.revision.RevisionMap object at 0x000002A379D4AAD0&gt;
+current_revisions = (), target = '-1', assert_relative_length = True
+
+    def _parse_downgrade_target(
+        self,
+        current_revisions: _RevisionIdentifierType,
+        target: _RevisionIdentifierType,
+        assert_relative_length: bool,
+    ) -&gt; Tuple[Optional[str], Optional[_RevisionOrBase]]:
+        """
+        Parse downgrade command syntax :target to retrieve the target revision
+        and branch label (if any) given the :current_revisions stamp of the
+        database.
+    
+        Returns a tuple (branch_label, target_revision) where branch_label
+        is a string from the command specifying the branch to consider (or
+        None if no branch given), and target_revision is a Revision object
+        which the command refers to. target_revisions is None if the command
+        refers to 'base'. The target may be specified in absolute form, or
+        relative to :current_revisions.
+        """
+        if target is None:
+            return None, None
+        assert isinstance(
+            target, str
+        ), "Expected downgrade target in string form"
+        match = _relative_destination.match(target)
+        if match:
+            branch_label, symbol, relative = match.groups()
+            rel_int = int(relative)
+            if rel_int &gt;= 0:
+                if symbol is None:
+                    # Downgrading to current + n is not valid.
+                    raise RevisionError(
+                        "Relative revision %s didn't "
+                        "produce %d migrations" % (relative, abs(rel_int))
+                    )
+                # Find target revision relative to given symbol.
+                rev = self._walk(
+                    symbol,
+                    rel_int,
+                    branch_label,
+                    no_overwalk=assert_relative_length,
+                )
+                if rev is None:
+                    raise RevisionError("Walked too far")
+                return branch_label, rev
+            else:
+                relative_revision = symbol is None
+                if relative_revision:
+                    # Find target revision relative to current state.
+                    if branch_label:
+                        cr_tuple = util.to_tuple(current_revisions)
+                        symbol_list: Sequence[str]
+                        symbol_list = self.filter_for_lineage(
+                            cr_tuple, branch_label
+                        )
+                        if not symbol_list:
+                            # check the case where there are multiple branches
+                            # but there is currently a single heads, since all
+                            # other branch heads are dependent of the current
+                            # single heads.
+                            all_current = cast(
+                                Set[Revision], self._get_all_current(cr_tuple)
+                            )
+                            sl_all_current = self.filter_for_lineage(
+                                all_current, branch_label
+                            )
+                            symbol_list = [
+                                r.revision if r else r  # type: ignore[misc]
+                                for r in sl_all_current
+                            ]
+    
+                        assert len(symbol_list) == 1
+                        symbol = symbol_list[0]
+                    else:
+                        current_revisions = util.to_tuple(current_revisions)
+                        if not current_revisions:
+&gt;                           raise RevisionError(
+                                "Relative revision %s didn't "
+                                "produce %d migrations"
+                                % (relative, abs(rel_int))
+                            )
+E                           alembic.script.revision.RevisionError: Relative revision -1 didn't produce 1 migrations
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\revision.py:1168: RevisionError
+
+The above exception was the direct cause of the following exception:
+
+    def test_alembic_downgrade_upgrade_smoke_test():
+        import alembic.config
+        import alembic.command
+        from app.core.config import settings
+    
+        alembic_cfg = alembic.config.Config("alembic.ini")
+        alembic_cfg.set_main_option("script_location", "alembic")
+        alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
+    
+        # downgrade 1 revision
+&gt;       alembic.command.downgrade(alembic_cfg, "-1")
+
+tests\integration\test_migrations.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:537: in downgrade
+    script.run_env()
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:556: in run_env
+    util.load_python_file(self.dir, "env.py")
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\util\pyfiles.py:116: in load_python_file
+    module = load_module_py(module_id, path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\util\pyfiles.py:136: in load_module_py
+    spec.loader.exec_module(module)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;frozen importlib._bootstrap_external&gt;:759: in exec_module
+    ???
+&lt;frozen importlib._bootstrap&gt;:491: in _call_with_frames_removed
+    ???
+alembic\env.py:92: in &lt;module&gt;
+    run_migrations_online()
+alembic\env.py:86: in run_migrations_online
+    context.run_migrations()
+&lt;string&gt;:8: in run_migrations
+    ???
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\runtime\environment.py:969: in run_migrations
+    self.get_context().run_migrations(**kw)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\runtime\migration.py:614: in run_migrations
+    for step in self._migrations_fn(heads, self):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\command.py:526: in downgrade
+    return script._downgrade_revs(revision, rev)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:438: in _downgrade_revs
+    with self._catch_revision_errors(
+C:\Python314\Lib\contextlib.py:162: in __exit__
+    self.gen.throw(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;alembic.script.base.ScriptDirectory object at 0x000002A379D4B110&gt;
+ancestor = 'Destination %(end)s is not a valid downgrade target from current head(s)'
+multiple_heads = None, start = None, end = '-1', resolution = None
+
+    @contextmanager
+    def _catch_revision_errors(
+        self,
+        ancestor: Optional[str] = None,
+        multiple_heads: Optional[str] = None,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+        resolution: Optional[str] = None,
+    ) -&gt; Iterator[None]:
+        try:
+            yield
+        except revision.RangeNotAncestorError as rna:
+            if start is None:
+                start = cast(Any, rna.lower)
+            if end is None:
+                end = cast(Any, rna.upper)
+            if not ancestor:
+                ancestor = (
+                    "Requested range %(start)s:%(end)s does not refer to "
+                    "ancestor/descendant revisions along the same branch"
+                )
+            ancestor = ancestor % {"start": start, "end": end}
+            raise util.CommandError(ancestor) from rna
+        except revision.MultipleHeads as mh:
+            if not multiple_heads:
+                multiple_heads = (
+                    "Multiple head revisions are present for given "
+                    "argument '%(head_arg)s'; please "
+                    "specify a specific target revision, "
+                    "'&lt;branchname&gt;@%(head_arg)s' to "
+                    "narrow to a specific head, or 'heads' for all heads"
+                )
+            multiple_heads = multiple_heads % {
+                "head_arg": end or mh.argument,
+                "heads": util.format_as_comma(mh.heads),
+            }
+            raise util.CommandError(multiple_heads) from mh
+        except revision.ResolutionError as re:
+            if resolution is None:
+                resolution = "Can't locate revision identified by '%s'" % (
+                    re.argument
+                )
+            raise util.CommandError(resolution) from re
+        except revision.RevisionError as err:
+&gt;           raise util.CommandError(err.args[0]) from err
+E           alembic.util.exc.CommandError: Relative revision -1 didn't produce 1 migrations
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\alembic\script\base.py:247: CommandError</failure></testcase><testcase classname="tests.integration.test_monitoring_api" name="test_monitoring_api_unauthenticated" time="0.031" /><testcase classname="tests.integration.test_monitoring_api" name="test_monitoring_api_not_found_or_unowned" time="0.024" /><testcase classname="tests.integration.test_monitoring_api" name="test_monitoring_api_malformed" time="0.031" /><testcase classname="tests.integration.test_monitoring_api" name="test_monitoring_api_success" time="0.057" /><testcase classname="tests.integration.test_monitoring_api" name="test_monitoring_api_skipped_disabled" time="0.044" /><testcase classname="tests.integration.test_monitoring_api" name="test_monitoring_api_dependency_analyzer" time="0.054" /><testcase classname="tests.integration.test_monitoring_api" name="test_dependency_monitor_run_repeat_updates_existing_finding" time="0.096" /><testcase classname="tests.integration.test_repo_health_api" name="test_repo_health_api_unauthenticated" time="0.030" /><testcase classname="tests.integration.test_repo_health_api" name="test_repo_health_api_not_found_or_unowned" time="0.037" /><testcase classname="tests.integration.test_repo_health_api" name="test_repo_health_lazy_compute_and_post" time="0.097" /><testcase classname="tests.integration.test_repo_health_api" name="test_repo_health_history_pagination" time="0.139" /><testcase classname="tests.integration.test_repositories_api" name="test_repositories_endpoints_unauthenticated" time="0.044" /><testcase classname="tests.integration.test_repositories_api" name="test_repositories_happy_path" time="0.118" /><testcase classname="tests.integration.test_repositories_api" name="test_repositories_ownership_protection" time="0.074" /><testcase classname="tests.integration.test_repository_health_snapshot_model" name="test_repository_health_snapshot_creation" time="0.025" /><testcase classname="tests.integration.test_user_model" name="test_create_user" time="0.007" /><testcase classname="tests.integration.test_user_model" name="test_email_uniqueness" time="0.007" /><testcase classname="tests.integration.test_webhooks_api" name="test_webhook_valid_new_delivery" time="0.038" /><testcase classname="tests.integration.test_webhooks_api" name="test_webhook_valid_duplicate_delivery" time="0.042" /><testcase classname="tests.integration.test_webhooks_api" name="test_webhook_invalid_missing_signature" time="0.034" /><testcase classname="tests.integration.test_webhooks_api" name="test_webhook_missing_delivery_or_event" time="0.027" /><testcase classname="tests.integration.test_webhooks_api" name="test_webhook_malformed_json_valid_signature" time="0.027" /><testcase classname="tests.integration.test_webhooks_api" name="test_webhook_installation_suspend" time="0.049" /><testcase classname="tests.integration.test_webhooks_api" name="test_webhook_installation_created" time="0.038" /><testcase classname="tests.services.test_ai_analysis_service" name="test_not_configured_raises_without_persisting_row" time="0.220" /><testcase classname="tests.services.test_ai_analysis_service" name="test_invalid_connection_status_raises_without_persisting_row" time="0.029" /><testcase classname="tests.services.test_ai_analysis_service" name="test_success_persists_completed_analysis" time="0.065" /><testcase classname="tests.services.test_ai_analysis_service" name="test_provider_failure_persists_sanitized_failed_analysis[provider_error0-ai_provider_invalid_api_key-The configured AI provider rejected the API key.]" time="0.045" /><testcase classname="tests.services.test_ai_analysis_service" name="test_provider_failure_persists_sanitized_failed_analysis[provider_error1-ai_provider_rate_limited-The AI provider is rate limited.]" time="0.052" /><testcase classname="tests.services.test_ai_analysis_service" name="test_provider_failure_persists_sanitized_failed_analysis[provider_error2-ai_provider_unavailable-The AI provider is unavailable.]" time="0.045" /><testcase classname="tests.services.test_ai_analysis_service" name="test_provider_failure_persists_sanitized_failed_analysis[provider_error3-ai_provider_invalid_response-The AI provider returned an invalid response.]" time="0.043" /><testcase classname="tests.services.test_ai_analysis_service" name="test_unexpected_failure_is_sanitized_and_persisted" time="0.038" /><testcase classname="tests.services.test_ai_analysis_service" name="test_latest_and_list_analysis_are_ordered_and_paginated" time="0.063" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_acknowledge_finding_valid_transitions" time="0.003" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_acknowledge_finding_invalid_transitions" time="0.003" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_resolve_finding_valid_transitions" time="0.002" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_resolve_finding_no_op" time="0.004" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_resolve_finding_invalid_transitions" time="0.003" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_ignore_finding_valid_transitions" time="0.003" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_ignore_finding_no_op" time="0.003" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_ignore_finding_invalid_transitions" time="0.004" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_reopen_finding_valid_transitions" time="0.002" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_reopen_finding_no_op" time="0.004" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_auto_resolve_finding_valid_transitions" time="0.003" /><testcase classname="tests.services.test_finding_lifecycle_service" name="test_auto_resolve_finding_no_op" time="0.003" /><testcase classname="tests.services.test_health_service" name="test_generate_reasons_first_snapshot" time="0.002" /><testcase classname="tests.services.test_health_service" name="test_generate_reasons_no_change" time="0.002" /><testcase classname="tests.services.test_health_service" name="test_generate_reasons_improvement" time="0.002" /><testcase classname="tests.services.test_health_service" name="test_generate_reasons_drop" time="0.003" /><testcase classname="tests.services.test_health_service" name="test_compute_and_persist_health_zero_findings" time="0.004" /><testcase classname="tests.services.test_health_service" name="test_compute_and_persist_health_critical_finding" time="0.004" /><testcase classname="tests.services.test_health_service" name="test_compute_and_persist_health_resolved_finding" time="0.005" /><testcase classname="tests.services.test_health_service" name="test_compute_and_persist_health_no_changes" time="0.003" /><testcase classname="tests.services.test_health_service" name="test_generate_reasons_cap_five" time="0.005" /><testcase classname="tests.services.test_health_service" name="test_finding_service_includes_acknowledged" time="0.004" /><testcase classname="tests.test_db_connection" name="test_connection" time="0.007" /><testcase classname="tests.unit.bot.test_context_builder" name="test_ci_status_uses_existing_finding" time="0.233" /><testcase classname="tests.unit.bot.test_context_builder" name="test_ci_status_without_finding_is_static" time="0.022" /><testcase classname="tests.unit.bot.test_context_builder" name="test_pr_summary_falls_back_to_one_github_read" time="0.030" /><testcase classname="tests.unit.bot.test_context_builder" name="test_issue_explain_falls_back_to_one_github_read" time="0.027" /><testcase classname="tests.unit.bot.test_context_builder" name="test_repo_attention_aggregates_findings_and_latest_reasons" time="0.049" /><testcase classname="tests.unit.bot.test_context_builder" name="test_bot_and_finding_context_share_delimiter_output" time="0.033" /><testcase classname="tests.unit.bot.test_mention_parser" name="test_extract_mention_simple" time="0.006" /><testcase classname="tests.unit.bot.test_mention_parser" name="test_extract_mention_punctuation" time="0.003" /><testcase classname="tests.unit.bot.test_mention_parser" name="test_extract_mention_no_mention" time="0.005" /><testcase classname="tests.unit.bot.test_mention_parser" name="test_extract_mention_mid_word" time="0.004" /><testcase classname="tests.unit.bot.test_mention_parser" name="test_extract_mention_in_code_block" time="0.002" /><testcase classname="tests.unit.bot.test_mention_parser" name="test_extract_mention_in_quote" time="0.002" /><testcase classname="tests.unit.bot.test_question_parser" name="test_classify_pr_summary" time="0.002" /><testcase classname="tests.unit.bot.test_question_parser" name="test_classify_pr_summary_downgrades_on_issue" time="0.002" /><testcase classname="tests.unit.bot.test_question_parser" name="test_classify_ci_status" time="0.003" /><testcase classname="tests.unit.bot.test_question_parser" name="test_classify_repo_attention" time="0.002" /><testcase classname="tests.unit.bot.test_question_parser" name="test_classify_issue_explain" time="0.002" /><testcase classname="tests.unit.bot.test_question_parser" name="test_classify_unknown" time="0.004" /><testcase classname="tests.unit.bot.test_question_parser" name="test_ci_keyword_boundary" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_gemini_provider_is_registered" time="0.002" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_valid_key_returns_without_exception" time="0.006" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_invalid_key_maps_to_invalid_api_key[401]" time="0.005" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_invalid_key_maps_to_invalid_api_key[403]" time="0.004" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_rate_limit_maps_to_rate_limited" time="0.004" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_server_errors_map_to_unavailable[response0]" time="0.006" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_server_errors_map_to_unavailable[response1]" time="0.004" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_timeout_maps_to_unavailable_without_key_leak" time="0.004" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_network_error_maps_to_unavailable_without_key_leak" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_default_timeout_is_passed_to_request" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_analysis_returns_validated_result_and_preserves_boundaries" time="0.004" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_analysis_rejects_invalid_structured_response[response0]" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_analysis_rejects_invalid_structured_response[response1]" time="0.005" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_analysis_rejects_invalid_structured_response[response2]" time="0.008" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_analysis_preserves_mapped_transport_errors[error0]" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_analysis_preserves_mapped_transport_errors[error1]" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_analysis_preserves_mapped_transport_errors[error2]" time="0.006" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generation_invalid_key_maps_to_invalid_api_key[401]" time="0.005" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generation_invalid_key_maps_to_invalid_api_key[403]" time="0.006" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generation_rate_limit_maps_to_rate_limited" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generation_timeout_maps_to_unavailable" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_bot_response_returns_validated_result_and_preserves_boundaries" time="0.004" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_bot_response_rejects_invalid_structured_response[response0]" time="0.004" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_bot_response_rejects_invalid_structured_response[response1]" time="0.005" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_bot_response_rejects_invalid_structured_response[response2]" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_bot_response_preserves_mapped_transport_errors[error0]" time="0.003" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_bot_response_preserves_mapped_transport_errors[error1]" time="0.002" /><testcase classname="tests.unit.integrations.ai.test_gemini_provider" name="test_generate_bot_response_preserves_mapped_transport_errors[error2]" time="0.006" /><testcase classname="tests.unit.integrations.ai.test_registry" name="test_ai_provider_registry" time="0.005" /><testcase classname="tests.unit.integrations.ai.test_registry" name="test_ai_provider_exceptions" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_pull_request" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_issues" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_issue_comment" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_workflow_run" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_push" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_installation" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_installation_repositories" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_malformed_non_dict_payload" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_partially_malformed_repository" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_malformed_installation" time="0.002" /><testcase classname="tests.unit.integrations.github.test_webhook_events" name="test_parse_unsupported_event_with_valid_shapes" time="0.003" /><testcase classname="tests.unit.test_ai_analysis" name="test_aianalysis_creation" time="0.032" /><testcase classname="tests.unit.test_ai_analysis" name="test_aianalysis_fk_cascade" time="0.002" /><testcase classname="tests.unit.test_ai_analysis" name="test_aianalysis_query_ordering" time="1.033" /><testcase classname="tests.unit.test_ai_connection_model" name="test_ai_connection_model_unique_user_id" time="0.016" /><testcase classname="tests.unit.test_ai_connection_model" name="test_ai_connection_no_plaintext_keys" time="0.002" /><testcase classname="tests.unit.test_ai_connection_model" name="test_ai_connection_fields" time="0.015" /><testcase classname="tests.unit.test_ai_connection_service" name="test_create_connection_validates_before_persisting" time="0.017" /><testcase classname="tests.unit.test_ai_connection_service" name="test_create_connection_rejects_unsupported_model_without_provider_call" time="0.008" /><testcase classname="tests.unit.test_ai_connection_service" name="test_create_connection_replaces_existing_row_and_status_is_safe" time="0.039" /><testcase classname="tests.unit.test_ai_connection_service" name="test_delete_connection_is_idempotent" time="0.023" /><testcase classname="tests.unit.test_ai_connection_service" name="test_get_connection_status_returns_none_when_unconfigured" time="0.012" /><testcase classname="tests.unit.test_ai_context_builder" name="test_ci_category" time="0.003" /><testcase classname="tests.unit.test_ai_context_builder" name="test_pull_request_category" time="0.004" /><testcase classname="tests.unit.test_ai_context_builder" name="test_issue_category" time="0.002" /><testcase classname="tests.unit.test_ai_context_builder" name="test_dependency_category" time="0.003" /><testcase classname="tests.unit.test_ai_context_builder" name="test_security_category" time="0.003" /><testcase classname="tests.unit.test_ai_context_builder" name="test_code_quality_category" time="0.003" /><testcase classname="tests.unit.test_ai_context_builder" name="test_repository_activity_category" time="0.002" /><testcase classname="tests.unit.test_ai_context_builder" name="test_fake_instructions_injection" time="0.002" /><testcase classname="tests.unit.test_ai_context_builder" name="test_graceful_degradation_missing_fields" time="0.002" /><testcase classname="tests.unit.test_analyzer_registry" name="test_registry_is_empty_by_default" time="0.005" /><testcase classname="tests.unit.test_analyzer_registry" name="test_register_and_get_analyzer" time="0.002" /><testcase classname="tests.unit.test_analyzer_registry" name="test_get_unknown_analyzer" time="0.002" /><testcase classname="tests.unit.test_auth_config_safety" name="test_settings_development_auth" time="0.006" /><testcase classname="tests.unit.test_auth_config_safety" name="test_settings_test_env_auth" time="0.006" /><testcase classname="tests.unit.test_auth_config_safety" name="test_settings_production_auth_safety" time="0.005" /><testcase classname="tests.unit.test_auth_factory_safety" name="test_factory_returns_dev_in_non_prod" time="0.003" /><testcase classname="tests.unit.test_auth_factory_safety" name="test_factory_raises_on_dev_in_production" time="0.003" /><testcase classname="tests.unit.test_auth_factory_safety" name="test_factory_raises_on_unrecognized" time="0.003" /><testcase classname="tests.unit.test_authorization_service" name="test_monitoring_disabled_short_circuits" time="0.021" /><testcase classname="tests.unit.test_authorization_service" name="test_owner_unresolved_short_circuits" time="0.023" /><testcase classname="tests.unit.test_authorization_service" name="test_ai_not_configured_short_circuits" time="0.033" /><testcase classname="tests.unit.test_authorization_service" name="test_insufficient_permission" time="0.037" /><testcase classname="tests.unit.test_authorization_service" name="test_permission_check_failure_denies" time="0.034" /><testcase classname="tests.unit.test_authorization_service" name="test_rate_limit_counts_only_trailing_hour" time="0.049" /><testcase classname="tests.unit.test_authorization_service" name="test_rate_limit_denies_trailing_hour_interaction" time="0.042" /><testcase classname="tests.unit.test_authorization_service" name="test_authorizes_write_permission" time="0.035" /><testcase classname="tests.unit.test_bot_interaction" name="test_create_bot_interaction" time="0.020" /><testcase classname="tests.unit.test_bot_interaction" name="test_bot_interaction_fks" time="0.007" /><testcase classname="tests.unit.test_bot_interaction" name="test_bot_interaction_unique_github_event_id" time="0.025" /><testcase classname="tests.unit.test_bot_interaction" name="test_bot_interaction_invalid_intent_rejected" time="0.010" /><testcase classname="tests.unit.test_bot_interaction" name="test_bot_interaction_composite_index" time="0.006" /><testcase classname="tests.unit.test_bot_interaction" name="test_bot_interaction_count_query" time="0.021" /><testcase classname="tests.unit.test_ci_analyzer" name="test_ci_analyzer_ignores_non_workflow_run" time="0.003" /><testcase classname="tests.unit.test_ci_analyzer" name="test_ci_analyzer_ignores_non_completed" time="0.002" /><testcase classname="tests.unit.test_ci_analyzer" name="test_ci_analyzer_ignores_success" time="0.003" /><testcase classname="tests.unit.test_ci_analyzer" name="test_ci_analyzer_failure_gives_high_severity" time="0.003" /><testcase classname="tests.unit.test_ci_analyzer" name="test_ci_analyzer_cancelled_gives_low_severity" time="0.002" /><testcase classname="tests.unit.test_code_quality_analyzer" name="test_analyzer_branch_protected" time="0.017" /><testcase classname="tests.unit.test_code_quality_analyzer" name="test_analyzer_branch_not_protected" time="0.014" /><testcase classname="tests.unit.test_code_quality_analyzer" name="test_analyzer_github_auth_error" time="0.012" /><testcase classname="tests.unit.test_code_quality_analyzer" name="test_run_analyzer_verifies_sync_path_for_code_quality" time="0.062" /><testcase classname="tests.unit.test_config" name="test_config_loads_valid_values" time="0.008" /><testcase classname="tests.unit.test_config" name="test_config_invalid_app_env_fails" time="0.007" /><testcase classname="tests.unit.test_config" name="test_config_cors_origins_parsing" time="0.005" /><testcase classname="tests.unit.test_config" name="test_config_cors_origins_json_parsing" time="0.009" /><testcase classname="tests.unit.test_config" name="test_config_non_dev_requires_db" time="0.006" /><testcase classname="tests.unit.test_config" name="test_config_empty_github_app_id_fails" time="0.012" /><testcase classname="tests.unit.test_config" name="test_config_empty_github_app_slug_fails" time="0.006" /><testcase classname="tests.unit.test_config" name="test_config_empty_github_app_private_key_fails" time="0.007" /><testcase classname="tests.unit.test_config" name="test_config_empty_github_app_webhook_secret_fails" time="0.006" /><testcase classname="tests.unit.test_dependency_analyzer" name="test_analyzer_manifest_present_no_lockfile" time="0.015" /><testcase classname="tests.unit.test_dependency_analyzer" name="test_analyzer_manifest_present_has_lockfile" time="0.021" /><testcase classname="tests.unit.test_dependency_analyzer" name="test_analyzer_manifest_absent" time="0.012" /><testcase classname="tests.unit.test_dependency_analyzer" name="test_analyzer_github_auth_error" time="0.015" /><testcase classname="tests.unit.test_dependency_analyzer" name="test_run_analyzer_constructs_client" time="0.034" /><testcase classname="tests.unit.test_development_auth_adapter" name="test_unauthenticated" time="0.022" /><testcase classname="tests.unit.test_development_auth_adapter" name="test_login_and_resolve" time="0.029" /><testcase classname="tests.unit.test_development_auth_adapter" name="test_logout" time="0.052" /><testcase classname="tests.unit.test_development_auth_adapter" name="test_invalid_tampered_cookie" time="0.026" /><testcase classname="tests.unit.test_encryption" name="test_encryption_round_trip" time="0.004" /><testcase classname="tests.unit.test_encryption" name="test_decryption_tampered_token" time="0.007" /><testcase classname="tests.unit.test_encryption" name="test_decryption_garbage_token" time="0.002" /><testcase classname="tests.unit.test_encryption" name="test_settings_fails_when_key_missing" time="0.006" /><testcase classname="tests.unit.test_encryption" name="test_settings_fails_when_key_malformed" time="0.007" /><testcase classname="tests.unit.test_error_handling" name="test_app_error_handler_returns_correct_shape" time="0.018" /><testcase classname="tests.unit.test_error_handling" name="test_global_exception_handler_returns_safe_500" time="0.018" /><testcase classname="tests.unit.test_error_handling" name="test_global_exception_handler_ignores_websocket" time="0.018" /><testcase classname="tests.unit.test_github_app_auth.TestGenerateAppJWT" name="test_jwt_is_well_formed_and_verifiable" time="1.351" /><testcase classname="tests.unit.test_github_app_auth.TestGenerateAppJWT" name="test_jwt_iat_is_backdated" time="0.309" /><testcase classname="tests.unit.test_github_app_auth.TestGenerateAppJWT" name="test_jwt_exp_within_10_minutes" time="0.312" /><testcase classname="tests.unit.test_github_app_auth.TestGenerateAppJWT" name="test_jwt_uses_rs256_algorithm" time="0.313" /><testcase classname="tests.unit.test_github_app_auth.TestGenerateAppJWT" name="test_jwt_caching_returns_same_token" time="0.315" /><testcase classname="tests.unit.test_github_app_auth.TestGenerateAppJWT" name="test_jwt_refreshes_when_near_expiry" time="0.602" /><testcase classname="tests.unit.test_github_app_auth.TestGetInstallationAccessToken" name="test_fetches_token_from_github" time="0.322" /><testcase classname="tests.unit.test_github_app_auth.TestGetInstallationAccessToken" name="test_caches_token_before_expiry" time="0.317" /><testcase classname="tests.unit.test_github_app_auth.TestGetInstallationAccessToken" name="test_refreshes_token_when_near_expiry" time="0.329" /><testcase classname="tests.unit.test_github_app_auth.TestGetInstallationAccessToken" name="test_raises_on_github_error_response" time="0.320" /><testcase classname="tests.unit.test_github_client.TestGetInstallation" name="test_returns_installation_dict" time="0.402" /><testcase classname="tests.unit.test_github_client.TestGetInstallation" name="test_uses_app_jwt_auth" time="0.055" /><testcase classname="tests.unit.test_github_client.TestListInstallationRepositories" name="test_single_page" time="0.065" /><testcase classname="tests.unit.test_github_client.TestListInstallationRepositories" name="test_multi_page_pagination" time="0.063" /><testcase classname="tests.unit.test_github_client.TestListInstallationRepositories" name="test_empty_repositories" time="0.061" /><testcase classname="tests.unit.test_github_client.TestErrorMapping" name="test_status_code_maps_to_correct_exception[401-GitHubAuthError]" time="0.057" /><testcase classname="tests.unit.test_github_client.TestErrorMapping" name="test_status_code_maps_to_correct_exception[403-GitHubAuthError]" time="0.056" /><testcase classname="tests.unit.test_github_client.TestErrorMapping" name="test_status_code_maps_to_correct_exception[404-GitHubNotFoundError]" time="0.065" /><testcase classname="tests.unit.test_github_client.TestErrorMapping" name="test_status_code_maps_to_correct_exception[429-GitHubRateLimitError]" time="0.055" /><testcase classname="tests.unit.test_github_client.TestErrorMapping" name="test_status_code_maps_to_correct_exception[500-GitHubAPIError]" time="0.059" /><testcase classname="tests.unit.test_github_client.TestGetRepositoryContent" name="test_success" time="0.059" /><testcase classname="tests.unit.test_github_client.TestGetRepositoryContent" name="test_returns_none_on_404" time="0.059" /><testcase classname="tests.unit.test_github_client.TestGetRepositoryContent" name="test_raises_github_auth_error_on_403" time="0.060" /><testcase classname="tests.unit.test_github_client.TestListDependabotAlerts" name="test_pagination" time="0.057" /><testcase classname="tests.unit.test_github_client.TestListDependabotAlerts" name="test_returns_empty_list_on_404" time="0.056" /><testcase classname="tests.unit.test_github_client.TestListDependabotAlerts" name="test_raises_github_auth_error_on_403" time="0.059" /><testcase classname="tests.unit.test_github_client.TestGetBranchProtection" name="test_success" time="0.058" /><testcase classname="tests.unit.test_github_client.TestGetBranchProtection" name="test_returns_none_on_404" time="0.064" /><testcase classname="tests.unit.test_github_client.TestGetBranchProtection" name="test_raises_github_auth_error_on_403" time="0.054" /><testcase classname="tests.unit.test_github_client.TestGetCollaboratorPermission" name="test_returns_permission_with_installation_auth" time="0.060" /><testcase classname="tests.unit.test_github_client.TestPostIssueComment" name="test_success_and_truncation" time="0.061" /><testcase classname="tests.unit.test_github_client.TestPostIssueComment" name="test_returns_github_not_found" time="0.055" /><testcase classname="tests.unit.test_github_client.TestPostIssueComment" name="test_raises_github_auth_error_on_403" time="0.064" /><testcase classname="tests.unit.test_github_exceptions.TestInheritance" name="test_github_api_error_is_app_error" time="0.003" /><testcase classname="tests.unit.test_github_exceptions.TestInheritance" name="test_github_auth_error_is_github_api_error" time="0.002" /><testcase classname="tests.unit.test_github_exceptions.TestInheritance" name="test_github_not_found_error_is_github_api_error" time="0.002" /><testcase classname="tests.unit.test_github_exceptions.TestInheritance" name="test_github_rate_limit_error_is_github_api_error" time="0.002" /><testcase classname="tests.unit.test_github_exceptions.TestInheritance" name="test_all_are_catchable_as_app_error" time="0.002" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_maps_status_to_correct_subclass[401-GitHubAuthError-github_auth_error]" time="0.007" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_maps_status_to_correct_subclass[403-GitHubAuthError-github_auth_error]" time="0.005" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_maps_status_to_correct_subclass[404-GitHubNotFoundError-github_not_found]" time="0.006" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_maps_status_to_correct_subclass[429-GitHubRateLimitError-github_rate_limit]" time="0.004" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_maps_status_to_correct_subclass[500-GitHubAPIError-github_api_error]" time="0.004" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_maps_status_to_correct_subclass[502-GitHubAPIError-github_api_error]" time="0.004" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_maps_status_to_correct_subclass[422-GitHubAPIError-github_api_error]" time="0.005" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_preserves_response_status" time="0.003" /><testcase classname="tests.unit.test_github_exceptions.TestFromResponse" name="test_handles_non_json_body" time="0.003" /><testcase classname="tests.unit.test_github_exceptions.TestDefaultAttributes" name="test_github_api_error_defaults" time="0.002" /><testcase classname="tests.unit.test_github_exceptions.TestDefaultAttributes" name="test_github_auth_error_defaults" time="0.002" /><testcase classname="tests.unit.test_github_exceptions.TestDefaultAttributes" name="test_github_not_found_defaults" time="0.003" /><testcase classname="tests.unit.test_github_exceptions.TestDefaultAttributes" name="test_github_rate_limit_defaults" time="0.003" /><testcase classname="tests.unit.test_health" name="test_health_endpoint" time="0.018" /><testcase classname="tests.unit.test_health_score_service" name="test_zero_findings" time="0.004" /><testcase classname="tests.unit.test_health_score_service" name="test_single_critical_finding" time="0.003" /><testcase classname="tests.unit.test_health_score_service" name="test_multiple_criticals_clamp_at_zero" time="0.006" /><testcase classname="tests.unit.test_health_score_service" name="test_overall_score_averages_all_categories" time="0.004" /><testcase classname="tests.unit.test_health_score_service" name="test_unmapped_category_is_ignored" time="0.002" /><testcase classname="tests.unit.test_health_score_service" name="test_compute_overall_empty" time="0.003" /><testcase classname="tests.unit.test_issue_analyzer" name="test_issue_analyzer_ignores_non_issue" time="0.003" /><testcase classname="tests.unit.test_issue_analyzer" name="test_issue_analyzer_ignores_edited_action" time="0.005" /><testcase classname="tests.unit.test_issue_analyzer" name="test_issue_analyzer_ignores_non_empty_body" time="0.002" /><testcase classname="tests.unit.test_issue_analyzer" name="test_issue_analyzer_flags_empty_body_string" time="0.002" /><testcase classname="tests.unit.test_issue_analyzer" name="test_issue_analyzer_flags_none_body" time="0.002" /><testcase classname="tests.unit.test_logging" name="test_configure_logging_development" time="0.005" /><testcase classname="tests.unit.test_logging" name="test_configure_logging_production" time="0.004" /><testcase classname="tests.unit.test_logging" name="test_get_logger" time="0.003" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_skipped_when_monitoring_disabled" time="0.031" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_unknown_analyzer" time="0.025" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_exception_containment" time="0.024" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_success_persists_findings" time="0.050" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_full_state_uses_sync_result" time="0.098" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_success_computes_health" time="0.046" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_exception_no_health_recomputation" time="0.025" /><testcase classname="tests.unit.test_monitor_service" name="test_run_analyzer_health_exception_swallowed" time="0.033" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[security-info-low]" time="0.003" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[quality-info-low]" time="0.004" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[performance-info-low]" time="0.004" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[quality-low-low]" time="0.006" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[quality-medium-medium]" time="0.004" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[quality-high-high]" time="0.003" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[quality-critical-critical]" time="0.006" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[security-low-medium]" time="0.003" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[security-medium-high]" time="0.006" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[security-high-critical]" time="0.006" /><testcase classname="tests.unit.test_priority_service" name="test_compute_priority_table_driven[security-critical-critical]" time="0.003" /><testcase classname="tests.unit.test_pull_request_analyzer" name="test_pr_analyzer_ignores_non_pull_request" time="0.005" /><testcase classname="tests.unit.test_pull_request_analyzer" name="test_pr_analyzer_ignores_edited_action" time="0.002" /><testcase classname="tests.unit.test_pull_request_analyzer" name="test_pr_analyzer_ignores_non_empty_body" time="0.003" /><testcase classname="tests.unit.test_pull_request_analyzer" name="test_pr_analyzer_flags_empty_body_string" time="0.002" /><testcase classname="tests.unit.test_pull_request_analyzer" name="test_pr_analyzer_flags_none_body" time="0.003" /><testcase classname="tests.unit.test_repository_activity_analyzer" name="test_activity_analyzer_force_push_default_branch" time="0.003" /><testcase classname="tests.unit.test_repository_activity_analyzer" name="test_activity_analyzer_force_push_non_default_branch" time="0.002" /><testcase classname="tests.unit.test_repository_activity_analyzer" name="test_activity_analyzer_non_forced_push" time="0.002" /><testcase classname="tests.unit.test_repository_activity_analyzer" name="test_activity_analyzer_non_push_event" time="0.002" /><testcase classname="tests.unit.test_security_analyzer" name="test_analyzer_returns_open_alerts" time="0.013" /><testcase classname="tests.unit.test_security_analyzer" name="test_analyzer_no_alerts" time="0.012" /><testcase classname="tests.unit.test_security_analyzer" name="test_analyzer_github_auth_error" time="0.013" /><testcase classname="tests.unit.test_security_analyzer" name="test_analyzer_missing_fields_graceful" time="0.016" /><testcase classname="tests.unit.test_security_analyzer" name="test_run_analyzer_verifies_sync_path_for_security" time="0.034" /><testcase classname="tests.unit.test_webhook_security" name="test_verify_signature_correct" time="0.003" /><testcase classname="tests.unit.test_webhook_security" name="test_verify_signature_wrong_secret" time="0.004" /><testcase classname="tests.unit.test_webhook_security" name="test_verify_signature_tampered_body" time="0.004" /><testcase classname="tests.unit.test_webhook_security" name="test_verify_signature_missing_header" time="0.004" /><testcase classname="tests.unit.test_webhook_security" name="test_verify_signature_malformed_header" time="0.014" /></testsuite></testsuites>

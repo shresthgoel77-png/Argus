@@ -30,6 +30,7 @@ from app.models.finding import Finding
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
 from app.models.ai_connection import AIConnection
 from app.models.ai_analysis import AIAnalysis
+from app.models.bot_interaction import BotInteraction
 target_metadata = Base.metadata
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import BigInteger, String, ForeignKey, Text, Index, func, text
+from sqlalchemy import BigInteger, String, ForeignKey, Text, Index, func, text, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING
 from app.db.base_class import Base
@@ -33,6 +33,10 @@ class BotInteraction(Base):
     completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
     __table_args__ = (
+        CheckConstraint(
+            "intent IN ('ci_status', 'pr_summary', 'repo_attention', 'issue_explain', 'unknown')",
+            name="ck_bot_interactions_intent"
+        ),
         Index(
             "ix_bot_interactions_repo_created_desc",
             "repository_id",

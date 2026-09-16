@@ -1,166 +1,29 @@
-﻿.\venv\Scripts\alembic : 
-Traceback (most recent 
-call last):
+﻿venv\Scripts\alembic : 
+INFO  [alembic.runtime.mi
+gration] Context impl 
+SQLiteImpl.
 At line:1 char:1
-+ .\venv\Scripts\alembic 
-upgrade head > alembic_up
-grade_error.txt 2>&1
++ venv\Scripts\alembic 
+upgrade head > 
+alembic_upgrade.txt 2>&1
 + ~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
     + CategoryInfo       
        : NotSpecified:   
-  (Traceback (most rec   
- ent call last)::Stri    
-ng) [], RemoteExcept    
-ion
+  (INFO  [alembic....m   
+ pl SQLiteImpl.:Strin    
+g) [], RemoteExcepti    
+on
     + FullyQualifiedErro 
    rId : NativeCommandE  
   rror
  
-  File "<frozen runpy>", 
-line 203, in 
-_run_module_as_main
-  File "<frozen runpy>", 
-line 88, in _run_code
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Scripts\alembic.
-exe\__main__.py", line 
-5, in <module>
-    sys.exit(main())
-             ~~~~^^
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\alembic\config.py", 
-line 1039, in main
-    CommandLine(prog=prog
-).main(argv=argv)
-    ~~~~~~~~~~~~~~~~~~~~~
-~~~~~~^^^^^^^^^^^
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\alembic\config.py", 
-line 1029, in main
-    self.run_cmd(cfg, 
-options)
-    ~~~~~~~~~~~~^^^^^^^^^
-^^^^^
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\alembic\config.py", 
-line 963, in run_cmd
-    fn(
-    ~~^
-        config,
-        ^^^^^^^
-        
-*[getattr(options, k, 
-None) for k in 
-positional],
-        ^^^^^^^^^^^^^^^^^
-^^^^^^^^^^^^^^^^^^^^^^^^^
-^^^^^^^
-        **{k: 
-getattr(options, k, 
-None) for k in kwarg},
-        ^^^^^^^^^^^^^^^^^
-^^^^^^^^^^^^^^^^^^^^^^^^^
-^^^^^^
-    )
-    ^
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\alembic\command.py", 
-line 487, in upgrade
-    script.run_env()
-    ~~~~~~~~~~~~~~^^
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\alembic\script\base.py"
-, line 550, in run_env
-    util.load_python_file
-(self.dir, "env.py")
-    ~~~~~~~~~~~~~~~~~~~~~
-^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\alembic\util\pyfiles.py
-", line 114, in 
-load_python_file
-    module = load_module_
-py(module_id, path)
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\alembic\util\pyfiles.py
-", line 132, in 
-load_module_py
-    spec.loader.exec_modu
-le(module)  # type: 
-ignore
-    ~~~~~~~~~~~~~~~~~~~~~
-~~^^^^^^^^
-  File "<frozen importlib
-._bootstrap_external>", 
-line 759, in exec_module
-  File "<frozen 
-importlib._bootstrap>", 
-line 491, in 
-_call_with_frames_removed
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\alembic\env.py", 
-line 24, in <module>
-    from app.core.config 
-import settings
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\app\core\config.py", 
-line 70, in <module>
-    settings = Settings()
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\pydantic_settings\main.
-py", line 262, in 
-__init__
-    super().__init__(**__
-pydantic_self__.__class__
-._settings_build_values(s
-ources, init_kwargs))
-    ~~~~~~~~~~~~~~~~^^^^^
-^^^^^^^^^^^^^^^^^^^^^^^^^
-^^^^^^^^^^^^^^^^^^^^^^^^^
-^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\HP\Deskt
-op\.vscode\Argus  og\back
-end\venv\Lib\site-package
-s\pydantic\main.py", 
-line 263, in __init__
-    validated_self = self
-.__pydantic_validator__.v
-alidate_python(data, 
-self_instance=self)
-pydantic_core._pydantic_c
-ore.ValidationError: 1 
-validation error for 
-Settings
-ai_credential_encryption_
-key
-  Field required 
-[type=missing, 
-input_value={'app_env': '
-development'...api/v1/web
-hooks/github'}, 
-input_type=dict]
-    For further 
-information visit https:/
-/errors.pydantic.dev/2.13
-/v/missing
+INFO  [alembic.runtime.mi
+gration] Will assume 
+non-transactional DDL.
+INFO  [alembic.runtime.mi
+gration] Running upgrade 
+5a70e50d3c97 -> 
+f1d5bb3861c2, Add 
+BotInteraction model

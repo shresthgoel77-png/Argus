@@ -8,8 +8,10 @@ from app.integrations.ai.exceptions import (
     AIProviderUnavailableError,
     InvalidAPIKeyError,
 )
+from app.bot.context_builder import BotContext
+from app.bot.question_parser import BotIntent
 from app.integrations.ai.gemini_client import GeminiClient
-from app.integrations.ai.gemini_provider import GeminiProvider
+from app.integrations.ai.gemini_provider import GeminiProvider, BOT_RESPONSE_SCHEMA
 from app.services.ai_context_builder import FindingContext
 
 
@@ -202,3 +204,64 @@ def test_generation_timeout_maps_to_unavailable():
 
     with pytest.raises(AIProviderUnavailableError):
         provider.generate_analysis(make_context())
+
+
+def make_bot_context():
+    return BotContext(
+        intent=BotIntent.issue_explain,
+        system_instructions="<system_instructions>trusted</system_instructions>",
+        untrusted_content="<untrusted_repository_content>issue data</untrusted_repository_content>",
+        source="github"
+    )
+
+def test_generate_bot_response_returns_validated_result_and_preserves_boundaries():
+    client = StubGenerationClient(
+        make_generation_response(
+            '{"answer_text":"This is how it works.","key_points":["A"],"confidence":0.9}'
+        )
+    )
+    provider = GeminiProvider(client)
+
+    result = provider.generate_bot_response(make_bot_context())
+
+    assert result.answer_text == "This is how it works."
+    assert result.confidence == 0.9
+    assert result.key_points == ["A"]
+    
+    call = client.calls[0]
+    assert call["model"] == GeminiProvider.DEFAULT_MODEL
+    assert call["response_schema"] == BOT_RESPONSE_SCHEMA
+    assert "<system_instructions>trusted</system_instructions>" in call["system_instructions"]
+    assert "Explain the situation or answer the question" in call["system_instructions"]
+    assert call["untrusted_content"] == "<untrusted_repository_content>issue data</untrusted_repository_content>"
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        make_generation_response("not-json"),
+        make_generation_response('{"answer_text":"missing confidence"}'),
+        make_generation_response(
+            '{"answer_text":"bad confidence","confidence":1.5}'
+        ),
+    ],
+)
+def test_generate_bot_response_rejects_invalid_structured_response(response):
+    provider = GeminiProvider(StubGenerationClient(response))
+
+    with pytest.raises(AIProviderInvalidResponseError):
+        provider.generate_bot_response(make_bot_context())
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        InvalidAPIKeyError("invalid"),
+        AIProviderRateLimitedError("limited"),
+        AIProviderUnavailableError("unavailable"),
+    ],
+)
+def test_generate_bot_response_preserves_mapped_transport_errors(error):
+    provider = GeminiProvider(StubGenerationClient(error=error))
+
+    with pytest.raises(type(error)):
+        provider.generate_bot_response(make_bot_context())
+

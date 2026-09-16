@@ -80,15 +80,23 @@ class GeminiClient:
             "Gemini API rejected the API-key validation request"
         )
 
-    def generate_content(self, *, model: str, system_instructions: str, untrusted_content: str) -> dict:
+    def generate_content(
+        self,
+        *,
+        model: str,
+        system_instructions: str,
+        untrusted_content: str,
+        response_schema: dict | None = None,
+    ) -> dict:
         """Return Gemini's structured content response without exposing request data in errors."""
         url = _GEMINI_GENERATE_URL.format(model=model)
+        schema = response_schema if response_schema is not None else _RESPONSE_SCHEMA
         payload = {
             "systemInstruction": {"parts": [{"text": system_instructions}]},
             "contents": [{"role": "user", "parts": [{"text": untrusted_content}]}],
             "generationConfig": {
                 "responseMimeType": "application/json",
-                "responseSchema": _RESPONSE_SCHEMA,
+                "responseSchema": schema,
             },
         }
         try:

@@ -6,8 +6,19 @@ from pydantic import ValidationError
 
 from app.integrations.ai.exceptions import AIProviderInvalidResponseError
 from app.integrations.ai.gemini_client import GeminiClient
-from app.integrations.ai.provider_base import BaseAIProvider, StructuredAnalysisResult
+from app.bot.context_builder import BotContext
+from app.integrations.ai.provider_base import BaseAIProvider, BotResponseResult, StructuredAnalysisResult
 from app.services.ai_context_builder import FindingContext
+
+BOT_RESPONSE_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "answer_text": {"type": "STRING"},
+        "key_points": {"type": "ARRAY", "items": {"type": "STRING"}},
+        "confidence": {"type": "NUMBER"},
+    },
+    "required": ["answer_text", "confidence"],
+}
 
 
 class GeminiProvider(BaseAIProvider):
@@ -48,4 +59,25 @@ class GeminiProvider(BaseAIProvider):
         except (KeyError, IndexError, TypeError, ValidationError, ValueError) as exc:
             raise AIProviderInvalidResponseError(
                 "Gemini API returned an invalid analysis response"
+            ) from exc
+
+    def generate_bot_response(self, context: BotContext) -> BotResponseResult:
+        instructions = (
+            f"{context.system_instructions}\n"
+            "This is a response for a GitHub comment. Keep your reply highly concise and use plain-text or Markdown. "
+            "Explain the situation or answer the question, but NEVER suggest raw code changes as if they'll be applied automatically. "
+            "You are an explainer, never modify the code."
+        )
+        try:
+            response = self._client.generate_content(
+                model=self.DEFAULT_MODEL,
+                system_instructions=instructions,
+                untrusted_content=context.untrusted_content,
+                response_schema=BOT_RESPONSE_SCHEMA,
+            )
+            generated_text = response["candidates"][0]["content"]["parts"][0]["text"]
+            return BotResponseResult.model_validate_json(generated_text)
+        except (KeyError, IndexError, TypeError, ValidationError, ValueError) as exc:
+            raise AIProviderInvalidResponseError(
+                "Gemini API returned an invalid bot response"
             ) from exc

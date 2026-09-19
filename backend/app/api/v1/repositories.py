@@ -1,10 +1,12 @@
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 from app.db.session import get_db
 from app.auth.dependencies import get_current_user
 from app.models.user import User
+from app.models.ai_analysis import AIAnalysis
 from app.schemas.repository import (
     RepositoryRead,
     RepositoryCreate,
@@ -22,6 +24,16 @@ from app.schemas.finding import FindingListResponse, FindingResponse
 from app.services.finding_service import list_findings
 from app.schemas.activity import ActivityFeedResponse, ActivitySource
 from app.services.activity_feed_service import get_activity_feed
+from app.schemas.ai_analysis import (
+    AIAnalysisResponse,
+    AIAnalysisHistoryResponse,
+    AIAnalysisNotExists,
+)
+from app.services.ai_analysis_service import (
+    request_repository_summary,
+    AINotConfiguredError,
+    AIAnalysisFailedError,
+)
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
 
@@ -125,3 +137,105 @@ def get_repository_activity(
     get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
     items, next_before = get_activity_feed(db=db, repository_id=repository_id, before=before, limit=limit, source=source)
     return ActivityFeedResponse(items=items, next_before=next_before)
+
+
+@router.post("/{repository_id}/ai-summary", response_model=AIAnalysisResponse)
+def create_repository_ai_summary(
+    repository_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Triggers a new AI summary for the repository synchronously.
+    """
+    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+
+    try:
+        analysis = request_repository_summary(db=db, repository_id=repository_id, user=user)
+        return AIAnalysisResponse.model_validate(analysis)
+    except AINotConfiguredError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No valid AI connection is configured. Please complete setup in the Settings AI/BYOK section."
+        ) from e
+    except AIAnalysisFailedError as e:
+        raise HTTPException(
+            status_code=e.status_code,
+            detail=e.message
+        ) from e
+
+
+def get_latest_repo_analysis(db: Session, repository_id: uuid.UUID) -> AIAnalysis | None:
+    return (
+        db.query(AIAnalysis)
+        .filter(
+            AIAnalysis.repository_id == repository_id,
+            AIAnalysis.analysis_type == "repository_summary"
+        )
+        .order_by(desc(AIAnalysis.requested_at))
+        .first()
+    )
+
+def list_repo_analyses(db: Session, repository_id: uuid.UUID, limit: int, offset: int) -> tuple[int, list[AIAnalysis]]:
+    query = (
+        db.query(AIAnalysis)
+        .filter(
+            AIAnalysis.repository_id == repository_id,
+            AIAnalysis.analysis_type == "repository_summary"
+        )
+    )
+    total = query.count()
+    items = (
+        query.order_by(desc(AIAnalysis.requested_at))
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return total, items
+
+
+@router.get(
+    "/{repository_id}/ai-summary", 
+    response_model=AIAnalysisResponse | AIAnalysisNotExists
+)
+def get_latest_repository_ai_summary(
+    repository_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns the latest AIAnalysis (type: repository_summary) for the repository, or {exists: false} if none exists.
+    """
+    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+
+    latest = get_latest_repo_analysis(db, repository_id)
+
+    if not latest:
+        return AIAnalysisNotExists()
+    return AIAnalysisResponse.model_validate(latest)
+
+
+@router.get("/{repository_id}/ai-summary/history", response_model=AIAnalysisHistoryResponse)
+def get_repository_ai_summary_history(
+    repository_id: uuid.UUID,
+    limit: int = 50,
+    offset: int = 0,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns a paginated list of all prior AI analyses for the repository, newest first.
+    """
+    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+
+    limit = min(max(limit, 1), 200)
+    offset = max(offset, 0)
+
+    total, items = list_repo_analyses(db, repository_id, limit, offset)
+
+    return AIAnalysisHistoryResponse(
+        items=[AIAnalysisResponse.model_validate(i) for i in items],
+        total=total,
+        limit=limit,
+        offset=offset
+    )

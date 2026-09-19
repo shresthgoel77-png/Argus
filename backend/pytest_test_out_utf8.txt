@@ -1,0 +1,326 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_success PASSED [ 10%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_not_configured PASSED [ 20%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_failed_provider PASSED [ 30%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_unowned PASSED [ 40%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_success ERROR [ 50%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_none PASSED [ 60%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_unowned PASSED [ 70%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_success ERROR [ 80%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_empty PASSED [ 90%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_unowned PASSED [100%]
+
+=================================== ERRORS ====================================
+___________ ERROR at setup of test_get_latest_repo_analysis_success ___________
+
+self = <sqlalchemy.engine.base.Connection object at 0x000001B5301FD350>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000001B5301151D0>
+constructor = <bound method DefaultExecutionContext._init_compiled of <class 'sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext'>>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x000001B5301CAAD0>
+parameters = [{'analysis_type': 'repository_summary', 'completed_at': datetime.datetime(2026, 9, 19, 20, 41, 12, 318909, tzinfo=datetime.timezone.utc), 'confidence': 'High', 'error_message': None, ...}]
+execution_options = immutabledict({'compiled_cache': <sqlalchemy.util._collections.LRUCache object at 0x000001B5301A79C0>})
+args = (<sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x000001B5301CAAD0>, [{'analysis_type': 'repository_summary...utc), 'confidence': 'High', 'error_message': None, ...}], <sqlalchemy.sql.dml.Insert object at 0x000001B53018C590>, [])
+kw = {'cache_hit': <CacheStats.CACHE_MISS: 1>}, yp = None
+conn = <sqlalchemy.pool.base._ConnectionFairy object at 0x000001B5301C8550>
+
+    def _execute_context(
+        self,
+        dialect: Dialect,
+        constructor: Callable[..., ExecutionContext],
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+        execution_options: _ExecuteOptions,
+        *args: Any,
+        **kw: Any,
+    ) -> CursorResult[Any]:
+        """Create an :class:`.ExecutionContext` and execute, returning
+        a :class:`_engine.CursorResult`."""
+    
+        if execution_options:
+            yp = execution_options.get("yield_per", None)
+            if yp:
+                execution_options = execution_options.union(
+                    {"stream_results": True, "max_row_buffer": yp}
+                )
+        try:
+            conn = self._dbapi_connection
+            if conn is None:
+                conn = self._revalidate_connection()
+    
+>           context = constructor(
+                dialect, self, conn, execution_options, *args, **kw
+            )
+
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   ???
+E   ValueError: could not convert string to float: 'High'
+
+lib/sqlalchemy/cyextension/processors.pyx:27: ValueError
+
+The above exception was the direct cause of the following exception:
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001B530052C40>
+test_user_repository = <app.models.repository.Repository object at 0x000001B530053820>
+
+    @pytest.fixture
+    def repo_ai_analysis_db(db_session, test_user_repository):
+        from app.models.ai_analysis import AIAnalysis
+        analysis = AIAnalysis(
+            repository_id=test_user_repository.id,
+            analysis_type="repository_summary",
+            provider="gemini",
+            model="gemini-1.5-pro",
+            status="completed",
+            summary="DB Summary",
+            severity_assessment=None,
+            confidence="High",
+            recommendations="DB Recs",
+            requested_at=datetime.now(timezone.utc),
+            completed_at=datetime.now(timezone.utc)
+        )
+        db_session.add(analysis)
+>       db_session.commit()
+
+tests\integration\api\v1\test_repositories_ai_summary.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2035: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+venv\Lib\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\session.py:1316: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+venv\Lib\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\session.py:1290: in _prepare_impl
+    self.session.flush()
+venv\Lib\site-packages\sqlalchemy\orm\session.py:4353: in flush
+    self._flush(objects)
+venv\Lib\site-packages\sqlalchemy\orm\session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+venv\Lib\site-packages\sqlalchemy\orm\session.py:4449: in _flush
+    flush_context.execute()
+venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py:465: in execute
+    rec.execute(self)
+venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+venv\Lib\site-packages\sqlalchemy\orm\persistence.py:94: in save_obj
+    _emit_insert_statements(
+venv\Lib\site-packages\sqlalchemy\orm\persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1823: in _execute_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   ???
+E   sqlalchemy.exc.StatementError: (builtins.ValueError) could not convert string to float: 'High'
+E   [SQL: INSERT INTO ai_analyses (id, finding_id, repository_id, analysis_type, status, provider, model, summary, severity_assessment, confidence, recommendations, error_message, requested_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+E   [parameters: [{'recommendations': 'DB Recs', 'model': 'gemini-1.5-pro', 'confidence': 'High', 'provider': 'gemini', 'repository_id': UUID('80d358e2-87d2-4a56-95bb-7 ... (219 characters truncated) ... etime.datetime(2026, 9, 19, 20, 41, 12, 318909, tzinfo=datetime.timezone.utc), 'error_message': None, 'severity_assessment': None, 'finding_id': None}]]
+
+lib/sqlalchemy/cyextension/processors.pyx:27: StatementError
+____________ ERROR at setup of test_history_repo_analysis_success _____________
+
+self = <sqlalchemy.engine.base.Connection object at 0x000001B5301096D0>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x000001B5301151D0>
+constructor = <bound method DefaultExecutionContext._init_compiled of <class 'sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext'>>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x000001B5301CAAD0>
+parameters = [{'analysis_type': 'repository_summary', 'completed_at': datetime.datetime(2026, 9, 19, 20, 41, 17, 610441, tzinfo=datetime.timezone.utc), 'confidence': 'High', 'error_message': None, ...}]
+execution_options = immutabledict({'compiled_cache': <sqlalchemy.util._collections.LRUCache object at 0x000001B5301A79C0>})
+args = (<sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x000001B5301CAAD0>, [{'analysis_type': 'repository_summary...utc), 'confidence': 'High', 'error_message': None, ...}], <sqlalchemy.sql.dml.Insert object at 0x000001B53018C590>, [])
+kw = {'cache_hit': <CacheStats.CACHE_HIT: 0>}, yp = None
+conn = <sqlalchemy.pool.base._ConnectionFairy object at 0x000001B53005A330>
+
+    def _execute_context(
+        self,
+        dialect: Dialect,
+        constructor: Callable[..., ExecutionContext],
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+        execution_options: _ExecuteOptions,
+        *args: Any,
+        **kw: Any,
+    ) -> CursorResult[Any]:
+        """Create an :class:`.ExecutionContext` and execute, returning
+        a :class:`_engine.CursorResult`."""
+    
+        if execution_options:
+            yp = execution_options.get("yield_per", None)
+            if yp:
+                execution_options = execution_options.union(
+                    {"stream_results": True, "max_row_buffer": yp}
+                )
+        try:
+            conn = self._dbapi_connection
+            if conn is None:
+                conn = self._revalidate_connection()
+    
+>           context = constructor(
+                dialect, self, conn, execution_options, *args, **kw
+            )
+
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   ???
+E   ValueError: could not convert string to float: 'High'
+
+lib/sqlalchemy/cyextension/processors.pyx:27: ValueError
+
+The above exception was the direct cause of the following exception:
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001B52EFB27A0>
+test_user_repository = <app.models.repository.Repository object at 0x000001B52EFB0D10>
+
+    @pytest.fixture
+    def repo_ai_analysis_db(db_session, test_user_repository):
+        from app.models.ai_analysis import AIAnalysis
+        analysis = AIAnalysis(
+            repository_id=test_user_repository.id,
+            analysis_type="repository_summary",
+            provider="gemini",
+            model="gemini-1.5-pro",
+            status="completed",
+            summary="DB Summary",
+            severity_assessment=None,
+            confidence="High",
+            recommendations="DB Recs",
+            requested_at=datetime.now(timezone.utc),
+            completed_at=datetime.now(timezone.utc)
+        )
+        db_session.add(analysis)
+>       db_session.commit()
+
+tests\integration\api\v1\test_repositories_ai_summary.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2035: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+venv\Lib\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\session.py:1316: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+venv\Lib\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\session.py:1290: in _prepare_impl
+    self.session.flush()
+venv\Lib\site-packages\sqlalchemy\orm\session.py:4353: in flush
+    self._flush(objects)
+venv\Lib\site-packages\sqlalchemy\orm\session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+venv\Lib\site-packages\sqlalchemy\orm\session.py:4449: in _flush
+    flush_context.execute()
+venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py:465: in execute
+    rec.execute(self)
+venv\Lib\site-packages\sqlalchemy\orm\unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+venv\Lib\site-packages\sqlalchemy\orm\persistence.py:94: in save_obj
+    _emit_insert_statements(
+venv\Lib\site-packages\sqlalchemy\orm\persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1823: in _execute_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+>   ???
+E   sqlalchemy.exc.StatementError: (builtins.ValueError) could not convert string to float: 'High'
+E   [SQL: INSERT INTO ai_analyses (id, finding_id, repository_id, analysis_type, status, provider, model, summary, severity_assessment, confidence, recommendations, error_message, requested_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+E   [parameters: [{'recommendations': 'DB Recs', 'model': 'gemini-1.5-pro', 'confidence': 'High', 'provider': 'gemini', 'repository_id': UUID('69f9409f-2d81-4433-80c4-9 ... (219 characters truncated) ... etime.datetime(2026, 9, 19, 20, 41, 17, 610441, tzinfo=datetime.timezone.utc), 'error_message': None, 'severity_assessment': None, 'finding_id': None}]]
+
+lib/sqlalchemy/cyextension/processors.pyx:27: StatementError
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_success
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_success
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\integration\conftest.py:61: SAWarning: transaction already deassociated from connection
+    transaction.rollback()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+ERROR tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_success - sqlalchemy.exc.StatementError: (builtins.ValueError) could not convert string to float: 'High'
+[SQL: INSERT INTO ai_analyses (id, finding_id, repository_id, analysis_type, status, provider, model, summary, severity_assessment, confidence, recommendations, error_message, requested_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: [{'recommendations': 'DB Recs', 'model': 'gemini-1.5-pro', 'confidence': 'High', 'provider': 'gemini', 'repository_id': UUID('80d358e2-87d2-4a56-95bb-7 ... (219 characters truncated) ... etime.datetime(2026, 9, 19, 20, 41, 12, 318909, tzinfo=datetime.timezone.utc), 'error_message': None, 'severity_assessment': None, 'finding_id': None}]]
+ERROR tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_success - sqlalchemy.exc.StatementError: (builtins.ValueError) could not convert string to float: 'High'
+[SQL: INSERT INTO ai_analyses (id, finding_id, repository_id, analysis_type, status, provider, model, summary, severity_assessment, confidence, recommendations, error_message, requested_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+[parameters: [{'recommendations': 'DB Recs', 'model': 'gemini-1.5-pro', 'confidence': 'High', 'provider': 'gemini', 'repository_id': UUID('69f9409f-2d81-4433-80c4-9 ... (219 characters truncated) ... etime.datetime(2026, 9, 19, 20, 41, 17, 610441, tzinfo=datetime.timezone.utc), 'error_message': None, 'severity_assessment': None, 'finding_id': None}]]
+=================== 8 passed, 6 warnings, 2 errors in 7.18s ===================

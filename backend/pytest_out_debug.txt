@@ -1,0 +1,452 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_success FAILED [ 10%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_not_configured PASSED [ 20%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_failed_provider PASSED [ 30%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_unowned PASSED [ 40%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_success FAILED [ 50%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_none PASSED [ 60%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_unowned PASSED [ 70%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_success FAILED [ 80%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_empty PASSED [ 90%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_unowned PASSED [100%]
+
+================================== FAILURES ===================================
+_____________________ test_trigger_repo_analysis_success ______________________
+
+mock_request = <MagicMock name='request_repository_summary' id='2791259641168'>
+authorized_client = <httpx.AsyncClient object at 0x00000289E40E7230>
+test_user_repository = <app.models.repository.Repository object at 0x00000289E40E6270>
+mock_repo_ai_analysis = <MagicMock name='request_repository_summary()' id='2791259639824'>
+
+    @pytest.mark.asyncio
+    @patch("app.api.v1.repositories.request_repository_summary")
+    async def test_trigger_repo_analysis_success(mock_request, authorized_client, test_user_repository, mock_repo_ai_analysis):
+        mock_request.return_value = mock_repo_ai_analysis
+    
+>       response = await authorized_client.post(f"/api/v1/repositories/{test_user_repository.id}/ai-summary")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\api\v1\test_repositories_ai_summary.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\httpx\_client.py:1859: in post
+    return await self.request(
+venv\Lib\site-packages\httpx\_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_client.py:1629: in send
+    response = await self._send_handling_auth(
+venv\Lib\site-packages\httpx\_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+venv\Lib\site-packages\httpx\_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_transports\asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\Lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+venv\Lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv\Lib\site-packages\starlette\middleware\cors.py:88: in __call__
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\starlette\middleware\sessions.py:88: in __call__
+    await self.app(scope, receive, send_wrapper)
+venv\Lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\starlette\routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2734: in app
+    await route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1791: in _handle_selected
+    await route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1279: in handle
+    await app(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\Lib\site-packages\fastapi\routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\fastapi\routing.py:706: in app
+    raw_response = await run_endpoint_function(
+venv\Lib\site-packages\fastapi\routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\starlette\concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\anyio\to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+venv\Lib\site-packages\anyio\_backends\_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+venv\Lib\site-packages\anyio\_backends\_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_id = UUID('822ba654-7310-4088-9fc5-be1504d219ad')
+user = <app.models.user.User object at 0x00000289E40E74D0>
+db = <sqlalchemy.orm.session.Session object at 0x00000289E40E7620>
+
+    @router.post("/{repository_id}/ai-summary", response_model=AIAnalysisResponse)
+    def create_repository_ai_summary(
+        repository_id: uuid.UUID,
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ):
+        """
+        Triggers a new AI summary for the repository synchronously.
+        """
+        get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    
+        try:
+            analysis = request_repository_summary(db=db, repository_id=repository_id, user=user)
+>           return AIAnalysisResponse.model_validate(analysis)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           pydantic_core._pydantic_core.ValidationError: 1 validation error for AIAnalysisResponse
+E           confidence
+E             Input should be a valid string [type=string_type, input_value=0.9, input_type=float]
+E               For further information visit https://errors.pydantic.dev/2.13/v/string_type
+
+app\api\v1\repositories.py:155: ValidationError
+---------------------------- Captured stderr setup ----------------------------
+{"timestamp": "2026-09-20T02:14:47.573955Z", "level": "INFO", "name": "app.main", "message": "Application starting up..."}
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+____________________ test_get_latest_repo_analysis_success ____________________
+
+mock_get = <MagicMock name='get_latest_repo_analysis' id='2791259925408'>
+authorized_client = <httpx.AsyncClient object at 0x00000289E3FFEB10>
+test_user_repository = <app.models.repository.Repository object at 0x00000289E3FFEFD0>
+mock_repo_ai_analysis = <MagicMock name='get_latest_repo_analysis()' id='2791259926752'>
+
+    @pytest.mark.asyncio
+    @patch("app.api.v1.repositories.get_latest_repo_analysis")
+    async def test_get_latest_repo_analysis_success(mock_get, authorized_client, test_user_repository, mock_repo_ai_analysis):
+        mock_get.return_value = mock_repo_ai_analysis
+>       response = await authorized_client.get(f"/api/v1/repositories/{test_user_repository.id}/ai-summary")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\api\v1\test_repositories_ai_summary.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\httpx\_client.py:1768: in get
+    return await self.request(
+venv\Lib\site-packages\httpx\_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_client.py:1629: in send
+    response = await self._send_handling_auth(
+venv\Lib\site-packages\httpx\_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+venv\Lib\site-packages\httpx\_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_transports\asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\Lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+venv\Lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv\Lib\site-packages\starlette\middleware\cors.py:88: in __call__
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\starlette\middleware\sessions.py:88: in __call__
+    await self.app(scope, receive, send_wrapper)
+venv\Lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\starlette\routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2734: in app
+    await route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1791: in _handle_selected
+    await route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1279: in handle
+    await app(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\Lib\site-packages\fastapi\routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\fastapi\routing.py:706: in app
+    raw_response = await run_endpoint_function(
+venv\Lib\site-packages\fastapi\routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\starlette\concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\anyio\to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+venv\Lib\site-packages\anyio\_backends\_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+venv\Lib\site-packages\anyio\_backends\_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_id = UUID('9e29d849-e3e0-48b3-ade0-db1805a8be43')
+user = <app.models.user.User object at 0x00000289E41D1A30>
+db = <sqlalchemy.orm.session.Session object at 0x00000289E3FFF360>
+
+    @router.get(
+        "/{repository_id}/ai-summary",
+        response_model=AIAnalysisResponse | AIAnalysisNotExists
+    )
+    def get_latest_repository_ai_summary(
+        repository_id: uuid.UUID,
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ):
+        """
+        Returns the latest AIAnalysis (type: repository_summary) for the repository, or {exists: false} if none exists.
+        """
+        get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    
+        latest = get_latest_repo_analysis(db, repository_id)
+    
+        if not latest:
+            return AIAnalysisNotExists()
+>       return AIAnalysisResponse.model_validate(latest)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for AIAnalysisResponse
+E       confidence
+E         Input should be a valid string [type=string_type, input_value=0.9, input_type=float]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_type
+
+app\api\v1\repositories.py:215: ValidationError
+_____________________ test_history_repo_analysis_success ______________________
+
+mock_list = <MagicMock name='list_repo_analyses' id='2791240703280'>
+authorized_client = <httpx.AsyncClient object at 0x00000289E419F8A0>
+test_user_repository = <app.models.repository.Repository object at 0x00000289E419F350>
+mock_repo_ai_analysis = <MagicMock id='2791240709328'>
+
+    @pytest.mark.asyncio
+    @patch("app.api.v1.repositories.list_repo_analyses")
+    async def test_history_repo_analysis_success(mock_list, authorized_client, test_user_repository, mock_repo_ai_analysis):
+        mock_list.return_value = (1, [mock_repo_ai_analysis])
+>       response = await authorized_client.get(f"/api/v1/repositories/{test_user_repository.id}/ai-summary/history")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\api\v1\test_repositories_ai_summary.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\httpx\_client.py:1768: in get
+    return await self.request(
+venv\Lib\site-packages\httpx\_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_client.py:1629: in send
+    response = await self._send_handling_auth(
+venv\Lib\site-packages\httpx\_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+venv\Lib\site-packages\httpx\_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\httpx\_transports\asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\Lib\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+venv\Lib\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv\Lib\site-packages\starlette\middleware\cors.py:88: in __call__
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\starlette\middleware\sessions.py:88: in __call__
+    await self.app(scope, receive, send_wrapper)
+venv\Lib\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv\Lib\site-packages\starlette\routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2734: in app
+    await route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1791: in _handle_selected
+    await route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:1279: in handle
+    await app(scope, receive, send)
+venv\Lib\site-packages\fastapi\routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv\Lib\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+venv\Lib\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv\Lib\site-packages\fastapi\routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\fastapi\routing.py:706: in app
+    raw_response = await run_endpoint_function(
+venv\Lib\site-packages\fastapi\routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\starlette\concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\anyio\to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+venv\Lib\site-packages\anyio\_backends\_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+venv\Lib\site-packages\anyio\_backends\_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repository_id = UUID('3d83d063-dab3-4602-9693-f2473c5528a1'), limit = 50
+offset = 0, user = <app.models.user.User object at 0x00000289E41BEF50>
+db = <sqlalchemy.orm.session.Session object at 0x00000289E419E8B0>
+
+    @router.get("/{repository_id}/ai-summary/history", response_model=AIAnalysisHistoryResponse)
+    def get_repository_ai_summary_history(
+        repository_id: uuid.UUID,
+        limit: int = 50,
+        offset: int = 0,
+        user: User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+    ):
+        """
+        Returns a paginated list of all prior AI analyses for the repository, newest first.
+        """
+        get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    
+        limit = min(max(limit, 1), 200)
+        offset = max(offset, 0)
+    
+        total, items = list_repo_analyses(db, repository_id, limit, offset)
+    
+        return AIAnalysisHistoryResponse(
+>           items=[AIAnalysisResponse.model_validate(i) for i in items],
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            total=total,
+            limit=limit,
+            offset=offset
+        )
+E       pydantic_core._pydantic_core.ValidationError: 1 validation error for AIAnalysisResponse
+E       confidence
+E         Input should be a valid string [type=string_type, input_value=0.9, input_type=float]
+E           For further information visit https://errors.pydantic.dev/2.13/v/string_type
+
+app\api\v1\repositories.py:237: ValidationError
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_success - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIAnalysisResponse
+confidence
+  Input should be a valid string [type=string_type, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.13/v/string_type
+FAILED tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_success - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIAnalysisResponse
+confidence
+  Input should be a valid string [type=string_type, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.13/v/string_type
+FAILED tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_success - pydantic_core._pydantic_core.ValidationError: 1 validation error for AIAnalysisResponse
+confidence
+  Input should be a valid string [type=string_type, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.13/v/string_type
+=================== 3 failed, 7 passed, 4 warnings in 4.29s ===================

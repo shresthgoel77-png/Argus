@@ -20,11 +20,18 @@ def get_needs_attention(db: Session, repository_id: uuid.UUID, limit: int = 5) -
     Includes the latest repository health snapshot and its reasons.
     """
     severity_order = case((Finding.severity == "critical", 0), (Finding.severity == "high", 1), else_=2)
+    priority_order = case(
+        (Finding.priority == "critical", 0),
+        (Finding.priority == "high", 1),
+        (Finding.priority == "medium", 2),
+        (Finding.priority == "low", 3),
+        else_=4
+    )
     findings = db.query(Finding).filter(
         Finding.repository_id == repository_id,
         Finding.status == "open",
         Finding.severity.in_(("critical", "high")),
-    ).order_by(severity_order, desc(Finding.detected_at)).limit(limit).all()
+    ).order_by(severity_order, priority_order, desc(Finding.detected_at)).limit(limit).all()
 
     snapshot = db.query(RepositoryHealthSnapshot).filter(
         RepositoryHealthSnapshot.repository_id == repository_id

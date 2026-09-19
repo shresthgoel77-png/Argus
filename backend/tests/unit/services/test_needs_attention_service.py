@@ -76,3 +76,23 @@ def test_get_needs_attention_with_snapshot_and_limit(db_session, test_user_repos
     assert result.findings[1].severity == "high"
     assert result.health_snapshot is not None
     assert result.reasons == ["Bad things"]
+
+
+def test_get_needs_attention_priority_ordering(db_session, test_user_repository):
+    import time
+    
+    # Same severity but different priority, different timestamps reversed
+    f1 = add_finding(db_session, test_user_repository, "security", {}, severity="high", priority="medium")
+    time.sleep(0.01) # to ensure different timestamps if needed though not really needed across different priorities
+    f2 = add_finding(db_session, test_user_repository, "security", {}, severity="high", priority="critical")
+    time.sleep(0.01)
+    f3 = add_finding(db_session, test_user_repository, "security", {}, severity="high", priority="high")
+    
+    # Needs Attention orders by severity, then priority, then detected_at
+    result = get_needs_attention(db_session, test_user_repository.id)
+    
+    assert len(result.findings) == 3
+    # Order should be f2 (critical), f3 (high), f1 (medium)
+    assert result.findings[0].id == f2.id
+    assert result.findings[1].id == f3.id
+    assert result.findings[2].id == f1.id

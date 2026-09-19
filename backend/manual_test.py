@@ -1,55 +1,56 @@
-import json
-import hmac
-import hashlib
-from uuid import uuid4
-from fastapi.testclient import TestClient
+import uuid
+from unittest.mock import MagicMock
 
-from app.main import app
-from app.db.session import SessionLocal
-from app.models.github_event import GitHubEvent
-from app.core.config import settings
+from app.models.repository import Repository
+from app.models.finding import Finding
+from app.models.repository_health_snapshot import RepositoryHealthSnapshot
+from app.services.needs_attention_service import NeedsAttentionDTO
+from app.services.repository_summary_context_builder import build_repository_summary_context
 
-def _sign_payload(payload_bytes: bytes) -> str:
-    secret_bytes = settings.github_app_webhook_secret.get_secret_value().encode('utf-8')
-    mac = hmac.new(secret_bytes, payload_bytes, hashlib.sha256).hexdigest()
-    return f"sha256={mac}"
+def main():
+    mock_db_session = MagicMock()
+    repo_id = uuid.uuid4()
+    
+    repo = MagicMock(spec=Repository)
+    repo.id = repo_id
+    repo.full_name = "test-org/test-repo-name"
+    repo.monitoring_enabled = True
+    
+    mock_query = MagicMock()
+    mock_query.filter.return_value.first.return_value = repo
+    mock_db_session.query.return_value = mock_query
 
-def run_manual_test():
-    with TestClient(app) as client:
-        db = SessionLocal()
-        try:
-            payload = {"action": "manual_test"}
-            body_bytes = json.dumps(payload).encode("utf-8")
-            valid_sig = _sign_payload(body_bytes)
-            
-            print("--- Manual Verification ---")
-            
-            # 1. Corrupted signature
-            del_id_invalid = str(uuid4())
-            headers1 = {
-                "x-github-event": "push",
-                "x-github-delivery": del_id_invalid,
-                "x-hub-signature-256": "sha256=deadbeefdeadbeef"
-            }
-            resp1 = client.post("/api/v1/webhooks/github", content=body_bytes, headers=headers1)
-            print(f"Corrupt Signature -> Status: {resp1.status_code}")
-            row_exists1 = db.query(GitHubEvent).filter_by(delivery_id=del_id_invalid).first() is not None
-            print(f"Zero Rows Persisted: {not row_exists1}")
-            
-            # 2. Valid signature
-            del_id_valid = str(uuid4())
-            headers2 = {
-                "x-github-event": "push",
-                "x-github-delivery": del_id_valid,
-                "x-hub-signature-256": valid_sig
-            }
-            resp2 = client.post("/api/v1/webhooks/github", content=body_bytes, headers=headers2)
-            print(f"Valid Signature -> Status: {resp2.status_code}")
-            row_exists2 = db.query(GitHubEvent).filter_by(delivery_id=del_id_valid).first() is not None
-            print(f"Persisted GitHubEvent: {row_exists2}")
-            
-        finally:
-            db.close()
+    finding1 = MagicMock(spec=Finding)
+    finding1.severity = "critical"
+    finding1.priority = "high"
+    finding1.category = "security"
+    finding1.title = "Critical security issue in dependencies"
+    finding1.description = "Found a vulnerability that could allow RCE."
+    finding1.evidence = {"severity": "critical", "package_name": "serialize", "advisory_title": "RCE Vulnerability"}
+    
+    snapshot = MagicMock(spec=RepositoryHealthSnapshot)
+    snapshot.overall_score = 42
+    snapshot.category_scores = {"security": 10, "code_quality": 32}
+
+    import app.services.repository_summary_context_builder as builder
+    old_get_needs_attention = builder.get_needs_attention
+    
+    builder.get_needs_attention = MagicMock(return_value=NeedsAttentionDTO(
+        findings=[finding1],
+        health_snapshot=snapshot,
+        reasons=["Reason 1: Outdated packages", "Reason 2: CI failure"]
+    ))
+
+    context = build_repository_summary_context(mock_db_session, repo_id)
+    
+    with open("manual_test_out.txt", "w", encoding="utf-8") as f:
+        f.write("--- MANUAL INSPECTION OF GENERATED CONTEXT ---\n")
+        f.write("\n[SYSTEM INSTRUCTIONS]\n")
+        f.write(context.system_instructions)
+        f.write("\n\n[UNTRUSTED CONTENT]\n")
+        f.write(context.untrusted_content)
+    
+    builder.get_needs_attention = old_get_needs_attention
 
 if __name__ == "__main__":
-    run_manual_test()
+    main()

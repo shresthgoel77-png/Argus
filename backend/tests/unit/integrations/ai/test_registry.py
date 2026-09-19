@@ -17,6 +17,9 @@ class DummyProvider(BaseAIProvider):
     def generate_analysis(self, context):
         raise NotImplementedError
 
+    def generate_repository_summary(self, context):
+        raise NotImplementedError
+
     def generate_bot_response(self, context):
         raise NotImplementedError
 

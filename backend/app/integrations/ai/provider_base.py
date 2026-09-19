@@ -3,7 +3,9 @@ from abc import ABC, abstractmethod
 from pydantic import BaseModel, Field
 
 from app.bot.context_builder import BotContext
+from app.schemas.repository_summary_result import RepositorySummaryResult
 from app.services.ai_context_builder import FindingContext
+from app.services.repository_summary_context_builder import RepositorySummaryContext
 
 
 class StructuredAnalysisResult(BaseModel):
@@ -35,6 +37,13 @@ class BaseAIProvider(ABC):
     @abstractmethod
     def generate_analysis(self, context: FindingContext) -> StructuredAnalysisResult:
         """Generate a structured explanation for a finding context."""
+        pass
+
+    @abstractmethod
+    def generate_repository_summary(
+        self, context: RepositorySummaryContext
+    ) -> RepositorySummaryResult:
+        """Generate a structured summary for a repository context."""
         pass
 
     @abstractmethod

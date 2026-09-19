@@ -67,6 +67,14 @@ class StubProvider:
             raise self.error
         return self.result
 
+    def generate_repository_summary(self, context):
+        assert self.db_session.query(AIAnalysis).count() == 1
+        analysis = self.db_session.query(AIAnalysis).one()
+        assert analysis.status == "pending"
+        if self.error is not None:
+            raise self.error
+        return self.result
+
 
 def patch_provider(monkeypatch, db_session, *, result=None, error=None):
     monkeypatch.setattr(
@@ -215,6 +223,90 @@ def test_unexpected_failure_is_sanitized_and_persisted(
     analysis = db_session.query(AIAnalysis).one()
     assert analysis.status == "failed"
     assert analysis.error_message == "The AI analysis could not be completed."
+    assert API_KEY not in analysis.error_message
+    assert API_KEY not in str(caught.value)
+
+
+def test_repository_summary_success_persists_repository_scoped_analysis(
+    db_session, test_user, test_user_repository, monkeypatch
+):
+    add_connection(db_session, test_user)
+    result = type(
+        "RepositorySummaryResult",
+        (),
+        {
+            "summary": "Repository summary",
+            "confidence": 0.88,
+            "recommendations": ["Address the critical finding"],
+        },
+    )()
+    patch_provider(monkeypatch, db_session, result=result)
+    monkeypatch.setattr(
+        ai_analysis_service.repository_summary_context_builder,
+        "build_repository_summary_context",
+        lambda db, repository_id: object(),
+    )
+
+    analysis = ai_analysis_service.request_repository_summary(
+        db_session, test_user_repository.id, test_user
+    )
+
+    assert analysis.status == "completed"
+    assert analysis.analysis_type == "repository_summary"
+    assert analysis.repository_id == test_user_repository.id
+    assert analysis.finding_id is None
+    assert analysis.summary == result.summary
+    assert analysis.confidence == result.confidence
+    assert analysis.recommendations == result.recommendations
+
+
+def test_repository_summary_not_configured_raises_without_persisting_row(
+    db_session, test_user, test_user_repository
+):
+    with pytest.raises(ai_analysis_service.AINotConfiguredError):
+        ai_analysis_service.request_repository_summary(
+            db_session, test_user_repository.id, test_user
+        )
+
+    assert db_session.query(AIAnalysis).count() == 0
+
+
+@pytest.mark.parametrize(
+    ("provider_error", "expected_message"),
+    [
+        (InvalidAPIKeyError(API_KEY), "The configured AI provider rejected the API key."),
+        (AIProviderRateLimitedError(API_KEY), "The AI provider is rate limited."),
+        (AIProviderUnavailableError(API_KEY), "The AI provider is unavailable."),
+        (AIProviderInvalidResponseError(API_KEY), "The AI provider returned an invalid response."),
+    ],
+)
+def test_repository_summary_provider_failure_is_sanitized_and_repository_scoped(
+    db_session,
+    test_user,
+    test_user_repository,
+    monkeypatch,
+    provider_error,
+    expected_message,
+):
+    add_connection(db_session, test_user)
+    patch_provider(monkeypatch, db_session, error=provider_error)
+    monkeypatch.setattr(
+        ai_analysis_service.repository_summary_context_builder,
+        "build_repository_summary_context",
+        lambda db, repository_id: object(),
+    )
+
+    with pytest.raises(AppError) as caught:
+        ai_analysis_service.request_repository_summary(
+            db_session, test_user_repository.id, test_user
+        )
+
+    analysis = db_session.query(AIAnalysis).one()
+    assert analysis.status == "failed"
+    assert analysis.analysis_type == "repository_summary"
+    assert analysis.repository_id == test_user_repository.id
+    assert analysis.finding_id is None
+    assert analysis.error_message == expected_message
     assert API_KEY not in analysis.error_message
     assert API_KEY not in str(caught.value)
 

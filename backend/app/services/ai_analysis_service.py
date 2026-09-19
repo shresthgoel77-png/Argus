@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from datetime import datetime, timezone
 from typing import Any
 
@@ -20,7 +21,11 @@ from app.models.ai_analysis import AIAnalysis
 from app.models.ai_connection import AIConnection
 from app.models.finding import Finding
 from app.models.user import User
-from app.services import ai_connection_service, ai_context_builder
+from app.services import (
+    ai_connection_service,
+    ai_context_builder,
+    repository_summary_context_builder,
+)
 
 
 class AINotConfiguredError(AppError):
@@ -125,6 +130,53 @@ def request_finding_analysis(finding: Finding, user: User) -> AIAnalysis:
         analysis.status = "completed"
         analysis.summary = result.summary
         analysis.severity_assessment = result.severity
+        analysis.confidence = result.confidence
+        analysis.recommendations = result.recommendations
+        analysis.error_message = None
+        analysis.completed_at = datetime.now(timezone.utc)
+        db.commit()
+        db.refresh(analysis)
+        return analysis
+    except Exception as exception:
+        _persist_failure(db, analysis, exception)
+        raise _failure_for(exception) from exception
+
+
+def request_repository_summary(
+    db: Session, repository_id: uuid.UUID, user: User
+) -> AIAnalysis:
+    """Run one observable, on-demand summary for *repository_id*."""
+    connection = (
+        db.query(AIConnection)
+        .filter(AIConnection.user_id == user.id)
+        .first()
+    )
+    if connection is None or connection.status != "valid":
+        raise AINotConfiguredError()
+
+    analysis = AIAnalysis(
+        repository_id=repository_id,
+        analysis_type="repository_summary",
+        provider=connection.provider,
+        model=connection.model,
+        status="pending",
+        requested_at=datetime.now(timezone.utc),
+    )
+    db.add(analysis)
+    db.commit()
+    db.refresh(analysis)
+
+    try:
+        context = repository_summary_context_builder.build_repository_summary_context(
+            db, repository_id
+        )
+        provider_class = get_provider(connection.provider)
+        provider = provider_class(
+            api_key=ai_connection_service.get_decrypted_api_key(db, user.id)
+        )
+        result = provider.generate_repository_summary(context)
+        analysis.status = "completed"
+        analysis.summary = result.summary
         analysis.confidence = result.confidence
         analysis.recommendations = result.recommendations
         analysis.error_message = None

@@ -13,6 +13,7 @@ from app.bot.question_parser import BotIntent
 from app.integrations.ai.gemini_client import GeminiClient
 from app.integrations.ai.gemini_provider import GeminiProvider, BOT_RESPONSE_SCHEMA
 from app.services.ai_context_builder import FindingContext
+from app.services.repository_summary_context_builder import RepositorySummaryContext
 
 
 SECRET_KEY = "AIza-test-secret-that-must-not-leak"
@@ -120,6 +121,14 @@ def make_context():
     )
 
 
+def make_repository_summary_context():
+    return RepositorySummaryContext(
+        repository_name="test-org/test-repo",
+        system_instructions="<system_instructions>trusted</system_instructions>",
+        untrusted_content="<untrusted_repository_content>findings</untrusted_repository_content>",
+    )
+
+
 def make_generation_response(result):
     return {
         "candidates": [
@@ -167,6 +176,40 @@ def test_generate_analysis_rejects_invalid_structured_response(response):
 
     with pytest.raises(AIProviderInvalidResponseError):
         provider.generate_analysis(make_context())
+
+
+def test_generate_repository_summary_returns_validated_result():
+    client = StubGenerationClient(
+        make_generation_response(
+            '{"summary":"Healthy repository","key_insights":["Repeated dependency issues"],'
+            '"recommendations":["Update dependencies"],"confidence":0.86}'
+        )
+    )
+    result = GeminiProvider(client).generate_repository_summary(
+        make_repository_summary_context()
+    )
+
+    assert result.summary == "Healthy repository"
+    assert result.key_insights == ["Repeated dependency issues"]
+    assert result.recommendations == ["Update dependencies"]
+    assert result.confidence == 0.86
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        make_generation_response("not-json"),
+        make_generation_response('{"summary":"missing fields"}'),
+        make_generation_response(
+            '{"summary":"bad confidence","key_insights":[],"recommendations":[],"confidence":1.5}'
+        ),
+    ],
+)
+def test_generate_repository_summary_rejects_invalid_structured_response(response):
+    with pytest.raises(AIProviderInvalidResponseError):
+        GeminiProvider(StubGenerationClient(response)).generate_repository_summary(
+            make_repository_summary_context()
+        )
 
 
 @pytest.mark.parametrize(

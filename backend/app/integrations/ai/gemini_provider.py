@@ -7,8 +7,14 @@ from pydantic import ValidationError
 from app.integrations.ai.exceptions import AIProviderInvalidResponseError
 from app.integrations.ai.gemini_client import GeminiClient
 from app.bot.context_builder import BotContext
-from app.integrations.ai.provider_base import BaseAIProvider, BotResponseResult, StructuredAnalysisResult
+from app.integrations.ai.provider_base import (
+    BaseAIProvider,
+    BotResponseResult,
+    StructuredAnalysisResult,
+)
 from app.services.ai_context_builder import FindingContext
+from app.services.repository_summary_context_builder import RepositorySummaryContext
+from app.schemas.repository_summary_result import RepositorySummaryResult
 
 BOT_RESPONSE_SCHEMA = {
     "type": "OBJECT",
@@ -59,6 +65,22 @@ class GeminiProvider(BaseAIProvider):
         except (KeyError, IndexError, TypeError, ValidationError, ValueError) as exc:
             raise AIProviderInvalidResponseError(
                 "Gemini API returned an invalid analysis response"
+            ) from exc
+
+    def generate_repository_summary(
+        self, context: RepositorySummaryContext
+    ) -> RepositorySummaryResult:
+        try:
+            response = self._client.generate_content(
+                model=self.DEFAULT_MODEL,
+                system_instructions=context.system_instructions,
+                untrusted_content=context.untrusted_content,
+            )
+            generated_text = response["candidates"][0]["content"]["parts"][0]["text"]
+            return RepositorySummaryResult.model_validate_json(generated_text)
+        except (KeyError, IndexError, TypeError, ValidationError, ValueError) as exc:
+            raise AIProviderInvalidResponseError(
+                "Gemini API returned an invalid repository summary response"
             ) from exc
 
     def generate_bot_response(self, context: BotContext) -> BotResponseResult:

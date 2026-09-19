@@ -1,5 +1,6 @@
 import uuid
-from fastapi import APIRouter, Depends
+from datetime import datetime
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.auth.dependencies import get_current_user
@@ -19,6 +20,8 @@ from app.services.repository_service import (
 from app.integrations.github.client import GitHubAppClient
 from app.schemas.finding import FindingListResponse, FindingResponse
 from app.services.finding_service import list_findings
+from app.schemas.activity import ActivityFeedResponse, ActivitySource
+from app.services.activity_feed_service import get_activity_feed
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
 
@@ -108,3 +111,17 @@ def get_repository_findings(
         limit=limit,
         offset=offset
     )
+
+
+@router.get("/{repository_id}/activity", response_model=ActivityFeedResponse)
+def get_repository_activity(
+    repository_id: uuid.UUID,
+    before: datetime | None = None,
+    limit: int = Query(default=25, ge=1, le=100),
+    source: ActivitySource | None = None,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    items, next_before = get_activity_feed(db=db, repository_id=repository_id, before=before, limit=limit, source=source)
+    return ActivityFeedResponse(items=items, next_before=next_before)

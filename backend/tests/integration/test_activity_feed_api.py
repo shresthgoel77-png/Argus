@@ -118,6 +118,21 @@ async def test_activity_feed_api_paginates_without_payload_or_duplicates(
 
 
 @pytest.mark.asyncio
+async def test_activity_feed_api_filters_by_source(
+    db_session, authorized_client, test_user_repository
+):
+    seed_activity(db_session, test_user_repository)
+
+    response = await authorized_client.get(
+        f"/api/v1/repositories/{test_user_repository.id}/activity",
+        params={"source": "health_changed"},
+    )
+
+    assert response.status_code == 200
+    assert [item["source"] for item in response.json()["items"]] == ["health_changed"]
+
+
+@pytest.mark.asyncio
 async def test_activity_feed_api_rejects_unowned_repository(
     db_session, authorized_client
 ):
@@ -131,7 +146,7 @@ async def test_activity_feed_api_rejects_unowned_repository(
     db_session.flush()
     connection = GitHubConnection(
         user_id=other_user.id,
-        installation_id=uuid.uuid4().int >> 64,
+        installation_id=uuid.uuid4().int % 1_000_000_000,
         account_login="other-org",
         account_type="Organization",
         status="active",
@@ -140,7 +155,7 @@ async def test_activity_feed_api_rejects_unowned_repository(
     db_session.flush()
     repository = Repository(
         connection_id=connection.id,
-        github_repo_id=uuid.uuid4().int >> 64,
+        github_repo_id=uuid.uuid4().int % 1_000_000_000,
         full_name="other-org/repo",
         default_branch="main",
         monitoring_enabled=True,

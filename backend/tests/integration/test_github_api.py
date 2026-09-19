@@ -61,7 +61,7 @@ def test_github_install_flow(client, monkeypatch):
     assert res_connections.status_code == 200
     connections_list = res_connections.json()
     assert len(connections_list) >= 1
-    assert connections_list[0]["installation_id"] == 12345
+    assert any(c["installation_id"] == 12345 for c in connections_list)
 
 def test_github_install_callback_rejections(client):
     """

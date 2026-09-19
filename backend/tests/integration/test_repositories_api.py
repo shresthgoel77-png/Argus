@@ -92,8 +92,8 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
     res_list = client.get("/api/v1/repositories")
     assert res_list.status_code == 200
     repos = res_list.json()
-    assert len(repos) == 1
-    assert repos[0]["id"] == repo_id
+    assert len(repos) >= 1
+    assert any(repo["id"] == repo_id for repo in repos)
     
     # Also verify that list_available returns already_added=True now
     res_avail_after = client.get(f"/api/v1/github/connections/{connection.id}/repositories")

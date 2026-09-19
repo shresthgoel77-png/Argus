@@ -1,19 +1,23 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, ForeignKey, JSON, Text, Index, text, func, Float
+from sqlalchemy import CheckConstraint, String, ForeignKey, JSON, Text, Index, text, func, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING, Any
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from app.models.finding import Finding
+    from app.models.repository import Repository
 
 class AIAnalysis(Base):
     __tablename__ = "ai_analyses"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    finding_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("findings.id", ondelete="CASCADE"), index=True, nullable=False
+    finding_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("findings.id", ondelete="CASCADE"), index=True, nullable=True
+    )
+    repository_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("repositories.id", ondelete="CASCADE"), index=True, nullable=True
     )
     analysis_type: Mapped[str] = mapped_column(String, default="finding_explanation", index=True, nullable=False)
     status: Mapped[str] = mapped_column(String, default="pending", nullable=False)
@@ -29,6 +33,10 @@ class AIAnalysis(Base):
     completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
 
     __table_args__ = (
+        CheckConstraint(
+            "(finding_id IS NOT NULL) != (repository_id IS NOT NULL)",
+            name="ck_ai_analyses_exactly_one_scope",
+        ),
         Index(
             "ix_ai_analyses_finding_requested_at",
             "finding_id",
@@ -37,3 +45,4 @@ class AIAnalysis(Base):
     )
 
     finding: Mapped["Finding"] = relationship()
+    repository: Mapped["Repository"] = relationship()

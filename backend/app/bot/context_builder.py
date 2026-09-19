@@ -18,6 +18,7 @@ from app.services.ai_context_common import (
     truncate,
     wrap_untrusted_content,
 )
+from app.services.needs_attention_service import get_needs_attention
 
 
 @dataclass(frozen=True)
@@ -134,18 +135,10 @@ async def build_bot_context(
         return await _github_context(intent, repository, event_payload, number)
 
     if intent == BotIntent.repo_attention:
-        severity_order = case((Finding.severity == "critical", 0), (Finding.severity == "high", 1), else_=2)
-        findings = db.query(Finding).filter(
-            Finding.repository_id == repository.id,
-            Finding.status == "open",
-            Finding.severity.in_(("critical", "high")),
-        ).order_by(severity_order, desc(Finding.detected_at)).limit(10).all()
-        snapshot = db.query(RepositoryHealthSnapshot).filter(
-            RepositoryHealthSnapshot.repository_id == repository.id
-        ).order_by(desc(RepositoryHealthSnapshot.computed_at)).first()
-        parts = [f"[{finding.severity}] {truncate(finding.title, 300)}" for finding in findings]
-        if snapshot is not None:
-            parts.append("Health reasons:\n" + "\n".join(truncate(reason, 300) for reason in (snapshot.reasons or [])))
+        needs_attention = get_needs_attention(db, repository.id, limit=10)
+        parts = [f"[{finding.severity}] {truncate(finding.title, 300)}" for finding in needs_attention.findings]
+        if needs_attention.health_snapshot is not None:
+            parts.append("Health reasons:\n" + "\n".join(truncate(reason, 300) for reason in needs_attention.reasons))
         content = "\n\n".join(parts) or "No open critical or high findings are recorded."
         return BotContext(intent, SYSTEM_INSTRUCTIONS_BLOCK, wrap_untrusted_content(content), "database")
 

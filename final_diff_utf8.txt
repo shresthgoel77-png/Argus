@@ -1,0 +1,164 @@
+﻿diff --git a/backend/app/bot/context_builder.py b/backend/app/bot/context_builder.py
+index cc68be8..3baff0a 100644
+--- a/backend/app/bot/context_builder.py
++++ b/backend/app/bot/context_builder.py
+@@ -18,6 +18,7 @@ from app.services.ai_context_common import (
+     truncate,
+     wrap_untrusted_content,
+ )
++from app.services.needs_attention_service import get_needs_attention
+ 
+ 
+ @dataclass(frozen=True)
+@@ -134,18 +135,10 @@ async def build_bot_context(
+         return await _github_context(intent, repository, event_payload, number)
+ 
+     if intent == BotIntent.repo_attention:
+-        severity_order = case((Finding.severity == "critical", 0), (Finding.severity == "high", 1), else_=2)
+-        findings = db.query(Finding).filter(
+-            Finding.repository_id == repository.id,
+-            Finding.status == "open",
+-            Finding.severity.in_(("critical", "high")),
+-        ).order_by(severity_order, desc(Finding.detected_at)).limit(10).all()
+-        snapshot = db.query(RepositoryHealthSnapshot).filter(
+-            RepositoryHealthSnapshot.repository_id == repository.id
+-        ).order_by(desc(RepositoryHealthSnapshot.computed_at)).first()
+-        parts = [f"[{finding.severity}] {truncate(finding.title, 300)}" for finding in findings]
+-        if snapshot is not None:
+-            parts.append("Health reasons:\n" + "\n".join(truncate(reason, 300) for reason in (snapshot.reasons or [])))
++        needs_attention = get_needs_attention(db, repository.id, limit=10)
++        parts = [f"[{finding.severity}] {truncate(finding.title, 300)}" for finding in needs_attention.findings]
++        if needs_attention.health_snapshot is not None:
++            parts.append("Health reasons:\n" + "\n".join(truncate(reason, 300) for reason in needs_attention.reasons))
+         content = "\n\n".join(parts) or "No open critical or high findings are recorded."
+         return BotContext(intent, SYSTEM_INSTRUCTIONS_BLOCK, wrap_untrusted_content(content), "database")
+ 
+diff --git a/backend/app/services/needs_attention_service.py b/backend/app/services/needs_attention_service.py
+new file mode 100644
+index 0000000..d54fccd
+--- /dev/null
++++ b/backend/app/services/needs_attention_service.py
+@@ -0,0 +1,39 @@
++from dataclasses import dataclass
++import uuid
++from sqlalchemy import case, desc
++from sqlalchemy.orm import Session
++
++from app.models.finding import Finding
++from app.models.repository_health_snapshot import RepositoryHealthSnapshot
++
++
++@dataclass
++class NeedsAttentionDTO:
++    findings: list[Finding]
++    health_snapshot: RepositoryHealthSnapshot | None
++    reasons: list[str]
++
++
++def get_needs_attention(db: Session, repository_id: uuid.UUID, limit: int = 5) -> NeedsAttentionDTO:
++    """
++    Get top open findings ordered by severity, then priority, then detected_at.
++    Includes the latest repository health snapshot and its reasons.
++    """
++    severity_order = case((Finding.severity == "critical", 0), (Finding.severity == "high", 1), else_=2)
++    findings = db.query(Finding).filter(
++        Finding.repository_id == repository_id,
++        Finding.status == "open",
++        Finding.severity.in_(("critical", "high")),
++    ).order_by(severity_order, desc(Finding.detected_at)).limit(limit).all()
++
++    snapshot = db.query(RepositoryHealthSnapshot).filter(
++        RepositoryHealthSnapshot.repository_id == repository_id
++    ).order_by(desc(RepositoryHealthSnapshot.computed_at)).first()
++
++    reasons = snapshot.reasons if snapshot is not None else []
++
++    return NeedsAttentionDTO(
++        findings=findings,
++        health_snapshot=snapshot,
++        reasons=reasons
++    )
+diff --git a/backend/tests/unit/services/test_needs_attention_service.py b/backend/tests/unit/services/test_needs_attention_service.py
+new file mode 100644
+index 0000000..cd84155
+--- /dev/null
++++ b/backend/tests/unit/services/test_needs_attention_service.py
+@@ -0,0 +1,78 @@
++import uuid
++
++import pytest
++
++from app.models.finding import Finding
++from app.models.repository_health_snapshot import RepositoryHealthSnapshot
++from app.services.needs_attention_service import get_needs_attention
++
++
++def add_finding(db_session, repository, category, evidence, severity="high", priority=None):
++    finding = Finding(
++        id=uuid.uuid4(),
++        repository_id=repository.id,
++        category=category,
++        type="test",
++        title="Test finding",
++        description="Finding description",
++        severity=severity,
++        status="open",
++        source="test",
++        evidence=evidence,
++        priority=priority,
++    )
++    db_session.add(finding)
++    db_session.commit()
++    return finding
++
++
++def add_snapshot(db_session, repository, reasons):
++    snapshot = RepositoryHealthSnapshot(
++        repository_id=repository.id,
++        overall_score=50,
++        category_scores={},
++        reasons=reasons,
++    )
++    db_session.add(snapshot)
++    db_session.commit()
++    return snapshot
++
++
++def test_get_needs_attention_empty_repository(db_session, test_user_repository):
++    result = get_needs_attention(db_session, test_user_repository.id)
++    assert result.findings == []
++    assert result.health_snapshot is None
++    assert result.reasons == []
++
++
++def test_get_needs_attention_low_severity_only(db_session, test_user_repository):
++    add_finding(db_session, test_user_repository, "security", {}, severity="low")
++    add_finding(db_session, test_user_repository, "security", {}, severity="medium")
++    result = get_needs_attention(db_session, test_user_repository.id)
++    
++    assert result.findings == []
++    assert result.health_snapshot is None
++
++
++def test_get_needs_attention_no_snapshot(db_session, test_user_repository):
++    add_finding(db_session, test_user_repository, "security", {}, severity="critical", priority="P0")
++    result = get_needs_attention(db_session, test_user_repository.id)
++    
++    assert len(result.findings) == 1
++    assert result.findings[0].severity == "critical"
++    assert result.health_snapshot is None
++    assert result.reasons == []
++
++
++def test_get_needs_attention_with_snapshot_and_limit(db_session, test_user_repository):
++    add_finding(db_session, test_user_repository, "security", {}, severity="high")
++    add_finding(db_session, test_user_repository, "security", {}, severity="critical")
++    add_finding(db_session, test_user_repository, "security", {}, severity="high")
++    add_snapshot(db_session, test_user_repository, ["Bad things"])
++    
++    result = get_needs_attention(db_session, test_user_repository.id, limit=2)
++    assert len(result.findings) == 2
++    assert result.findings[0].severity == "critical"
++    assert result.findings[1].severity == "high"
++    assert result.health_snapshot is not None
++    assert result.reasons == ["Bad things"]

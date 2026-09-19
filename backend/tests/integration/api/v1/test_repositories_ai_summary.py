@@ -157,3 +157,15 @@ async def test_history_repo_analysis_empty(mock_list, authorized_client, test_us
 async def test_history_repo_analysis_unowned(authorized_client, other_user_repository):
     response = await authorized_client.get(f"/api/v1/repositories/{other_user_repository.id}/ai-summary/history")
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_unauthenticated(async_client, test_user_repository):
+    resp1 = await async_client.post(f"/api/v1/repositories/{test_user_repository.id}/ai-summary")
+    assert resp1.status_code == 401
+    
+    resp2 = await async_client.get(f"/api/v1/repositories/{test_user_repository.id}/ai-summary")
+    assert resp2.status_code == 401
+    
+    resp3 = await async_client.get(f"/api/v1/repositories/{test_user_repository.id}/ai-summary/history")
+    assert resp3.status_code == 401

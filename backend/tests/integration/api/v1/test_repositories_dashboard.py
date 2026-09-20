@@ -73,31 +73,39 @@ async def test_get_dashboard_overview(
     db_session.add(ai)
     db_session.commit()
 
-    response = await authorized_client.get(
-        f"/api/v1/repositories/{valid_repository.id}/dashboard"
-    )
-
-    assert response.status_code == 200
-    data = response.json()
-
-    # Struct check
-    assert data["repository_id"] == str(valid_repository.id)
+    # We patch AI summary request and GitHub client to explicitly ensure 0 calls
+    with patch("app.services.ai_analysis_service.request_repository_summary") as mock_ai, \
+         patch("app.integrations.github.client.GitHubAppClient") as mock_github:
     
-    assert data["health"]["overall_score"] == 85
-    assert data["health"]["reasons"] == ["Good security score"]
-
-    # Needs attention -> high severities
-    # f1 is 'high', should be in needs attention findings
-    na_findings = data["needs_attention"]["findings"]
-    assert len(na_findings) == 1
-    assert na_findings[0]["title"] == "High Vuln"
-    assert data["needs_attention"]["reasons"] == ["Good security score"]
-
-    assert data["ai_summary"]["status"] == "completed"
-    assert data["ai_summary"]["summary"] == "test summary"
-
-    # Counts
-    counts = data["finding_category_counts"]
-    assert counts["security"] == 1
-    assert counts["ci_cd"] == 1
-    assert counts["dependencies"] == 0
+        response = await authorized_client.get(
+            f"/api/v1/repositories/{valid_repository.id}/dashboard"
+        )
+    
+        assert response.status_code == 200
+        data = response.json()
+    
+        # Struct check
+        assert data["repository_id"] == str(valid_repository.id)
+        
+        assert data["health"]["overall_score"] == 85
+        assert data["health"]["reasons"] == ["Good security score"]
+    
+        # Needs attention -> high severities
+        # f1 is 'high', should be in needs attention findings
+        na_findings = data["needs_attention"]["findings"]
+        assert len(na_findings) == 1
+        assert na_findings[0]["title"] == "High Vuln"
+        assert data["needs_attention"]["reasons"] == ["Good security score"]
+    
+        assert data["ai_summary"]["status"] == "completed"
+        assert data["ai_summary"]["summary"] == "test summary"
+    
+        # Counts
+        counts = data["finding_category_counts"]
+        assert counts["security"] == 1
+        assert counts["ci_cd"] == 1
+        assert counts["dependencies"] == 0
+        
+        # Explicit verifications
+        mock_ai.assert_not_called()
+        mock_github.assert_not_called()

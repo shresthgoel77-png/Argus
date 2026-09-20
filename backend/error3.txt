@@ -1,0 +1,397 @@
+﻿.\venv\Scripts\python.e
+xe : C:\Users\HP\Deskto
+p\.vscode\Argus  og\bac
+kend\venv\Lib\site-pack
+ages\fastapi\testclient
+.py:1: StarletteDepreca
+tionWarning: Using 
+`httpx` with 
+`starlette.testclient` 
+is deprecated; install 
+`httpx2` instead.
+At line:1 char:13
++ cd backend; .\venv\Sc
+ripts\python.exe 
+verify_final.py 2>&1 | 
+Out-File ...
++             ~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\HP\D   
+ es...ttpx2` instea    
+d.:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  from 
+starlette.testclient 
+import TestClient as 
+TestClient  # noqa
+C:\Users\HP\Desktop\.vs
+code\Argus  og\backend\
+verify_final.py:44: 
+DeprecationWarning: dat
+etime.datetime.utcnow()
+ is deprecated and 
+scheduled for removal 
+in a future version. 
+Use timezone-aware 
+objects to represent 
+datetimes in UTC: datet
+ime.datetime.now(dateti
+me.UTC).
+  now = 
+datetime.utcnow()
+Traceback (most recent 
+call last):
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\base.py", line 
+1969, in 
+_exec_single_context
+    self.dialect.do_exe
+cute(
+    ~~~~~~~~~~~~~~~~~~~
+~~~~^
+        cursor, 
+str_statement, 
+effective_parameters, 
+context
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\default.py", line 
+952, in do_execute
+    cursor.execute(stat
+ement, parameters)
+    ~~~~~~~~~~~~~~^^^^^
+^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError:
+ NOT NULL constraint 
+failed: github_connecti
+ons.account_login
+
+The above exception 
+was the direct cause 
+of the following 
+exception:
+
+Traceback (most recent 
+call last):
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\verify_final.py
+", line 52, in <module>
+    db.commit()
+    ~~~~~~~~~^^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+session.py", line 
+2035, in commit
+    trans.commit(_to_ro
+ot=True)
+    ~~~~~~~~~~~~^^^^^^^
+^^^^^^^^
+  File "<string>", 
+line 2, in commit
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+state_changes.py", 
+line 137, in _go
+    ret_value = 
+fn(self, *arg, **kw)
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+session.py", line 
+1316, in commit
+    
+self._prepare_impl()
+    
+~~~~~~~~~~~~~~~~~~^^
+  File "<string>", 
+line 2, in 
+_prepare_impl
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+state_changes.py", 
+line 137, in _go
+    ret_value = 
+fn(self, *arg, **kw)
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+session.py", line 
+1290, in _prepare_impl
+    
+self.session.flush()
+    
+~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+session.py", line 
+4353, in flush
+    
+self._flush(objects)
+    
+~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+session.py", line 
+4488, in _flush
+    with 
+util.safe_reraise():
+         
+~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\util
+\langhelpers.py", line 
+122, in __exit__
+    raise exc_value.wit
+h_traceback(exc_tb)
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+session.py", line 
+4449, in _flush
+    
+flush_context.execute()
+    
+~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+unitofwork.py", line 
+465, in execute
+    rec.execute(self)
+    ~~~~~~~~~~~^^^^^^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+unitofwork.py", line 
+641, in execute
+    util.preloaded.orm_
+persistence.save_obj(
+    ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~^
+        self.mapper,
+        ^^^^^^^^^^^^
+        uow.states_for_
+mapper_hierarchy(self.m
+apper, False, False),
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+        uow,
+        ^^^^
+    )
+    ^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+persistence.py", line 
+94, in save_obj
+    _emit_insert_statem
+ents(
+    ~~~~~~~~~~~~~~~~~~~
+~~~~^
+        base_mapper,
+        ^^^^^^^^^^^^
+    ...<3 lines>...
+        insert,
+        ^^^^^^^
+    )
+    ^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+persistence.py", line 
+1234, in 
+_emit_insert_statements
+    result = 
+connection.execute(
+        statement,
+        params,
+        execution_optio
+ns=execution_options,
+    )
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\base.py", line 
+1421, in execute
+    return meth(
+        self,
+        
+distilled_parameters,
+        
+execution_options or 
+NO_OPTIONS,
+    )
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\sql\
+elements.py", line 
+526, in 
+_execute_on_connection
+    return connection._
+execute_clauseelement(
+           ~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~^
+        self, 
+distilled_params, 
+execution_options
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+    )
+    ^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\base.py", line 
+1643, in 
+_execute_clauseelement
+    ret = 
+self._execute_context(
+        dialect,
+    ...<8 lines>...
+        
+cache_hit=cache_hit,
+    )
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\base.py", line 
+1848, in 
+_execute_context
+    return self._exec_s
+ingle_context(
+           ~~~~~~~~~~~~
+~~~~~~~~~~~~~^
+        dialect, 
+context, statement, 
+parameters
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^
+    )
+    ^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\base.py", line 
+1988, in 
+_exec_single_context
+    self._handle_dbapi_
+exception(
+    ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~^
+        e, 
+str_statement, 
+effective_parameters, 
+cursor, context
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\base.py", line 
+2365, in 
+_handle_dbapi_exception
+    raise sqlalchemy_ex
+ception.with_traceback(
+exc_info[2]) from e
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\base.py", line 
+1969, in 
+_exec_single_context
+    self.dialect.do_exe
+cute(
+    ~~~~~~~~~~~~~~~~~~~
+~~~~^
+        cursor, 
+str_statement, 
+effective_parameters, 
+context
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\engi
+ne\default.py", line 
+952, in do_execute
+    cursor.execute(stat
+ement, parameters)
+    ~~~~~~~~~~~~~~^^^^^
+^^^^^^^^^^^^^^^^^^
+sqlalchemy.exc.Integrit
+yError: (sqlite3.Integr
+ityError) NOT NULL 
+constraint failed: gith
+ub_connections.account_
+login
+[SQL: INSERT INTO 
+github_connections 
+(id, user_id, 
+installation_id, 
+account_login, 
+account_type, status) 
+VALUES (?, ?, ?, ?, ?, 
+?) RETURNING 
+created_at, updated_at]
+[parameters: ('ed17d09c
+f32e4456b35b3e1baa502b4
+4', '05a9608ac8a24eab85
+6b1ed9bd50fb96', 1234, 
+None, None, 'active')]
+(Background on this 
+error at: https://sqlal
+che.me/e/20/gkpj)

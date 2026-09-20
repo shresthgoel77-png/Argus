@@ -1,0 +1,93 @@
+﻿.\venv\Scripts\python.e
+xe : C:\Users\HP\Deskto
+p\.vscode\Argus  og\bac
+kend\venv\Lib\site-pack
+ages\fastapi\testclient
+.py:1: StarletteDepreca
+tionWarning: Using 
+`httpx` with 
+`starlette.testclient` 
+is deprecated; install 
+`httpx2` instead.
+At line:1 char:13
++ cd backend; .\venv\Sc
+ripts\python.exe 
+verify_final.py 2>&1 | 
+Out-File ...
++             ~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\HP\D   
+ es...ttpx2` instea    
+d.:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  from 
+starlette.testclient 
+import TestClient as 
+TestClient  # noqa
+Traceback (most recent 
+call last):
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\verify_final.py
+", line 41, in <module>
+    repo = 
+Repository(id=repo_id, 
+github_repo_id=999, 
+owner="test", 
+name="test-repo", 
+connection_id=conn_id)
+  File "<string>", 
+line 4, in __init__
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+state.py", line 596, 
+in _initialize_instance
+    with 
+util.safe_reraise():
+         
+~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\util
+\langhelpers.py", line 
+122, in __exit__
+    raise exc_value.wit
+h_traceback(exc_tb)
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+state.py", line 594, 
+in _initialize_instance
+    manager.original_in
+it(*mixed[1:], 
+**kwargs)
+    ~~~~~~~~~~~~~~~~~~~
+~~^^^^^^^^^^^^^^^^^^^^^
+^
+  File "C:\Users\HP\Des
+ktop\.vscode\Argus  og\
+backend\venv\Lib\site-p
+ackages\sqlalchemy\orm\
+decl_base.py", line 
+2193, in _declarative_c
+onstructor
+    raise TypeError(
+        "%r is an 
+invalid keyword 
+argument for %s" % (k, 
+cls_.__name__)
+    )
+TypeError: 'owner' is 
+an invalid keyword 
+argument for Repository

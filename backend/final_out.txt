@@ -1,0 +1,13 @@
+﻿=========================
+--- Test 1: window_days=30 ---
+200
+overall_delta: 30
+--- Test 2: window_days=90 ---
+200
+overall_delta: 50
+--- Test 3: window_days=100 (capped check) ---
+422
+--- Test 4: Ownership scoping ---
+404
+=========================
+All verifications passed!

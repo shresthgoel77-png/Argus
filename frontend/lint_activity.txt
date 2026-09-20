@@ -1,0 +1,25 @@
+﻿node.exe : The compact 
+formatter is no longer 
+part of core ESLint. 
+Install it manually 
+with `npm install -D es
+lint-formatter-compact`
+At line:1 char:1
++ & "C:\users\hp\.vscod
+e/node.exe" "C:\users\h
+p\.vscode/node_modules/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (The compact f   
+ or...matter-compac    
+t`:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 

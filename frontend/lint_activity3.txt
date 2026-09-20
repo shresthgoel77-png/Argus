@@ -1,0 +1,29 @@
+﻿
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\components\activity\activity-feed-list.tsx
+  163:9  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\components\activity\activity-feed-list.tsx:163:9
+  161 |     const filterKey = `${sourceFilter}:${repositoryId}`;
+  162 |     const filterKeyRef = React.useRef(filterKey);
+> 163 |     if (filterKeyRef.current !== filterKey) {
+      |         ^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  164 |         filterKeyRef.current = filterKey;
+  165 |         setCursors([null]);
+  166 |         setPageIndex(0);  react-hooks/refs
+  164:9  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\components\activity\activity-feed-list.tsx:164:9
+  162 |     const filterKeyRef = React.useRef(filterKey);
+  163 |     if (filterKeyRef.current !== filterKey) {
+> 164 |         filterKeyRef.current = filterKey;
+      |         ^^^^^^^^^^^^^^^^^^^^ Cannot update ref during render
+  165 |         setCursors([null]);
+  166 |         setPageIndex(0);
+  167 |     }                                                           react-hooks/refs
+
+Γ£û 2 problems (2 errors, 0 warnings)
+

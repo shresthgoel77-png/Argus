@@ -19,6 +19,7 @@ def _item(
     title: str,
     summary: str,
     reference_id: uuid.UUID,
+    details: dict | None = None,
 ) -> ActivityItem:
     return ActivityItem(
         source=source,
@@ -26,6 +27,7 @@ def _item(
         title=title,
         summary=summary[:500],
         reference_id=reference_id,
+        details=details,
     )
 
 
@@ -96,11 +98,22 @@ def get_activity_feed(
             BotInteraction.question_text,
             BotInteraction.status,
             BotInteraction.created_at,
+            BotInteraction.skip_reason,
+            BotInteraction.response_text,
+            BotInteraction.requester_github_login,
         ).filter(BotInteraction.repository_id == repository_id)
         if before is not None:
             query = query.filter(BotInteraction.created_at < before)
-        for interaction_id, intent, question_text, status, created_at in query.order_by(desc(BotInteraction.created_at), desc(BotInteraction.id)).limit(limit).all():
-            items.append(_item(ActivitySource.bot_interaction, created_at, f"Bot interaction: {intent}", f"{status}: {question_text}", interaction_id))
+        for interaction_id, intent, question_text, status, created_at, skip_reason, response_text, requester_github_login in query.order_by(desc(BotInteraction.created_at), desc(BotInteraction.id)).limit(limit).all():
+            details = {
+                "intent": intent,
+                "status": status,
+                "skip_reason": skip_reason,
+                "response_text": response_text if status == "completed" else None,
+                "requester_github_login": requester_github_login,
+                "question_text": question_text,
+            }
+            items.append(_item(ActivitySource.bot_interaction, created_at, f"Bot interaction: {intent}", f"{status}: {question_text}", interaction_id, details=details))
 
     items.sort(key=lambda item: (item.timestamp, str(item.reference_id)), reverse=True)
     page = items[:limit]

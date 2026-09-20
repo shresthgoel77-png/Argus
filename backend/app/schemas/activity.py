@@ -19,6 +19,7 @@ class ActivityItem(BaseModel):
     title: str
     summary: str
     reference_id: uuid.UUID
+    details: dict | None = None
 
 
 class ActivityFeedResponse(BaseModel):

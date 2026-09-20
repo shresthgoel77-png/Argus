@@ -42,6 +42,10 @@ from app.schemas.trend import (
     CategoryVelocity,
 )
 from app.services.trend_service import get_health_trend, get_finding_velocity
+from app.schemas.dashboard_overview import DashboardOverviewResponse
+from app.services.health_service import get_latest_snapshot
+from app.services.needs_attention_service import get_needs_attention
+from app.services.finding_service import get_all_open_findings_for_repository
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
 
@@ -283,5 +287,84 @@ def get_repository_trends(
         window_days=window_days,
         health_trend=health_trend,
         finding_velocity=finding_velocity
+    )
+
+
+@router.get("/{repository_id}/dashboard", response_model=DashboardOverviewResponse)
+def get_dashboard_overview(
+    repository_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Composed dashboard overview endpoint that reads from multiple domains without triggering new AI analysis.
+    """
+    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+
+    # 1. Health
+    health_snapshot = get_latest_snapshot(db, repository_id)
+
+    # 2. Needs Attention (uses open findings inside)
+    # The return type of get_needs_attention is NeedsAttentionDTO
+    # Which maps easily to our NeedsAttentionResponse schema via from_attributes=True mapping, because Finding mapped to FindingResponse
+    needs_attention_dto = get_needs_attention(db, repository_id, limit=5)
+
+    # 3. Activity feed
+    activity_items, _ = get_activity_feed(db=db, repository_id=repository_id, limit=5)
+
+    # 4. AI Summary (latest, do not trigger generation)
+    latest_ai_summary = get_latest_repo_analysis(db, repository_id)
+
+    # 5. Trends (default 30 days window)
+    overall_delta, category_deltas_dict = get_health_trend(db, repository_id, window_days=30)
+    velocity_dict = get_finding_velocity(db, repository_id, window_days=30)
+
+    health_trend = HealthTrend(
+        overall_delta=overall_delta,
+        category_deltas=[
+            CategoryDelta(category=k, delta=v)
+            for k, v in category_deltas_dict.items()
+        ]
+    )
+
+    finding_velocity = FindingVelocity(
+        categories=[
+            CategoryVelocity(category=k, detected=v["detected"], resolved=v["resolved"])
+            for k, v in velocity_dict.items()
+        ]
+    )
+
+    trends = TrendResponse(
+        window_days=30,
+        health_trend=health_trend,
+        finding_velocity=finding_velocity
+    )
+
+    # 6. Open finding counts by category
+    open_findings = get_all_open_findings_for_repository(db, repository_id)
+    finding_counts = {
+        "ci_cd": 0,
+        "dependencies": 0,
+        "security": 0,
+        "issues": 0,
+        "pull_requests": 0,
+        "code_quality": 0,
+    }
+    # Using predefined valid categories from instructions/other parts
+    for finding in open_findings:
+        if finding.category in finding_counts:
+            finding_counts[finding.category] += 1
+        else:
+            finding_counts[finding.category] = 1 # Just in case a category differs
+
+    # Assemble composed response
+    return DashboardOverviewResponse(
+        repository_id=repository_id,
+        health=health_snapshot,
+        needs_attention=needs_attention_dto,
+        activity_feed=activity_items,
+        ai_summary=latest_ai_summary if latest_ai_summary else AIAnalysisNotExists(),
+        trends=trends,
+        finding_category_counts=finding_counts
     )
 

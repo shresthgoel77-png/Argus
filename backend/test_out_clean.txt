@@ -1,0 +1,148 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1 item
+
+tests/integration/api/v1/test_repositories_dashboard.py::test_get_dashboard_overview FAILED [100%]
+
+================================== FAILURES ===================================
+_________________________ test_get_dashboard_overview _________________________
+
+authorized_client = <httpx.AsyncClient object at 0x000001C81266F8C0>
+db_session = <sqlalchemy.orm.session.Session object at 0x000001C81266FB60>
+test_user_repository = <app.models.repository.Repository object at 0x000001C81266C980>
+
+    def test_get_dashboard_overview(
+        authorized_client: TestClient,
+        db_session: Session,
+        test_user_repository: Repository,
+    ):
+    
+        valid_repository = test_user_repository
+    
+        # 1. Setup mock data for health, findings (needs_attention + counts), activity feed is implicit, AI sum
+    
+        # Health
+        snapshot = RepositoryHealthSnapshot(
+            repository_id=valid_repository.id,
+            computed_at=datetime.now(timezone.utc),
+            overall_score=85,
+            category_scores={"security": 90},
+            reasons=["Good security score"]
+        )
+        db_session.add(snapshot)
+    
+        # Findings
+        f1 = Finding(
+            repository_id=valid_repository.id,
+            category="security",
+            type="vuln",
+            title="High Vuln",
+            description="desc",
+            severity="high",
+            priority="high",
+            status="open",
+            source="test",
+            evidence={},
+            detected_at=datetime.now(timezone.utc),
+        )
+        f2 = Finding(
+            repository_id=valid_repository.id,
+            category="ci_cd",
+            type="fail",
+            title="CI fail",
+            description="desc",
+            severity="low",
+            priority="low",
+            status="open",
+            source="test",
+            evidence={},
+            detected_at=datetime.now(timezone.utc),
+        )
+        db_session.add_all([f1, f2])
+    
+        # AI
+        ai = AIAnalysis(
+            repository_id=valid_repository.id,
+            analysis_type="repository_summary",
+            status="completed",
+            provider="gemini",
+            model="gemini-1.5-pro",
+            summary="test summary",
+            requested_at=datetime.now(timezone.utc)
+        )
+        db_session.add(ai)
+        db_session.commit()
+    
+        response = authorized_client.get(
+            f"/api/v1/repositories/{valid_repository.id}/dashboard"
+        )
+    
+>       assert response.status_code == 200
+               ^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'coroutine' object has no attribute 'status_code'
+
+tests\integration\api\v1\test_repositories_dashboard.py:78: AttributeError
+---------------------------- Captured stderr setup ----------------------------
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/api/v1/test_repositories_dashboard.py::test_get_dashboard_overview
+======================== 1 failed, 4 warnings in 0.41s ========================
+.\venv\Scripts\pytest.e
+xe : <sys>:0: 
+RuntimeWarning: 
+coroutine 
+'AsyncClient.get' was 
+never awaited
+At line:1 char:47
++ ... ./test.db"; .\ven
+v\Scripts\pytest.exe te
+sts\integration\api\v1\
+test_r ...
++                 ~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (<sys>:0: Runt   
+ im...s never await    
+ed:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 

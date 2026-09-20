@@ -1,0 +1,101 @@
+﻿node.exe : [WebServer] 
+INFO:     Started 
+server process [38916]
+At line:1 char:1
++ & "C:\users\hp\.vscod
+e/node.exe" "C:\users\h
+p\.vscode/node_modules/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([WebServer] I   
+ NF...process [3891    
+6]:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+
+[WebServer] INFO:     
+Waiting for 
+application startup.
+[WebServer] 2026-09-21 
+00:32:36 - app.main - 
+INFO - Application 
+starting up...
+[WebServer] INFO:     
+Application startup 
+complete.
+[WebServer] INFO:     
+Uvicorn running on 
+http://127.0.0.1:8000 
+(Press CTRL+C to quit)
+
+[WebServer] 
+(node:11572) [MODULE_TY
+PELESS_PACKAGE_JSON] 
+Warning: Module type 
+of file:///C:/Users/HP/
+Desktop/.vscode/Argus%2
+0%20og/frontend/tailwin
+d.config.ts?id=17899309
+60349 is not specified 
+and it doesn't parse 
+as CommonJS.
+[WebServer] Reparsing 
+as ES module because 
+module syntax was 
+detected. This incurs 
+a performance overhead.
+[WebServer] To 
+eliminate this 
+warning, add "type": 
+"module" to \\?\C:\User
+s\HP\Desktop\.vscode\Ar
+gus  og\frontend\packag
+e.json.
+[WebServer] (Use `node 
+--trace-warnings ...` 
+to show where the 
+warning was created)
+
+
+Running 1 test using 1 worker
+
+[1/1] [chromium] ΓÇ║ e2e\tests\activity-page.spec.ts:9:9 ΓÇ║ Activity page ΓÇ║ renders mixed-source activity and handles source filtering, pagination, and bot-interaction expansion
+  1) [chromium] ΓÇ║ e2e\tests\activity-page.spec.ts:9:9 ΓÇ║ Activity page ΓÇ║ renders mixed-source activity and handles source filtering, pagination, and bot-interaction expansion 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('Deployment completed')
+    Expected: visible
+    Error: strict mode violation: getByText('Deployment completed') resolved to 2 elements:
+        1) <p class="font-medium text-foreground">Deployment completed</p> aka getByText('Deployment completed', { exact: true })
+        2) <p class="text-sm text-muted-foreground">Production deployment completed successfully.</p> aka getByText('Production deployment')
+
+    Call log:
+      - Expect "toBeVisible" getByText('Deployment completed') with timeout 5000ms
+      - waiting for getByText('Deployment completed')
+
+
+      102 |
+      103 |         // Verify mixed-source rendering
+    > 104 |         await expect(page.getByText('Deployment completed')).toBeVisible();
+          |                                                              ^
+      105 |         await expect(page.getByText('Production deployment completed successfully.')).toBeVisible();
+      106 |         await expect(page.getByText('Is CI passing?')).toBeVisible();
+      107 |
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\activity-page.spec.ts:104:62
+
+    Error Context: test-results\tests-activity-page-Activi-7a313-d-bot-interaction-expansion-chromium\error-context.md
+
+
+  1 failed
+    [chromium] ΓÇ║ e2e\tests\activity-page.spec.ts:9:9 ΓÇ║ Activity page ΓÇ║ renders mixed-source activity and handles source filtering, pagination, and bot-interaction expansion 
+
+[36m  Serving HTML report at http://localhost:64240. Press Ctrl+C to quit.[39m

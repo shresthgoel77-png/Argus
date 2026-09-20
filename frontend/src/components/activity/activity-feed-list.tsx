@@ -96,6 +96,7 @@ function ActivityRow({ item }: { item: ActivityItem }) {
                                 onClick={() => setIsExpanded(!isExpanded)}
                                 className="-mr-2 ml-1 px-2"
                                 aria-expanded={isExpanded}
+                                aria-label="Toggle details"
                             >
                                 {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
                             </Button>

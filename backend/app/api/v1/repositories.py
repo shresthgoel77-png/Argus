@@ -34,6 +34,14 @@ from app.services.ai_analysis_service import (
     AINotConfiguredError,
     AIAnalysisFailedError,
 )
+from app.schemas.trend import (
+    TrendResponse,
+    HealthTrend,
+    CategoryDelta,
+    FindingVelocity,
+    CategoryVelocity,
+)
+from app.services.trend_service import get_health_trend, get_finding_velocity
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
 
@@ -239,3 +247,41 @@ def get_repository_ai_summary_history(
         limit=limit,
         offset=offset
     )
+
+
+@router.get("/{repository_id}/trends", response_model=TrendResponse)
+def get_repository_trends(
+    repository_id: uuid.UUID,
+    window_days: int = Query(default=30, ge=1, le=90),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns repository health trends and finding velocity analytics in a given window.
+    """
+    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+
+    overall_delta, category_deltas_dict = get_health_trend(db, repository_id, window_days)
+    velocity_dict = get_finding_velocity(db, repository_id, window_days)
+
+    health_trend = HealthTrend(
+        overall_delta=overall_delta,
+        category_deltas=[
+            CategoryDelta(category=k, delta=v)
+            for k, v in category_deltas_dict.items()
+        ]
+    )
+
+    finding_velocity = FindingVelocity(
+        categories=[
+            CategoryVelocity(category=k, detected=v["detected"], resolved=v["resolved"])
+            for k, v in velocity_dict.items()
+        ]
+    )
+
+    return TrendResponse(
+        window_days=window_days,
+        health_trend=health_trend,
+        finding_velocity=finding_velocity
+    )
+

@@ -50,3 +50,11 @@ export function getFindingAIAnalysis(findingId: string): Promise<AIAnalysisRespo
 export function createFindingAIAnalysis(findingId: string): Promise<AIAnalysis> {
     return requestAnalysis<AIAnalysis>(`/api/v1/findings/${findingId}/ai-analysis`, { method: "POST" });
 }
+
+export function getRepositoryAIAnalysis(repositoryId: string): Promise<AIAnalysisResponse> {
+    return requestAnalysis<AIAnalysisResponse>(`/api/v1/repositories/${repositoryId}/ai-summary`);
+}
+
+export function createRepositoryAIAnalysis(repositoryId: string): Promise<AIAnalysis> {
+    return requestAnalysis<AIAnalysis>(`/api/v1/repositories/${repositoryId}/ai-summary`, { method: "POST" });
+}

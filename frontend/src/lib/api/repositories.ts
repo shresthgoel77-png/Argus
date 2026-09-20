@@ -1,4 +1,5 @@
 import { AvailableRepository, Repository } from "../types/github";
+import type { DashboardOverviewResponse } from "../types/overview";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -79,6 +80,20 @@ export async function setMonitoringEnabled(
         return await res.json() as Repository;
     } catch (error) {
         console.error("Network error during setMonitoringEnabled:", error);
+        return null;
+    }
+}
+
+export async function getDashboardOverview(repositoryId: string): Promise<DashboardOverviewResponse | null> {
+    try {
+        const res = await fetchClient(`/api/v1/repositories/${repositoryId}/dashboard`);
+        if (!res.ok) {
+            console.error("getDashboardOverview failed with status:", res.status);
+            return null;
+        }
+        return await res.json() as DashboardOverviewResponse;
+    } catch (error) {
+        console.error("Network error during getDashboardOverview:", error);
         return null;
     }
 }

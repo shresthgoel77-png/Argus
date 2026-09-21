@@ -9,6 +9,7 @@ from app.api.v1 import findings
 from app.api.v1 import repo_health
 from app.api.v1 import ai_connections
 from app.api.v1 import bot_interactions
+from app.api.v1 import notification_preferences
 
 api_router = APIRouter()
 
@@ -23,3 +24,4 @@ api_router.include_router(findings.router)
 api_router.include_router(repo_health.router)
 api_router.include_router(ai_connections.router)
 api_router.include_router(bot_interactions.router)
+api_router.include_router(notification_preferences.router, prefix="/notifications", tags=["notifications"])

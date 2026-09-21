@@ -12,6 +12,8 @@ from app.services.notification_service import (
     mark_all_read
 )
 
+from tests.integration.conftest import *  # noqa: F401,F403
+
 def test_create_and_list_notifications(db_session):
     user_id = uuid.uuid4()
     

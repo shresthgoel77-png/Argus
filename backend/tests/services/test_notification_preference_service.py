@@ -2,6 +2,8 @@ import uuid
 from app.models.notification_preference import NotificationSeverity
 from app.services.notification_preference_service import get_or_create_preference, update_preference
 
+from tests.integration.conftest import *  # noqa: F401,F403
+
 def test_get_or_create_preference_new_user(db_session):
     user_id = uuid.uuid4()
     

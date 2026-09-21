@@ -165,11 +165,11 @@ tests/services/test_health_service.py::test_compute_and_persist_health_resolved_
 tests/services/test_health_service.py::test_compute_and_persist_health_no_changes PASSED [ 35%]
 tests/services/test_health_service.py::test_generate_reasons_cap_five PASSED [ 35%]
 tests/services/test_health_service.py::test_finding_service_includes_acknowledged PASSED [ 36%]
-tests/services/test_notification_preference_service.py::test_get_or_create_preference_new_user ERROR [ 36%]
-tests/services/test_notification_preference_service.py::test_update_preference_round_trip ERROR [ 36%]
-tests/services/test_notification_service.py::test_create_and_list_notifications ERROR [ 36%]
-tests/services/test_notification_service.py::test_mark_read_and_permissions ERROR [ 37%]
-tests/services/test_notification_service.py::test_mark_all_read ERROR    [ 37%]
+tests/services/test_notification_preference_service.py::test_get_or_create_preference_new_user PASSED [ 36%]
+tests/services/test_notification_preference_service.py::test_update_preference_round_trip PASSED [ 36%]
+tests/services/test_notification_service.py::test_create_and_list_notifications PASSED [ 36%]
+tests/services/test_notification_service.py::test_mark_read_and_permissions PASSED [ 37%]
+tests/services/test_notification_service.py::test_mark_all_read PASSED   [ 37%]
 tests/services/test_trend_service.py::test_get_health_trend_no_history PASSED [ 37%]
 tests/services/test_trend_service.py::test_get_health_trend_one_snapshot PASSED [ 37%]
 tests/services/test_trend_service.py::test_get_health_trend_improving PASSED [ 38%]
@@ -443,47 +443,6 @@ tests/unit/test_webhook_security.py::test_verify_signature_tampered_body PASSED 
 tests/unit/test_webhook_security.py::test_verify_signature_missing_header PASSED [ 99%]
 tests/unit/test_webhook_security.py::test_verify_signature_malformed_header PASSED [100%]
 
-=================================== ERRORS ====================================
-__________ ERROR at setup of test_get_or_create_preference_new_user ___________
-file C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_preference_service.py, line 5
-  def test_get_or_create_preference_new_user(db_session):
-E       fixture 'db_session' not found
->       available fixtures: _asyncio_loop_factory, _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
->       use 'pytest --fixtures [testpath]' for help on them.
-
-C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_preference_service.py:5
-_____________ ERROR at setup of test_update_preference_round_trip _____________
-file C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_preference_service.py, line 18
-  def test_update_preference_round_trip(db_session):
-E       fixture 'db_session' not found
->       available fixtures: _asyncio_loop_factory, _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
->       use 'pytest --fixtures [testpath]' for help on them.
-
-C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_preference_service.py:18
-____________ ERROR at setup of test_create_and_list_notifications _____________
-file C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_service.py, line 15
-  def test_create_and_list_notifications(db_session):
-E       fixture 'db_session' not found
->       available fixtures: _asyncio_loop_factory, _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
->       use 'pytest --fixtures [testpath]' for help on them.
-
-C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_service.py:15
-______________ ERROR at setup of test_mark_read_and_permissions _______________
-file C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_service.py, line 57
-  def test_mark_read_and_permissions(db_session):
-E       fixture 'db_session' not found
->       available fixtures: _asyncio_loop_factory, _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
->       use 'pytest --fixtures [testpath]' for help on them.
-
-C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_service.py:57
-____________________ ERROR at setup of test_mark_all_read _____________________
-file C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_service.py, line 90
-  def test_mark_all_read(db_session):
-E       fixture 'db_session' not found
->       available fixtures: _asyncio_loop_factory, _class_scoped_runner, _function_scoped_runner, _module_scoped_runner, _package_scoped_runner, _session_scoped_runner, anyio_backend, anyio_backend_name, anyio_backend_options, cache, capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, client, doctest_namespace, event_loop_policy, free_tcp_port, free_tcp_port_factory, free_udp_port, free_udp_port_factory, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, unused_tcp_port, unused_tcp_port_factory, unused_udp_port, unused_udp_port_factory
->       use 'pytest --fixtures [testpath]' for help on them.
-
-C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\services\test_notification_service.py:90
 ============================== warnings summary ===============================
 venv\Lib\site-packages\fastapi\testclient.py:1
   C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
@@ -548,10 +507,4 @@ tests/unit/test_bot_interaction.py::test_bot_interaction_count_query
     one_hour_ago = datetime.utcnow() - timedelta(hours=1)
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-=========================== short test summary info ===========================
-ERROR tests/services/test_notification_preference_service.py::test_get_or_create_preference_new_user
-ERROR tests/services/test_notification_preference_service.py::test_update_preference_round_trip
-ERROR tests/services/test_notification_service.py::test_create_and_list_notifications
-ERROR tests/services/test_notification_service.py::test_mark_read_and_permissions
-ERROR tests/services/test_notification_service.py::test_mark_all_read
-================= 429 passed, 22 warnings, 5 errors in 6.94s ==================
+====================== 434 passed, 22 warnings in 19.20s ======================

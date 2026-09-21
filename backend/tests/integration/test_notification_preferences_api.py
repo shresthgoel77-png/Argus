@@ -75,3 +75,14 @@ async def test_auth_scoping_isolation(authorized_client, db_session, test_user):
     response1 = await authorized_client.get("/api/v1/notifications/preferences")
     assert response1.json()["email_enabled"] is True
     assert response1.json()["min_severity_email"] == "high" # original was critical in prev test, wait, these are isolated tests. Default string was "high"
+
+@pytest.mark.asyncio
+async def test_unauthenticated_requests_rejected(async_client):
+    response = await async_client.get("/api/v1/notifications/preferences")
+    assert response.status_code == 401
+    
+    response2 = await async_client.put(
+        "/api/v1/notifications/preferences",
+        json={"email_enabled": True}
+    )
+    assert response2.status_code == 401

@@ -21,6 +21,13 @@ class Settings(BaseSettings):
     
     bot_mention_handle: str = "@repomedic"
     bot_max_interactions_per_hour: int = 10
+    
+    smtp_host: str | None = None
+    smtp_port: int | None = None
+    smtp_username: str | None = None
+    smtp_password: SecretStr | None = None
+    smtp_from_address: str | None = None
+    smtp_use_tls: bool = True
 
     @field_validator("cors_origins", mode="before")
     @classmethod

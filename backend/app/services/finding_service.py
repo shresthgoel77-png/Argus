@@ -13,7 +13,7 @@ from app.models.finding import Finding
 from app.models.repository import Repository
 from app.models.github_connection import GitHubConnection
 from app.monitoring.analyzer_base import FindingDraft
-from app.services import finding_lifecycle_service
+from app.services import finding_lifecycle_service, notification_dispatch_service
 from app.services.priority_service import compute_priority
 
 logger = get_logger(__name__)
@@ -25,6 +25,30 @@ class SyncResult:
     updated: int = 0
     auto_resolved: int = 0
     skipped_ignored: int = 0
+
+
+def _trigger_finding_notification(db: Session, finding: Finding) -> None:
+    try:
+        repo = db.query(Repository).filter(Repository.id == finding.repository_id).one()
+        gh_conn = db.query(GitHubConnection).filter(GitHubConnection.id == repo.connection_id).one()
+        
+        notification_dispatch_service.dispatch_notification(
+            db,
+            user_id=gh_conn.user_id,
+            repository_id=finding.repository_id,
+            notification_type="finding_created",
+            severity=finding.severity,
+            title=finding.title,
+            message=finding.description,
+            reference_type="finding",
+            reference_id=str(finding.id),
+        )
+    except Exception:
+        logger.warning(
+            "Failed to dispatch finding creation notification",
+            exc_info=True,
+            extra={"finding_id": str(finding.id), "repository_id": str(finding.repository_id)},
+        )
 
 
 def _create_or_update_finding(
@@ -59,6 +83,8 @@ def _create_or_update_finding(
         db.add(finding)
         db.commit()
         db.refresh(finding)
+        if finding.severity in ("critical", "high"):
+            _trigger_finding_notification(db, finding)
         return finding, True
 
     try:
@@ -69,6 +95,8 @@ def _create_or_update_finding(
             db.flush()
         db.commit()
         db.refresh(finding)
+        if finding.severity in ("critical", "high"):
+            _trigger_finding_notification(db, finding)
         return finding, True
     except IntegrityError:
         existing = (

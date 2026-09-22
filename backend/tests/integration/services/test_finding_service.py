@@ -2,6 +2,7 @@ import time
 import pytest
 import uuid
 import random
+from unittest.mock import patch
 from app.models.user import User
 from app.models.github_connection import GitHubConnection
 from app.models.repository import Repository
@@ -247,3 +248,98 @@ def test_list_findings_for_repository(db_session, repo_for_findings):
     assert len(sec_findings) == 2
     titles = [f.title for f in sec_findings]
     assert sorted(titles) == ["Secret 1", "Secret 2"]
+
+
+@patch("app.services.notification_dispatch_service.dispatch_notification")
+def test_create_finding_triggers_dispatch_on_new_critical(mock_dispatch, db_session, repo_for_findings):
+    finding = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="secret_leak",
+        title="Secret Found",
+        description="A secret was found.",
+        severity="critical",
+        source="scanner",
+        evidence={"line": 42}
+    )
+    assert mock_dispatch.call_count == 1
+    mock_dispatch.assert_called_with(
+        db_session,
+        user_id=repo_for_findings.connection.user_id,
+        repository_id=repo_for_findings.id,
+        notification_type="finding_created",
+        severity="critical",
+        title="Secret Found",
+        message="A secret was found.",
+        reference_type="finding",
+        reference_id=str(finding.id)
+    )
+
+
+@patch("app.services.notification_dispatch_service.dispatch_notification")
+def test_create_finding_does_not_trigger_on_deduplication(mock_dispatch, db_session, repo_for_findings):
+    first = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Original",
+        description="Original desc",
+        severity="high",
+        source="scanner",
+        evidence={},
+        fingerprint="dup-test-fingerprint"
+    )
+    assert mock_dispatch.call_count == 1
+
+    mock_dispatch.reset_mock()
+
+    second = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Updated",
+        description="Updated desc",
+        severity="high",
+        source="scanner",
+        evidence={},
+        fingerprint="dup-test-fingerprint"
+    )
+    assert mock_dispatch.call_count == 0
+
+
+@patch("app.services.notification_dispatch_service.dispatch_notification")
+def test_create_finding_does_not_trigger_on_low_severity(mock_dispatch, db_session, repo_for_findings):
+    create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="dependency",
+        title="Low Severity",
+        description="Not critical",
+        severity="low",
+        source="scanner",
+        evidence={}
+    )
+    assert mock_dispatch.call_count == 0
+
+
+@patch("app.services.notification_dispatch_service.dispatch_notification")
+def test_create_finding_dispatch_failure_does_not_rollback(mock_dispatch, db_session, repo_for_findings):
+    mock_dispatch.side_effect = Exception("Simulated dispatch failure")
+    finding = create_finding(
+        db_session,
+        repository_id=repo_for_findings.id,
+        category="security",
+        type_="secret_leak",
+        title="Secret Found",
+        description="A secret was found.",
+        severity="critical",
+        source="scanner",
+        evidence={"line": 42}
+    )
+    
+    assert finding.id is not None
+    assert mock_dispatch.call_count == 1

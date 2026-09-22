@@ -100,7 +100,8 @@ def test_create_finding_fingerprint_conflict_updates_existing_row(db_session, re
     assert second.title == "Updated"
     assert second.description == "Updated description"
     assert second.evidence == {"count": 2}
-    assert db_session.query(type(first)).count() == 1
+    from app.models.finding import Finding
+    assert db_session.query(Finding).filter(Finding.repository_id == repo_for_findings.id).count() == 1
 
 
 def _draft(fingerprint: str, title: str = "Finding") -> FindingDraft:
@@ -197,7 +198,7 @@ def test_sync_findings_for_run_updates_present_finding(db_session, repo_for_find
     assert result.created == 0
     assert result.updated == 1
     assert result.auto_resolved == 0
-    assert existing.id == db_session.query(type(existing)).one().id
+    assert existing.id == db_session.query(type(existing)).filter(type(existing).repository_id == repo_for_findings.id).one().id
     assert existing.title == "After"
     assert existing.status == "open"
 

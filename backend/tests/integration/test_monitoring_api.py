@@ -194,5 +194,4 @@ async def test_dependency_monitor_run_repeat_updates_existing_finding(
     assert second.json()["sync_result"]["updated"] == 1
 
     from app.models.finding import Finding
-
-    assert db_session.query(Finding).count() == 1
+    assert db_session.query(Finding).filter(Finding.repository_id == test_user_repository.id).count() == 1

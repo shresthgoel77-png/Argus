@@ -6,7 +6,7 @@ from app.models.notification_preference import NotificationSeverity
 from app.services.notification_dispatch_service import dispatch_notification
 from app.services.notification_preference_service import update_preference
 
-from tests.integration.conftest import *  # noqa: F401,F403
+
 
 
 def _dispatch(db_session, user_id, severity="high"):

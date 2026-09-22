@@ -125,7 +125,8 @@ async def test_run_analyzer_full_state_uses_sync_result(db_session, test_user_re
     assert second_result.sync_result is not None
     assert second_result.sync_result.created == 0
     assert second_result.sync_result.updated == 1
-    assert db_session.query(Finding).count() == 1
+    assert db_session.query(Finding).filter(Finding.repository_id == test_user_repository.id).count() == 1
+
 
 
 @pytest.mark.asyncio

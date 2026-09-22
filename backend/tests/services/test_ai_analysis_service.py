@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from tests.integration.conftest import *  # noqa: F401,F403
+
 
 from app.core.exceptions import AppError
 from app.integrations.ai.exceptions import (

@@ -66,6 +66,28 @@ def _create_or_update_finding(
 ) -> tuple[Finding, bool]:
     """Insert a finding, or update the open row when the DB constraint wins."""
     priority = compute_priority(category=category, severity=severity)
+    
+    if fingerprint is not None:
+        existing = (
+            db.query(Finding)
+            .filter(
+                Finding.repository_id == repository_id,
+                Finding.fingerprint == fingerprint,
+                Finding.status == "open",
+            )
+            .first()
+        )
+        if existing:
+            existing.title = title
+            existing.description = description
+            existing.evidence = evidence
+            existing.severity = severity
+            existing.priority = priority
+            existing.updated_at = datetime.now(timezone.utc)
+            db.commit()
+            db.refresh(existing)
+            return existing, False
+
     finding = Finding(
         repository_id=repository_id,
         category=category,
@@ -79,47 +101,12 @@ def _create_or_update_finding(
         fingerprint=fingerprint,
     )
 
-    if fingerprint is None:
-        db.add(finding)
-        db.commit()
-        db.refresh(finding)
-        if finding.severity in ("critical", "high"):
-            _trigger_finding_notification(db, finding)
-        return finding, True
-
-    try:
-        # Deduplication is intentionally delegated to the partial unique index.
-        # The savepoint keeps the session usable after an IntegrityError.
-        with db.begin_nested():
-            db.add(finding)
-            db.flush()
-        db.commit()
-        db.refresh(finding)
-        if finding.severity in ("critical", "high"):
-            _trigger_finding_notification(db, finding)
-        return finding, True
-    except IntegrityError:
-        existing = (
-            db.query(Finding)
-            .filter(
-                Finding.repository_id == repository_id,
-                Finding.fingerprint == fingerprint,
-                Finding.status == "open",
-            )
-            .first()
-        )
-        if existing is None:
-            raise
-
-        existing.title = title
-        existing.description = description
-        existing.evidence = evidence
-        existing.priority = priority
-        existing.updated_at = datetime.now(timezone.utc)
-        db.commit()
-        db.refresh(existing)
-        return existing, False
-
+    db.add(finding)
+    db.commit()
+    db.refresh(finding)
+    if finding.severity in ("critical", "high"):
+        _trigger_finding_notification(db, finding)
+    return finding, True
 
 def create_finding(
     db: Session,

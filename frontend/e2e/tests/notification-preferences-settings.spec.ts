@@ -7,7 +7,7 @@ test.describe('Notification Preferences Settings Flow', () => {
     });
 
     test('loads and displays current notification preferences', async ({ page }) => {
-        await page.route('**/api/v1/users/me/notification-preferences', async (route) => {
+        await page.route('**/api/v1/notifications/preferences', async (route) => {
             if (route.request().method() === 'GET') {
                 await route.fulfill({
                     status: 200,
@@ -38,7 +38,7 @@ test.describe('Notification Preferences Settings Flow', () => {
 
     test('toggles preferences and saves successfully', async ({ page }) => {
         // Mock GET load
-        await page.route('**/api/v1/users/me/notification-preferences', async (route) => {
+        await page.route('**/api/v1/notifications/preferences', async (route) => {
             if (route.request().method() === 'GET') {
                 await route.fulfill({
                     status: 200,
@@ -85,7 +85,7 @@ test.describe('Notification Preferences Settings Flow', () => {
     });
 
     test('shows an error state if loading fails', async ({ page }) => {
-        await page.route('**/api/v1/users/me/notification-preferences', async (route) => {
+        await page.route('**/api/v1/notifications/preferences', async (route) => {
             if (route.request().method() === 'GET') {
                 await route.fulfill({
                     status: 500,
@@ -102,7 +102,7 @@ test.describe('Notification Preferences Settings Flow', () => {
 
     test('shows an error state if saving fails', async ({ page }) => {
         let isGet = true;
-        await page.route('**/api/v1/users/me/notification-preferences', async (route) => {
+        await page.route('**/api/v1/notifications/preferences', async (route) => {
             if (route.request().method() === 'GET') {
                 await route.fulfill({
                     status: 200,

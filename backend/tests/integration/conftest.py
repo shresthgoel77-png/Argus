@@ -25,7 +25,7 @@ def engine():
     alembic_cfg.set_main_option("script_location", "alembic")
     alembic_cfg.set_main_option("sqlalchemy.url", settings.database_url)
     
-    alembic.command.upgrade(alembic_cfg, "head")
+    # alembic.command.upgrade(alembic_cfg, "head")
     
     # Fallback to create_all to ensure all models are fully registered (in case migrations lag)
     from app.db.base_class import Base
@@ -34,6 +34,8 @@ def engine():
     from app.models.github_connection import GitHubConnection
     from app.models.repository import Repository
     from app.models.finding import Finding
+    from app.models.notification import Notification
+    from app.models.notification_preference import NotificationPreference
     Base.metadata.create_all(bind=test_engine)
     
     yield test_engine

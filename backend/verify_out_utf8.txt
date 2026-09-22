@@ -1,0 +1,83 @@
+﻿venv\Scripts\python.exe
+ : C:\Users\HP\Desktop\
+.vscode\Argus  og\backe
+nd\venv\Lib\site-packag
+es\fastapi\testclient.p
+y:1: StarletteDeprecati
+onWarning: Using 
+`httpx` with 
+`starlette.testclient` 
+is deprecated; install 
+`httpx2` instead.
+At line:1 char:1
++ venv\Scripts\python.e
+xe verify_trigger.py > 
+verify_out.txt 2>&1; 
+Get- ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (C:\Users\HP\D   
+ es...ttpx2` instea    
+d.:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  from 
+starlette.testclient 
+import TestClient as 
+TestClient  # noqa
+2026-09-22 19:44:10 - 
+app.main - INFO - 
+Application starting 
+up...
+2026-09-22 19:44:10 - a
+pp.monitoring.monitor_s
+ervice - INFO - 
+Starting analyzer run
+2026-09-22 19:44:10 - a
+pp.monitoring.monitor_s
+ervice - INFO - 
+Analyzer run completed 
+successfully
+2026-09-22 19:44:10 - 
+httpx - INFO - HTTP 
+Request: POST http://te
+stserver/api/v1/reposit
+ories/46ef489d-6f08-46c
+5-b7f9-40707c1f32f3/mon
+itor-runs "HTTP/1.1 
+200 OK"
+2026-09-22 19:44:10 - a
+pp.monitoring.monitor_s
+ervice - INFO - 
+Starting analyzer run
+2026-09-22 19:44:10 - a
+pp.monitoring.monitor_s
+ervice - INFO - 
+Analyzer run completed 
+successfully
+2026-09-22 19:44:10 - 
+httpx - INFO - HTTP 
+Request: POST http://te
+stserver/api/v1/reposit
+ories/46ef489d-6f08-46c
+5-b7f9-40707c1f32f3/mon
+itor-runs "HTTP/1.1 
+200 OK"
+Testing manual-trigger for finding dispatch
+
+--- FIRST RUN (New Findings) ---
+Security Analyzer Triggered successfully.
+Findings created: 1
+Notifications generated: 1
+
+--- SECOND RUN (Re-detection) ---
+Findings in DB: 1
+Notifications generated after re-run: 1
+
+SUCCESS! Notification was not duplicated on re-detection.

@@ -1,0 +1,219 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 10 items
+
+tests/integration/services/test_finding_service.py::test_create_finding PASSED [ 10%]
+tests/integration/services/test_finding_service.py::test_create_finding_fingerprint_conflict_updates_existing_row FAILED [ 20%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_auto_resolves_missing PASSED [ 30%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_leaves_ignored_missing_finding_untouched PASSED [ 40%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_updates_present_finding FAILED [ 50%]
+tests/integration/services/test_finding_service.py::test_list_findings_for_repository PASSED [ 60%]
+tests/integration/services/test_finding_service.py::test_create_finding_triggers_dispatch_on_new_critical PASSED [ 70%]
+tests/integration/services/test_finding_service.py::test_create_finding_does_not_trigger_on_deduplication PASSED [ 80%]
+tests/integration/services/test_finding_service.py::test_create_finding_does_not_trigger_on_low_severity PASSED [ 90%]
+tests/integration/services/test_finding_service.py::test_create_finding_dispatch_failure_does_not_rollback PASSED [100%]
+
+================================== FAILURES ===================================
+________ test_create_finding_fingerprint_conflict_updates_existing_row ________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000002A2073BCE10>
+repo_for_findings = <app.models.repository.Repository object at 0x000002A2073BD310>
+
+    def test_create_finding_fingerprint_conflict_updates_existing_row(db_session, repo_for_findings):
+        first = create_finding(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            type_="dependency",
+            title="Original",
+            description="Original description",
+            severity="high",
+            source="scanner",
+            evidence={"count": 1},
+            fingerprint="same-fingerprint",
+        )
+        second = create_finding(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            type_="dependency",
+            title="Updated",
+            description="Updated description",
+            severity="high",
+            source="scanner",
+            evidence={"count": 2},
+            fingerprint="same-fingerprint",
+        )
+    
+        assert second.id == first.id
+        assert second.title == "Updated"
+        assert second.description == "Updated description"
+        assert second.evidence == {"count": 2}
+>       assert db_session.query(type(first)).count() == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = count()
+E        +    where count = <sqlalchemy.orm.query.Query object at 0x000002A20710EBE0>.count
+E        +      where <sqlalchemy.orm.query.Query object at 0x000002A20710EBE0> = query(<class 'app.models.finding.Finding'>)
+E        +        where query = <sqlalchemy.orm.session.Session object at 0x000002A2073BCE10>.query
+E        +        and   <class 'app.models.finding.Finding'> = type(<app.models.finding.Finding object at 0x000002A2073BD090>)
+
+tests\integration\services\test_finding_service.py:98: AssertionError
+_____________ test_sync_findings_for_run_updates_present_finding ______________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000002A2072D35C0>
+repo_for_findings = <app.models.repository.Repository object at 0x000002A2072D2FD0>
+
+    def test_sync_findings_for_run_updates_present_finding(db_session, repo_for_findings):
+        existing = create_finding(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            type_="dependency",
+            title="Before",
+            description="Before",
+            severity="high",
+            source="scanner",
+            evidence={"count": 1},
+            fingerprint="present",
+        )
+    
+        result = sync_findings_for_run(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            analyzer_key="security",
+            drafts=[_draft("present", "After")],
+        )
+    
+        assert result.created == 0
+        assert result.updated == 1
+        assert result.auto_resolved == 0
+>       assert existing.id == db_session.query(type(existing)).one().id
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\services\test_finding_service.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2815: in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\engine\result.py:1867: in one
+    return self._only_one_row(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <sqlalchemy.engine.result.ScalarResult object at 0x000002A207329A90>
+raise_for_second_row = True, raise_for_none = True, scalar = False
+
+    def _only_one_row(
+        self,
+        raise_for_second_row: bool,
+        raise_for_none: bool,
+        scalar: bool,
+    ) -> Optional[_R]:
+        onerow = self._fetchone_impl
+    
+        row: Optional[_InterimRowType[Any]] = onerow(hard_close=True)
+        if row is None:
+            if raise_for_none:
+                raise exc.NoResultFound(
+                    "No row was found when one was required"
+                )
+            else:
+                return None
+    
+        if scalar and self._source_supports_scalars:
+            self._generate_rows = False
+            make_row = None
+        else:
+            make_row = self._row_getter
+    
+        try:
+            row = make_row(row) if make_row else row
+        except:
+            self._soft_close(hard=True)
+            raise
+    
+        if raise_for_second_row:
+            if self._unique_filter_state:
+                # for no second row but uniqueness, need to essentially
+                # consume the entire result :(
+                uniques, strategy = self._unique_strategy
+    
+                existing_row_hash = strategy(row) if strategy else row
+    
+                while True:
+                    next_row: Any = onerow(hard_close=True)
+                    if next_row is None:
+                        next_row = _NO_ROW
+                        break
+    
+                    try:
+                        next_row = make_row(next_row) if make_row else next_row
+    
+                        if strategy:
+                            assert next_row is not _NO_ROW
+                            if existing_row_hash == strategy(next_row):
+                                continue
+                        elif row == next_row:
+                            continue
+                        # here, we have a row and it's different
+                        break
+                    except:
+                        self._soft_close(hard=True)
+                        raise
+            else:
+                next_row = onerow(hard_close=True)
+                if next_row is None:
+                    next_row = _NO_ROW
+    
+            if next_row is not _NO_ROW:
+                self._soft_close(hard=True)
+>               raise exc.MultipleResultsFound(
+                    "Multiple rows were found when exactly one was required"
+                    if raise_for_none
+                    else "Multiple rows were found when one or none "
+                    "was required"
+                )
+E               sqlalchemy.exc.MultipleResultsFound: Multiple rows were found when exactly one was required
+
+venv\Lib\site-packages\sqlalchemy\engine\result.py:852: MultipleResultsFound
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\schemas\notification.py:24
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\schemas\notification.py:24: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Notification(NotificationBase):
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/services/test_finding_service.py::test_create_finding_fingerprint_conflict_updates_existing_row
+FAILED tests/integration/services/test_finding_service.py::test_sync_findings_for_run_updates_present_finding
+=================== 2 failed, 8 passed, 5 warnings in 0.56s ===================

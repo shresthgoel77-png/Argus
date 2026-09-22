@@ -14,6 +14,11 @@ from app.services.finding_service import (
     sync_findings_for_run,
 )
 
+@pytest.fixture(autouse=True)
+def mock_dispatch():
+    with patch("app.services.finding_service.notification_dispatch_service.dispatch_notification") as m_dispatch:
+        yield m_dispatch
+
 @pytest.fixture
 def repo_for_findings(db_session):
     unique_id = uuid.uuid4().hex[:8]
@@ -250,7 +255,6 @@ def test_list_findings_for_repository(db_session, repo_for_findings):
     assert sorted(titles) == ["Secret 1", "Secret 2"]
 
 
-@patch("app.services.notification_dispatch_service.dispatch_notification")
 def test_create_finding_triggers_dispatch_on_new_critical(mock_dispatch, db_session, repo_for_findings):
     finding = create_finding(
         db_session,
@@ -277,7 +281,6 @@ def test_create_finding_triggers_dispatch_on_new_critical(mock_dispatch, db_sess
     )
 
 
-@patch("app.services.notification_dispatch_service.dispatch_notification")
 def test_create_finding_does_not_trigger_on_deduplication(mock_dispatch, db_session, repo_for_findings):
     first = create_finding(
         db_session,
@@ -310,7 +313,6 @@ def test_create_finding_does_not_trigger_on_deduplication(mock_dispatch, db_sess
     assert mock_dispatch.call_count == 0
 
 
-@patch("app.services.notification_dispatch_service.dispatch_notification")
 def test_create_finding_does_not_trigger_on_low_severity(mock_dispatch, db_session, repo_for_findings):
     create_finding(
         db_session,
@@ -326,7 +328,6 @@ def test_create_finding_does_not_trigger_on_low_severity(mock_dispatch, db_sessi
     assert mock_dispatch.call_count == 0
 
 
-@patch("app.services.notification_dispatch_service.dispatch_notification")
 def test_create_finding_dispatch_failure_does_not_rollback(mock_dispatch, db_session, repo_for_findings):
     mock_dispatch.side_effect = Exception("Simulated dispatch failure")
     finding = create_finding(

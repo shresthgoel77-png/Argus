@@ -1,0 +1,1007 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- C:\Python314\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.14.1, langsmith-0.9.2, asyncio-1.4.0, timeout-2.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 445 items
+
+tests/integration/api/v1/test_findings.py::test_get_findings_list PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_findings_list_filters PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_repository_findings PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_repository_findings_unowned PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_finding_detail PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_get_finding_detail_unowned PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_patch_finding_status PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_patch_finding_status_conflict PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_patch_finding_unowned PASSED [  2%]
+tests/integration/api/v1/test_findings.py::test_unauthenticated PASSED   [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_success PASSED [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_not_configured PASSED [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_failed_provider PASSED [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_unowned_finding PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_get_latest_analysis_none PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_get_latest_analysis_success PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_get_latest_analysis_unowned_finding PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_list_analyses_history PASSED [  4%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_list_analyses_unowned_finding PASSED [  4%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_success PASSED [  4%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_not_configured PASSED [  4%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_failed_provider PASSED [  4%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_unowned PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_success PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_none PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_unowned PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_success PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_empty PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_unowned PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_unauthenticated PASSED [  6%]
+tests/integration/api/v1/test_repositories_dashboard_integration.py::test_get_dashboard_overview PASSED [  6%]
+tests/integration/services/test_finding_service.py::test_create_finding PASSED [  7%]
+tests/integration/services/test_finding_service.py::test_create_finding_fingerprint_conflict_updates_existing_row FAILED [  7%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_auto_resolves_missing PASSED [  7%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_leaves_ignored_missing_finding_untouched PASSED [  7%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_updates_present_finding FAILED [  8%]
+tests/integration/services/test_finding_service.py::test_list_findings_for_repository PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_create_finding_triggers_dispatch_on_new_critical PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_create_finding_does_not_trigger_on_deduplication PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_create_finding_does_not_trigger_on_low_severity PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_create_finding_dispatch_failure_does_not_rollback PASSED [  9%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_new PASSED [  9%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_idempotent_update PASSED [  9%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_ownership_reassignment PASSED [  9%]
+tests/integration/services/test_github_connection_service.py::test_list_connections PASSED [ 10%]
+tests/integration/services/test_github_connection_service.py::test_get_connection_or_404 PASSED [ 10%]
+tests/integration/services/test_github_connection_service.py::test_handle_installation_status_change PASSED [ 10%]
+tests/integration/services/test_github_event_service.py::test_record_event_success PASSED [ 10%]
+tests/integration/services/test_github_event_service.py::test_record_event_duplicate_returns_none PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_status_transitions PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_mark_failed_strips_secrets PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_concurrent_insert_race PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_duplicate PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_unknown_installation PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_known_installation_suspend PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_removed_repos PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_reaction_failure_marks_failed PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_analyzes_pull_request PASSED [ 13%]
+tests/integration/services/test_pr_integration.py::test_process_webhook_event_analyzes_pull_request PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_list_available_repositories_flags_already_added PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_add_repository_idempotency PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_add_repository_rejects_unauthorized PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_set_monitoring_enabled_ownership PASSED [ 14%]
+tests/integration/services/test_repository_service.py::test_disable_monitoring_for_removed_repositories PASSED [ 14%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_merges_sources_and_paginates PASSED [ 14%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_empty_repository PASSED [ 14%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_api_paginates_without_payload_or_duplicates PASSED [ 15%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_api_filters_by_source PASSED [ 15%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_api_rejects_unowned_repository PASSED [ 15%]
+tests/integration/test_ai_connection_api.py::test_create_connection_returns_safe_status PASSED [ 15%]
+tests/integration/test_ai_connection_api.py::test_invalid_api_key_is_sanitized PASSED [ 15%]
+tests/integration/test_ai_connection_api.py::test_provider_errors_are_sanitized[provider_error0-429-The AI provider is rate limited. Please try again later.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_provider_errors_are_sanitized[provider_error1-503-The AI provider is currently unavailable. Please try again later.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_unsupported_provider_or_model_is_sanitized[<lambda>-supported-model-The selected AI provider or model is not supported.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_unsupported_provider_or_model_is_sanitized[<lambda>-unsupported-model-The selected AI provider or model is not supported.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_get_unconfigured_connection_returns_false PASSED [ 17%]
+tests/integration/test_ai_connection_api.py::test_get_configured_connection_returns_safe_status PASSED [ 17%]
+tests/integration/test_ai_connection_api.py::test_delete_connection_is_idempotent_and_has_no_body PASSED [ 17%]
+tests/integration/test_auth_flow.py::test_auth_flow_e2e PASSED           [ 17%]
+tests/integration/test_auth_flow.py::test_dev_login_fails_non_development_provider PASSED [ 17%]
+tests/integration/test_bot_interactions_api.py::test_bot_interactions_are_owned_paginated_and_newest_first PASSED [ 18%]
+tests/integration/test_bot_interactions_api.py::test_bot_interactions_returns_404_for_unowned_repository PASSED [ 18%]
+tests/integration/test_finding_lifecycle.py::test_partial_unique_index_on_finding PASSED [ 18%]
+tests/integration/test_finding_lifecycle.py::test_partial_unique_index_allows_multiple_resolved PASSED [ 18%]
+tests/integration/test_finding_lifecycle.py::test_partial_unique_index_ignores_null_fingerprint PASSED [ 19%]
+tests/integration/test_finding_model.py::test_finding_insert PASSED      [ 19%]
+tests/integration/test_github_api.py::test_github_install_flow PASSED    [ 19%]
+tests/integration/test_github_api.py::test_github_install_callback_rejections PASSED [ 19%]
+tests/integration/test_github_api.py::test_github_endpoints_unauthenticated PASSED [ 20%]
+tests/integration/test_github_event_model.py::test_create_github_event_required_fields_only PASSED [ 20%]
+tests/integration/test_github_event_model.py::test_github_event_delivery_id_unique PASSED [ 20%]
+tests/integration/test_github_models.py::test_valid_connection_and_repo PASSED [ 20%]
+tests/integration/test_github_models.py::test_duplicate_connection PASSED [ 20%]
+tests/integration/test_github_models.py::test_duplicate_repo PASSED      [ 21%]
+tests/integration/test_migrations.py::test_alembic_upgrade_head_completes PASSED [ 21%]
+tests/integration/test_migrations.py::test_alembic_downgrade_upgrade_smoke_test PASSED [ 21%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_unauthenticated PASSED [ 21%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_not_found_or_unowned PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_malformed PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_success PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_skipped_disabled PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_dependency_analyzer PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_dependency_monitor_run_repeat_updates_existing_finding FAILED [ 23%]
+tests/integration/test_notification_preferences_api.py::test_get_preferences_auto_creates PASSED [ 23%]
+tests/integration/test_notification_preferences_api.py::test_update_preferences PASSED [ 23%]
+tests/integration/test_notification_preferences_api.py::test_auth_scoping_isolation PASSED [ 23%]
+tests/integration/test_notification_preferences_api.py::test_unauthenticated_requests_rejected PASSED [ 24%]
+tests/integration/test_repo_health_api.py::test_repo_health_api_unauthenticated PASSED [ 24%]
+tests/integration/test_repo_health_api.py::test_repo_health_api_not_found_or_unowned PASSED [ 24%]
+tests/integration/test_repo_health_api.py::test_repo_health_lazy_compute_and_post PASSED [ 24%]
+tests/integration/test_repo_health_api.py::test_repo_health_history_pagination PASSED [ 24%]
+tests/integration/test_repositories_api.py::test_repositories_endpoints_unauthenticated PASSED [ 25%]
+tests/integration/test_repositories_api.py::test_repositories_happy_path FAILED [ 25%]
+tests/integration/test_repositories_api.py::test_repositories_ownership_protection PASSED [ 25%]
+tests/integration/test_repository_health_snapshot_model.py::test_repository_health_snapshot_creation PASSED [ 25%]
+tests/integration/test_user_model.py::test_create_user PASSED            [ 26%]
+tests/integration/test_user_model.py::test_email_uniqueness PASSED       [ 26%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_new_delivery PASSED [ 26%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_duplicate_delivery PASSED [ 26%]
+tests/integration/test_webhooks_api.py::test_webhook_invalid_missing_signature PASSED [ 26%]
+tests/integration/test_webhooks_api.py::test_webhook_missing_delivery_or_event PASSED [ 27%]
+tests/integration/test_webhooks_api.py::test_webhook_malformed_json_valid_signature PASSED [ 27%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_suspend PASSED [ 27%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_created PASSED [ 27%]
+tests/services/test_ai_analysis_service.py::test_not_configured_raises_without_persisting_row PASSED [ 28%]
+tests/services/test_ai_analysis_service.py::test_invalid_connection_status_raises_without_persisting_row PASSED [ 28%]
+tests/services/test_ai_analysis_service.py::test_success_persists_completed_analysis PASSED [ 28%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error0-ai_provider_invalid_api_key-The configured AI provider rejected the API key.] PASSED [ 28%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error1-ai_provider_rate_limited-The AI provider is rate limited.] PASSED [ 28%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error2-ai_provider_unavailable-The AI provider is unavailable.] PASSED [ 29%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error3-ai_provider_invalid_response-The AI provider returned an invalid response.] PASSED [ 29%]
+tests/services/test_ai_analysis_service.py::test_unexpected_failure_is_sanitized_and_persisted PASSED [ 29%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_success_persists_repository_scoped_analysis PASSED [ 29%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_not_configured_raises_without_persisting_row PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error0-The configured AI provider rejected the API key.] PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error1-The AI provider is rate limited.] PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error2-The AI provider is unavailable.] PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error3-The AI provider returned an invalid response.] PASSED [ 31%]
+tests/services/test_ai_analysis_service.py::test_latest_and_list_analysis_are_ordered_and_paginated PASSED [ 31%]
+tests/services/test_finding_lifecycle_service.py::test_acknowledge_finding_valid_transitions PASSED [ 31%]
+tests/services/test_finding_lifecycle_service.py::test_acknowledge_finding_invalid_transitions PASSED [ 31%]
+tests/services/test_finding_lifecycle_service.py::test_resolve_finding_valid_transitions PASSED [ 31%]
+tests/services/test_finding_lifecycle_service.py::test_resolve_finding_no_op PASSED [ 32%]
+tests/services/test_finding_lifecycle_service.py::test_resolve_finding_invalid_transitions PASSED [ 32%]
+tests/services/test_finding_lifecycle_service.py::test_ignore_finding_valid_transitions PASSED [ 32%]
+tests/services/test_finding_lifecycle_service.py::test_ignore_finding_no_op PASSED [ 32%]
+tests/services/test_finding_lifecycle_service.py::test_ignore_finding_invalid_transitions PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_reopen_finding_valid_transitions PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_reopen_finding_no_op PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_auto_resolve_finding_valid_transitions PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_auto_resolve_finding_no_op PASSED [ 33%]
+tests/services/test_health_service.py::test_generate_reasons_first_snapshot PASSED [ 34%]
+tests/services/test_health_service.py::test_generate_reasons_no_change PASSED [ 34%]
+tests/services/test_health_service.py::test_generate_reasons_improvement PASSED [ 34%]
+tests/services/test_health_service.py::test_generate_reasons_drop PASSED [ 34%]
+tests/services/test_health_service.py::test_compute_and_persist_health_zero_findings PASSED [ 35%]
+tests/services/test_health_service.py::test_compute_and_persist_health_critical_finding PASSED [ 35%]
+tests/services/test_health_service.py::test_compute_and_persist_health_resolved_finding PASSED [ 35%]
+tests/services/test_health_service.py::test_compute_and_persist_health_no_changes PASSED [ 35%]
+tests/services/test_health_service.py::test_generate_reasons_cap_five PASSED [ 35%]
+tests/services/test_health_service.py::test_finding_service_includes_acknowledged PASSED [ 36%]
+tests/services/test_health_service.py::test_health_drop_notification_thresholds PASSED [ 36%]
+tests/services/test_health_service.py::test_health_drop_notification_exception_handling PASSED [ 36%]
+tests/services/test_notification_dispatch_service.py::test_email_enabled_and_severity_met_sends_email PASSED [ 36%]
+tests/services/test_notification_dispatch_service.py::test_email_disabled_does_not_send_email PASSED [ 37%]
+tests/services/test_notification_dispatch_service.py::test_severity_below_threshold_does_not_send_email PASSED [ 37%]
+tests/services/test_notification_dispatch_service.py::test_provider_failure_is_persisted_without_propagating PASSED [ 37%]
+tests/services/test_notification_dispatch_service.py::test_provider_returned_failure_is_persisted_without_raw_message PASSED [ 37%]
+tests/services/test_notification_preference_service.py::test_get_or_create_preference_new_user PASSED [ 37%]
+tests/services/test_notification_preference_service.py::test_update_preference_round_trip PASSED [ 38%]
+tests/services/test_notification_service.py::test_create_and_list_notifications PASSED [ 38%]
+tests/services/test_notification_service.py::test_mark_read_and_permissions PASSED [ 38%]
+tests/services/test_notification_service.py::test_mark_all_read PASSED   [ 38%]
+tests/services/test_trend_service.py::test_get_health_trend_no_history PASSED [ 39%]
+tests/services/test_trend_service.py::test_get_health_trend_one_snapshot PASSED [ 39%]
+tests/services/test_trend_service.py::test_get_health_trend_improving PASSED [ 39%]
+tests/services/test_trend_service.py::test_get_finding_velocity PASSED   [ 39%]
+tests/test_db_connection.py::test_connection PASSED                      [ 40%]
+tests/unit/bot/test_bot_orchestration_service.py::test_no_mention_no_interaction PASSED [ 40%]
+tests/unit/bot/test_bot_orchestration_service.py::test_unknown_intent_posts_help PASSED [ 40%]
+tests/unit/bot/test_bot_orchestration_service.py::test_unknown_intent_insufficient_permission_silent PASSED [ 40%]
+tests/unit/bot/test_bot_orchestration_service.py::test_authorization_denied_no_ai_no_post PASSED [ 40%]
+tests/unit/bot/test_bot_orchestration_service.py::test_happy_path_end_to_end PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_provider_failure_no_github_post PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_github_post_failure PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_api_key_not_logged PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_each_authorization_denial_creates_skipped_row PASSED [ 42%]
+tests/unit/bot/test_context_builder.py::test_ci_status_uses_existing_finding PASSED [ 42%]
+tests/unit/bot/test_context_builder.py::test_ci_status_without_finding_is_static PASSED [ 42%]
+tests/unit/bot/test_context_builder.py::test_pr_summary_falls_back_to_one_github_read PASSED [ 42%]
+tests/unit/bot/test_context_builder.py::test_issue_explain_falls_back_to_one_github_read PASSED [ 42%]
+tests/unit/bot/test_context_builder.py::test_repo_attention_aggregates_findings_and_latest_reasons PASSED [ 43%]
+tests/unit/bot/test_context_builder.py::test_bot_and_finding_context_share_delimiter_output PASSED [ 43%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_simple PASSED [ 43%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_punctuation PASSED [ 43%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_no_mention PASSED [ 44%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_mid_word PASSED [ 44%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_in_code_block PASSED [ 44%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_in_quote PASSED [ 44%]
+tests/unit/bot/test_question_parser.py::test_classify_pr_summary PASSED  [ 44%]
+tests/unit/bot/test_question_parser.py::test_classify_pr_summary_downgrades_on_issue PASSED [ 45%]
+tests/unit/bot/test_question_parser.py::test_classify_ci_status PASSED   [ 45%]
+tests/unit/bot/test_question_parser.py::test_classify_repo_attention PASSED [ 45%]
+tests/unit/bot/test_question_parser.py::test_classify_issue_explain PASSED [ 45%]
+tests/unit/bot/test_question_parser.py::test_classify_unknown PASSED     [ 46%]
+tests/unit/bot/test_question_parser.py::test_ci_keyword_boundary PASSED  [ 46%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_gemini_provider_is_registered PASSED [ 46%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_valid_key_returns_without_exception PASSED [ 46%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_invalid_key_maps_to_invalid_api_key[401] PASSED [ 46%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_invalid_key_maps_to_invalid_api_key[403] PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_rate_limit_maps_to_rate_limited PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_server_errors_map_to_unavailable[response0] PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_server_errors_map_to_unavailable[response1] PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_timeout_maps_to_unavailable_without_key_leak PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_network_error_maps_to_unavailable_without_key_leak PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_default_timeout_is_passed_to_request PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_returns_validated_result_and_preserves_boundaries PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_rejects_invalid_structured_response[response0] PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_rejects_invalid_structured_response[response1] PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_rejects_invalid_structured_response[response2] PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_returns_validated_result PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_rejects_invalid_structured_response[response0] PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_rejects_invalid_structured_response[response1] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_rejects_invalid_structured_response[response2] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_preserves_mapped_transport_errors[error0] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_preserves_mapped_transport_errors[error1] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_preserves_mapped_transport_errors[error2] PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_invalid_key_maps_to_invalid_api_key[401] PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_invalid_key_maps_to_invalid_api_key[403] PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_rate_limit_maps_to_rate_limited PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_timeout_maps_to_unavailable PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_returns_validated_result_and_preserves_boundaries PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_rejects_invalid_structured_response[response0] PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_rejects_invalid_structured_response[response1] PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_rejects_invalid_structured_response[response2] PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_preserves_mapped_transport_errors[error0] PASSED [ 53%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_preserves_mapped_transport_errors[error1] PASSED [ 53%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_preserves_mapped_transport_errors[error2] PASSED [ 53%]
+tests/unit/integrations/ai/test_registry.py::test_ai_provider_registry PASSED [ 53%]
+tests/unit/integrations/ai/test_registry.py::test_ai_provider_exceptions PASSED [ 53%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_not_configured PASSED [ 54%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_successful_send_with_tls PASSED [ 54%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_auth_failure PASSED [ 54%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_connection_failure PASSED [ 54%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_pull_request PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_issues PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_issue_comment PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_workflow_run PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_push PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_installation PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_installation_repositories PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_malformed_non_dict_payload PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_partially_malformed_repository PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_malformed_installation PASSED [ 57%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_unsupported_event_with_valid_shapes PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_empty_repository PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_low_severity_only PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_no_snapshot PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_with_snapshot_and_limit PASSED [ 58%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_priority_ordering PASSED [ 58%]
+tests/unit/services/test_repository_summary_context_builder.py::test_build_repository_summary_context_with_findings_and_snapshot PASSED [ 58%]
+tests/unit/services/test_repository_summary_context_builder.py::test_build_repository_summary_context_no_findings_no_snapshot PASSED [ 58%]
+tests/unit/services/test_repository_summary_context_builder.py::test_build_repository_summary_context_repo_not_found PASSED [ 59%]
+tests/unit/test_ai_analysis.py::test_aianalysis_creation PASSED          [ 59%]
+tests/unit/test_ai_analysis.py::test_aianalysis_fk_cascade PASSED        [ 59%]
+tests/unit/test_ai_analysis.py::test_aianalysis_query_ordering PASSED    [ 59%]
+tests/unit/test_ai_connection_model.py::test_ai_connection_model_unique_user_id PASSED [ 60%]
+tests/unit/test_ai_connection_model.py::test_ai_connection_no_plaintext_keys PASSED [ 60%]
+tests/unit/test_ai_connection_model.py::test_ai_connection_fields PASSED [ 60%]
+tests/unit/test_ai_connection_service.py::test_create_connection_validates_before_persisting PASSED [ 60%]
+tests/unit/test_ai_connection_service.py::test_create_connection_rejects_unsupported_model_without_provider_call PASSED [ 60%]
+tests/unit/test_ai_connection_service.py::test_create_connection_replaces_existing_row_and_status_is_safe PASSED [ 61%]
+tests/unit/test_ai_connection_service.py::test_delete_connection_is_idempotent PASSED [ 61%]
+tests/unit/test_ai_connection_service.py::test_get_connection_status_returns_none_when_unconfigured PASSED [ 61%]
+tests/unit/test_ai_context_builder.py::test_ci_category PASSED           [ 61%]
+tests/unit/test_ai_context_builder.py::test_pull_request_category PASSED [ 62%]
+tests/unit/test_ai_context_builder.py::test_issue_category PASSED        [ 62%]
+tests/unit/test_ai_context_builder.py::test_dependency_category PASSED   [ 62%]
+tests/unit/test_ai_context_builder.py::test_security_category PASSED     [ 62%]
+tests/unit/test_ai_context_builder.py::test_code_quality_category PASSED [ 62%]
+tests/unit/test_ai_context_builder.py::test_repository_activity_category PASSED [ 63%]
+tests/unit/test_ai_context_builder.py::test_fake_instructions_injection PASSED [ 63%]
+tests/unit/test_ai_context_builder.py::test_graceful_degradation_missing_fields PASSED [ 63%]
+tests/unit/test_analyzer_registry.py::test_registry_is_empty_by_default PASSED [ 63%]
+tests/unit/test_analyzer_registry.py::test_register_and_get_analyzer PASSED [ 64%]
+tests/unit/test_analyzer_registry.py::test_get_unknown_analyzer PASSED   [ 64%]
+tests/unit/test_auth_config_safety.py::test_settings_development_auth PASSED [ 64%]
+tests/unit/test_auth_config_safety.py::test_settings_test_env_auth PASSED [ 64%]
+tests/unit/test_auth_config_safety.py::test_settings_production_auth_safety PASSED [ 64%]
+tests/unit/test_auth_factory_safety.py::test_factory_returns_dev_in_non_prod PASSED [ 65%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_dev_in_production PASSED [ 65%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_unrecognized PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_monitoring_disabled_short_circuits PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_owner_unresolved_short_circuits PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_ai_not_configured_short_circuits PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_insufficient_permission PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_permission_check_failure_denies PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_rate_limit_counts_only_trailing_hour PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_rate_limit_denies_trailing_hour_interaction PASSED [ 67%]
+tests/unit/test_authorization_service.py::test_authorizes_write_permission PASSED [ 67%]
+tests/unit/test_bot_interaction.py::test_create_bot_interaction PASSED   [ 67%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_fks PASSED      [ 67%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_unique_github_event_id PASSED [ 68%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_invalid_intent_rejected PASSED [ 68%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_composite_index PASSED [ 68%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_count_query PASSED [ 68%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_ignores_non_workflow_run PASSED [ 68%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_ignores_non_completed PASSED [ 69%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_ignores_success PASSED  [ 69%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_failure_gives_high_severity PASSED [ 69%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_cancelled_gives_low_severity PASSED [ 69%]
+tests/unit/test_code_quality_analyzer.py::test_analyzer_branch_protected PASSED [ 70%]
+tests/unit/test_code_quality_analyzer.py::test_analyzer_branch_not_protected PASSED [ 70%]
+tests/unit/test_code_quality_analyzer.py::test_analyzer_github_auth_error PASSED [ 70%]
+tests/unit/test_code_quality_analyzer.py::test_run_analyzer_verifies_sync_path_for_code_quality PASSED [ 70%]
+tests/unit/test_config.py::test_config_loads_valid_values PASSED         [ 71%]
+tests/unit/test_config.py::test_config_invalid_app_env_fails PASSED      [ 71%]
+tests/unit/test_config.py::test_config_cors_origins_parsing PASSED       [ 71%]
+tests/unit/test_config.py::test_config_cors_origins_json_parsing PASSED  [ 71%]
+tests/unit/test_config.py::test_config_non_dev_requires_db PASSED        [ 71%]
+tests/unit/test_config.py::test_config_empty_github_app_id_fails PASSED  [ 72%]
+tests/unit/test_config.py::test_config_empty_github_app_slug_fails PASSED [ 72%]
+tests/unit/test_config.py::test_config_empty_github_app_private_key_fails PASSED [ 72%]
+tests/unit/test_config.py::test_config_empty_github_app_webhook_secret_fails PASSED [ 72%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_manifest_present_no_lockfile PASSED [ 73%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_manifest_present_has_lockfile PASSED [ 73%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_manifest_absent PASSED [ 73%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_github_auth_error PASSED [ 73%]
+tests/unit/test_dependency_analyzer.py::test_run_analyzer_constructs_client PASSED [ 73%]
+tests/unit/test_development_auth_adapter.py::test_unauthenticated PASSED [ 74%]
+tests/unit/test_development_auth_adapter.py::test_login_and_resolve PASSED [ 74%]
+tests/unit/test_development_auth_adapter.py::test_logout PASSED          [ 74%]
+tests/unit/test_development_auth_adapter.py::test_invalid_tampered_cookie PASSED [ 74%]
+tests/unit/test_encryption.py::test_encryption_round_trip PASSED         [ 75%]
+tests/unit/test_encryption.py::test_decryption_tampered_token PASSED     [ 75%]
+tests/unit/test_encryption.py::test_decryption_garbage_token PASSED      [ 75%]
+tests/unit/test_encryption.py::test_settings_fails_when_key_missing PASSED [ 75%]
+tests/unit/test_encryption.py::test_settings_fails_when_key_malformed PASSED [ 75%]
+tests/unit/test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 76%]
+tests/unit/test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [ 76%]
+tests/unit/test_error_handling.py::test_global_exception_handler_ignores_websocket PASSED [ 76%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_is_well_formed_and_verifiable PASSED [ 76%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_iat_is_backdated PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_exp_within_10_minutes PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_uses_rs256_algorithm PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_caching_returns_same_token PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_refreshes_when_near_expiry PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_fetches_token_from_github PASSED [ 78%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_caches_token_before_expiry PASSED [ 78%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_refreshes_token_when_near_expiry PASSED [ 78%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_raises_on_github_error_response PASSED [ 78%]
+tests/unit/test_github_client.py::TestGetInstallation::test_returns_installation_dict PASSED [ 79%]
+tests/unit/test_github_client.py::TestGetInstallation::test_uses_app_jwt_auth PASSED [ 79%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_single_page PASSED [ 79%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_multi_page_pagination PASSED [ 79%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_empty_repositories PASSED [ 80%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[401-GitHubAuthError] PASSED [ 80%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[403-GitHubAuthError] PASSED [ 80%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[404-GitHubNotFoundError] PASSED [ 80%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[429-GitHubRateLimitError] PASSED [ 80%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[500-GitHubAPIError] PASSED [ 81%]
+tests/unit/test_github_client.py::TestGetRepositoryContent::test_success PASSED [ 81%]
+tests/unit/test_github_client.py::TestGetRepositoryContent::test_returns_none_on_404 PASSED [ 81%]
+tests/unit/test_github_client.py::TestGetRepositoryContent::test_raises_github_auth_error_on_403 PASSED [ 81%]
+tests/unit/test_github_client.py::TestListDependabotAlerts::test_pagination PASSED [ 82%]
+tests/unit/test_github_client.py::TestListDependabotAlerts::test_returns_empty_list_on_404 PASSED [ 82%]
+tests/unit/test_github_client.py::TestListDependabotAlerts::test_raises_github_auth_error_on_403 PASSED [ 82%]
+tests/unit/test_github_client.py::TestGetBranchProtection::test_success PASSED [ 82%]
+tests/unit/test_github_client.py::TestGetBranchProtection::test_returns_none_on_404 PASSED [ 82%]
+tests/unit/test_github_client.py::TestGetBranchProtection::test_raises_github_auth_error_on_403 PASSED [ 83%]
+tests/unit/test_github_client.py::TestGetCollaboratorPermission::test_returns_permission_with_installation_auth PASSED [ 83%]
+tests/unit/test_github_client.py::TestPostIssueComment::test_success_and_truncation PASSED [ 83%]
+tests/unit/test_github_client.py::TestPostIssueComment::test_returns_github_not_found PASSED [ 83%]
+tests/unit/test_github_client.py::TestPostIssueComment::test_raises_github_auth_error_on_403 PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_api_error_is_app_error PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_auth_error_is_github_api_error PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_not_found_error_is_github_api_error PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_rate_limit_error_is_github_api_error PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_all_are_catchable_as_app_error PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[401-GitHubAuthError-github_auth_error] PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[403-GitHubAuthError-github_auth_error] PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[404-GitHubNotFoundError-github_not_found] PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[429-GitHubRateLimitError-github_rate_limit] PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[500-GitHubAPIError-github_api_error] PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[502-GitHubAPIError-github_api_error] PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[422-GitHubAPIError-github_api_error] PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_preserves_response_status PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_handles_non_json_body PASSED [ 87%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_api_error_defaults PASSED [ 87%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_auth_error_defaults PASSED [ 87%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_not_found_defaults PASSED [ 87%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_rate_limit_defaults PASSED [ 88%]
+tests/unit/test_health.py::test_health_endpoint PASSED                   [ 88%]
+tests/unit/test_health_score_service.py::test_zero_findings PASSED       [ 88%]
+tests/unit/test_health_score_service.py::test_single_critical_finding PASSED [ 88%]
+tests/unit/test_health_score_service.py::test_multiple_criticals_clamp_at_zero PASSED [ 88%]
+tests/unit/test_health_score_service.py::test_overall_score_averages_all_categories PASSED [ 89%]
+tests/unit/test_health_score_service.py::test_unmapped_category_is_ignored PASSED [ 89%]
+tests/unit/test_health_score_service.py::test_compute_overall_empty PASSED [ 89%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_ignores_non_issue PASSED [ 89%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_ignores_edited_action PASSED [ 90%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_ignores_non_empty_body PASSED [ 90%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_flags_empty_body_string PASSED [ 90%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_flags_none_body PASSED [ 90%]
+tests/unit/test_logging.py::test_configure_logging_development PASSED    [ 91%]
+tests/unit/test_logging.py::test_configure_logging_production PASSED     [ 91%]
+tests/unit/test_logging.py::test_get_logger PASSED                       [ 91%]
+tests/unit/test_monitor_service.py::test_run_analyzer_skipped_when_monitoring_disabled PASSED [ 91%]
+tests/unit/test_monitor_service.py::test_run_analyzer_unknown_analyzer PASSED [ 91%]
+tests/unit/test_monitor_service.py::test_run_analyzer_exception_containment PASSED [ 92%]
+tests/unit/test_monitor_service.py::test_run_analyzer_success_persists_findings PASSED [ 92%]
+tests/unit/test_monitor_service.py::test_run_analyzer_full_state_uses_sync_result FAILED [ 92%]
+tests/unit/test_monitor_service.py::test_run_analyzer_success_computes_health PASSED [ 92%]
+tests/unit/test_monitor_service.py::test_run_analyzer_exception_no_health_recomputation PASSED [ 93%]
+tests/unit/test_monitor_service.py::test_run_analyzer_health_exception_swallowed PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-info-low] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-info-low] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[performance-info-low] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-low-low] PASSED [ 94%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-medium-medium] PASSED [ 94%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-high-high] PASSED [ 94%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-critical-critical] PASSED [ 94%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-low-medium] PASSED [ 95%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-medium-high] PASSED [ 95%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-high-critical] PASSED [ 95%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-critical-critical] PASSED [ 95%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_ignores_non_pull_request PASSED [ 95%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_ignores_edited_action PASSED [ 96%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_ignores_non_empty_body PASSED [ 96%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_flags_empty_body_string PASSED [ 96%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_flags_none_body PASSED [ 96%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_force_push_default_branch PASSED [ 97%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_force_push_non_default_branch PASSED [ 97%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_non_forced_push PASSED [ 97%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_non_push_event PASSED [ 97%]
+tests/unit/test_security_analyzer.py::test_analyzer_returns_open_alerts PASSED [ 97%]
+tests/unit/test_security_analyzer.py::test_analyzer_no_alerts PASSED     [ 98%]
+tests/unit/test_security_analyzer.py::test_analyzer_github_auth_error PASSED [ 98%]
+tests/unit/test_security_analyzer.py::test_analyzer_missing_fields_graceful PASSED [ 98%]
+tests/unit/test_security_analyzer.py::test_run_analyzer_verifies_sync_path_for_security PASSED [ 98%]
+tests/unit/test_webhook_security.py::test_verify_signature_correct PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_wrong_secret PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_tampered_body PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_missing_header PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_malformed_header PASSED [100%]
+
+================================== FAILURES ===================================
+________ test_create_finding_fingerprint_conflict_updates_existing_row ________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000209D761B890>
+repo_for_findings = <app.models.repository.Repository object at 0x00000209D772DB30>
+
+    def test_create_finding_fingerprint_conflict_updates_existing_row(db_session, repo_for_findings):
+        first = create_finding(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            type_="dependency",
+            title="Original",
+            description="Original description",
+            severity="high",
+            source="scanner",
+            evidence={"count": 1},
+            fingerprint="same-fingerprint",
+        )
+        second = create_finding(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            type_="dependency",
+            title="Updated",
+            description="Updated description",
+            severity="high",
+            source="scanner",
+            evidence={"count": 2},
+            fingerprint="same-fingerprint",
+        )
+    
+        assert second.id == first.id
+        assert second.title == "Updated"
+        assert second.description == "Updated description"
+        assert second.evidence == {"count": 2}
+>       assert db_session.query(type(first)).count() == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = count()
+E        +    where count = <sqlalchemy.orm.query.Query object at 0x00000209D7559E10>.count
+E        +      where <sqlalchemy.orm.query.Query object at 0x00000209D7559E10> = query(<class 'app.models.finding.Finding'>)
+E        +        where query = <sqlalchemy.orm.session.Session object at 0x00000209D761B890>.query
+E        +        and   <class 'app.models.finding.Finding'> = type(<app.models.finding.Finding object at 0x00000209D76535C0>)
+
+tests\integration\services\test_finding_service.py:103: AssertionError
+_____________ test_sync_findings_for_run_updates_present_finding ______________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000209D77748C0>
+repo_for_findings = <app.models.repository.Repository object at 0x00000209D77BFE30>
+
+    def test_sync_findings_for_run_updates_present_finding(db_session, repo_for_findings):
+        existing = create_finding(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            type_="dependency",
+            title="Before",
+            description="Before",
+            severity="high",
+            source="scanner",
+            evidence={"count": 1},
+            fingerprint="present",
+        )
+    
+        result = sync_findings_for_run(
+            db_session,
+            repository_id=repo_for_findings.id,
+            category="security",
+            analyzer_key="security",
+            drafts=[_draft("present", "After")],
+        )
+    
+        assert result.created == 0
+        assert result.updated == 1
+        assert result.auto_resolved == 0
+>       assert existing.id == db_session.query(type(existing)).one().id
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\integration\services\test_finding_service.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\query.py:2815: in one
+    return self._iter().one()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\result.py:1867: in one
+    return self._only_one_row(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <sqlalchemy.engine.result.ScalarResult object at 0x00000209D7821D10>
+raise_for_second_row = True, raise_for_none = True, scalar = False
+
+    def _only_one_row(
+        self,
+        raise_for_second_row: bool,
+        raise_for_none: bool,
+        scalar: bool,
+    ) -> Optional[_R]:
+        onerow = self._fetchone_impl
+    
+        row: Optional[_InterimRowType[Any]] = onerow(hard_close=True)
+        if row is None:
+            if raise_for_none:
+                raise exc.NoResultFound(
+                    "No row was found when one was required"
+                )
+            else:
+                return None
+    
+        if scalar and self._source_supports_scalars:
+            self._generate_rows = False
+            make_row = None
+        else:
+            make_row = self._row_getter
+    
+        try:
+            row = make_row(row) if make_row else row
+        except:
+            self._soft_close(hard=True)
+            raise
+    
+        if raise_for_second_row:
+            if self._unique_filter_state:
+                # for no second row but uniqueness, need to essentially
+                # consume the entire result :(
+                uniques, strategy = self._unique_strategy
+    
+                existing_row_hash = strategy(row) if strategy else row
+    
+                while True:
+                    next_row: Any = onerow(hard_close=True)
+                    if next_row is None:
+                        next_row = _NO_ROW
+                        break
+    
+                    try:
+                        next_row = make_row(next_row) if make_row else next_row
+    
+                        if strategy:
+                            assert next_row is not _NO_ROW
+                            if existing_row_hash == strategy(next_row):
+                                continue
+                        elif row == next_row:
+                            continue
+                        # here, we have a row and it's different
+                        break
+                    except:
+                        self._soft_close(hard=True)
+                        raise
+            else:
+                next_row = onerow(hard_close=True)
+                if next_row is None:
+                    next_row = _NO_ROW
+    
+            if next_row is not _NO_ROW:
+                self._soft_close(hard=True)
+>               raise exc.MultipleResultsFound(
+                    "Multiple rows were found when exactly one was required"
+                    if raise_for_none
+                    else "Multiple rows were found when one or none "
+                    "was required"
+                )
+E               sqlalchemy.exc.MultipleResultsFound: Multiple rows were found when exactly one was required
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\result.py:852: MultipleResultsFound
+_________ test_dependency_monitor_run_repeat_updates_existing_finding _________
+
+mock_client_class = <MagicMock name='GitHubAppClient' id='2241293849264'>
+db_session = <sqlalchemy.orm.session.Session object at 0x00000209D79EAA80>
+authorized_client = <httpx.AsyncClient object at 0x00000209D7A4DD90>
+test_user_repository = <app.models.repository.Repository object at 0x00000209D79A18B0>
+
+    @pytest.mark.asyncio
+    @patch("app.monitoring.monitor_service.GitHubAppClient")
+    async def test_dependency_monitor_run_repeat_updates_existing_finding(
+        mock_client_class, db_session, authorized_client: AsyncClient, test_user_repository: Repository
+    ):
+        mock_client = AsyncMock()
+        mock_client.__aenter__.return_value = mock_client
+    
+        async def get_content(full_name, path):
+            return {"name": "test"} if path == "package.json" else None
+    
+        mock_client.get_repository_content.side_effect = get_content
+        mock_client_class.return_value = mock_client
+    
+        payload = {"analyzer_key": "dependency"}
+        first = await authorized_client.post(
+            f"/api/v1/repositories/{test_user_repository.id}/monitor-runs",
+            json=payload,
+        )
+        second = await authorized_client.post(
+            f"/api/v1/repositories/{test_user_repository.id}/monitor-runs",
+            json=payload,
+        )
+    
+        assert first.status_code == 200
+        assert first.json()["sync_result"]["created"] == 1
+        assert second.status_code == 200
+        assert second.json()["sync_result"]["created"] == 0
+        assert second.json()["sync_result"]["updated"] == 1
+    
+        from app.models.finding import Finding
+    
+>       assert db_session.query(Finding).count() == 1
+E       AssertionError: assert 2 == 1
+E        +  where 2 = count()
+E        +    where count = <sqlalchemy.orm.query.Query object at 0x00000209D7829370>.count
+E        +      where <sqlalchemy.orm.query.Query object at 0x00000209D7829370> = query(<class 'app.models.finding.Finding'>)
+E        +        where query = <sqlalchemy.orm.session.Session object at 0x00000209D79EAA80>.query
+
+tests\integration\test_monitoring_api.py:198: AssertionError
+________________________ test_repositories_happy_path _________________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x00000209D79E9400>
+dialect = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x00000209D7421310>
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x00000209D7B0C270>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x00000209D762E490>
+parameters = [('a956405ea2f746fc9ec89d12122e80ab', '4e74f22857b84e8f962b17a314f1f01d', 12345, 'test_org', 'Organization', 'active')]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x00000209D7421310>
+cursor = <sqlite3.Cursor object at 0x00000209D7A5E940>
+statement = 'INSERT INTO github_connections (id, user_id, installation_id, account_login, account_type, status) VALUES (?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('a956405ea2f746fc9ec89d12122e80ab', '4e74f22857b84e8f962b17a314f1f01d', 12345, 'test_org', 'Organization', 'active')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x00000209D7B0C270>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlite3.IntegrityError: UNIQUE constraint failed: github_connections.installation_id
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x00000209D782A580>
+db_session = <sqlalchemy.orm.session.Session object at 0x00000209D79E8320>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000209D795B850>
+
+    def test_repositories_happy_path(client, db_session, monkeypatch):
+        """
+        Full happy path:
+        1. Dev Login
+        2. Create a connection manually
+        3. List available repositories (with mock GitHub client)
+        4. Add a repository
+        5. List persisted repositories
+        6. Toggle monitoring
+        """
+        # 1. Login
+        res_login = client.post("/api/v1/auth/dev-login")
+        assert res_login.status_code == 200
+    
+        # Get the user that was just created/logged in by dev-login
+        # dev-login typically creates a test user with a known email or just gets the first user
+        user = db_session.query(User).first()
+    
+        # 2. Setup connection
+        connection = GitHubConnection(
+            user_id=user.id,
+            installation_id=12345,
+            account_login="test_org",
+            account_type="Organization"
+        )
+        db_session.add(connection)
+>       db_session.commit()
+
+tests\integration\test_repositories_api.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:2035: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:1316: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:1290: in _prepare_impl
+    self.session.flush()
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4353: in flush
+    self._flush(objects)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4488: in _flush
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\session.py:4449: in _flush
+    flush_context.execute()
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\unitofwork.py:465: in execute
+    rec.execute(self)
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\unitofwork.py:641: in execute
+    util.preloaded.orm_persistence.save_obj(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\persistence.py:94: in save_obj
+    _emit_insert_statements(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\orm\persistence.py:1234: in _emit_insert_statements
+    result = connection.execute(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1848: in _execute_context
+    return self._exec_single_context(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1988: in _exec_single_context
+    self._handle_dbapi_exception(
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\base.py:1969: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <sqlalchemy.dialects.sqlite.pysqlite.SQLiteDialect_pysqlite object at 0x00000209D7421310>
+cursor = <sqlite3.Cursor object at 0x00000209D7A5E940>
+statement = 'INSERT INTO github_connections (id, user_id, installation_id, account_login, account_type, status) VALUES (?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at'
+parameters = ('a956405ea2f746fc9ec89d12122e80ab', '4e74f22857b84e8f962b17a314f1f01d', 12345, 'test_org', 'Organization', 'active')
+context = <sqlalchemy.dialects.sqlite.base.SQLiteExecutionContext object at 0x00000209D7B0C270>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: github_connections.installation_id
+E       [SQL: INSERT INTO github_connections (id, user_id, installation_id, account_login, account_type, status) VALUES (?, ?, ?, ?, ?, ?) RETURNING created_at, updated_at]
+E       [parameters: ('a956405ea2f746fc9ec89d12122e80ab', '4e74f22857b84e8f962b17a314f1f01d', 12345, 'test_org', 'Organization', 'active')]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\sqlalchemy\engine\default.py:952: IntegrityError
+________________ test_run_analyzer_full_state_uses_sync_result ________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x00000209D93FE210>
+test_user_repository = <app.models.repository.Repository object at 0x00000209D937AA30>
+
+    @pytest.mark.asyncio
+    async def test_run_analyzer_full_state_uses_sync_result(db_session, test_user_repository):
+        test_user_repository.monitoring_enabled = True
+        db_session.commit()
+    
+        result = await run_analyzer(db_session, "dummy_full_state", test_user_repository)
+    
+        assert result.status == "success"
+        assert result.findings_created == []
+        assert result.sync_result is not None
+        assert result.sync_result.created == 1
+        assert result.sync_result.updated == 0
+        assert result.sync_result.auto_resolved == 0
+    
+        second_result = await run_analyzer(
+            db_session, "dummy_full_state", test_user_repository
+        )
+    
+        assert second_result.sync_result is not None
+        assert second_result.sync_result.created == 0
+        assert second_result.sync_result.updated == 1
+>       assert db_session.query(Finding).count() == 1
+E       assert 2 == 1
+E        +  where 2 = count()
+E        +    where count = <sqlalchemy.orm.query.Query object at 0x00000209D78297B0>.count
+E        +      where <sqlalchemy.orm.query.Query object at 0x00000209D78297B0> = query(Finding)
+E        +        where query = <sqlalchemy.orm.session.Session object at 0x00000209D93FE210>.query
+
+tests\unit\test_monitor_service.py:128: AssertionError
+============================== warnings summary ===============================
+..\..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+app\schemas\notification.py:24
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\schemas\notification.py:24: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Notification(NotificationBase):
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+..\..\..\..\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\fastapi\applications.py:4675: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/integration/api/v1/test_repositories_dashboard_integration.py::test_get_dashboard_overview
+tests/services/test_trend_service.py::test_get_health_trend_no_history
+tests/services/test_trend_service.py::test_get_health_trend_one_snapshot
+tests/services/test_trend_service.py::test_get_health_trend_improving
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\services\trend_service.py:15: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    cutoff_date = datetime.utcnow() - timedelta(days=window_days)
+
+tests/integration/api/v1/test_repositories_dashboard_integration.py::test_get_dashboard_overview
+tests/services/test_trend_service.py::test_get_finding_velocity
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\services\trend_service.py:47: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    cutoff_date = datetime.utcnow() - timedelta(days=window_days)
+
+tests/integration/test_ai_connection_api.py::test_invalid_api_key_is_sanitized
+  C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\anyio\_backends\_asyncio.py:1029: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    result = context.run(func, *args)
+
+tests/integration/test_finding_lifecycle.py: 1 warning
+tests/integration/test_github_event_model.py: 1 warning
+tests/integration/test_github_models.py: 2 warnings
+tests/integration/test_repositories_api.py: 1 warning
+tests/integration/test_user_model.py: 1 warning
+tests/unit/test_ai_connection_model.py: 1 warning
+tests/unit/test_bot_interaction.py: 3 warnings
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\integration\conftest.py:61: SAWarning: transaction already deassociated from connection
+    transaction.rollback()
+
+tests/unit/test_bot_interaction.py::test_bot_interaction_count_query
+  c:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_bot_interaction.py:177: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/services/test_finding_service.py::test_create_finding_fingerprint_conflict_updates_existing_row
+FAILED tests/integration/services/test_finding_service.py::test_sync_findings_for_run_updates_present_finding
+FAILED tests/integration/test_monitoring_api.py::test_dependency_monitor_run_repeat_updates_existing_finding
+FAILED tests/integration/test_repositories_api.py::test_repositories_happy_path
+FAILED tests/unit/test_monitor_service.py::test_run_analyzer_full_state_uses_sync_result
+================= 5 failed, 440 passed, 22 warnings in 8.90s ==================

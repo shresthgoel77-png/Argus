@@ -3,14 +3,21 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
+from app.core.logging import get_logger
+from app.core.config import settings
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
 from app.models.finding import Finding
+from app.models.repository import Repository
+from app.models.github_connection import GitHubConnection
 from app.services.finding_service import get_all_open_findings_for_repository
+from app.services import notification_dispatch_service
 from app.services.health_score_service import (
     compute_category_scores,
     compute_overall_score,
     FINDING_CATEGORY_TO_HEALTH_CATEGORY,
 )
+
+logger = get_logger(__name__)
 
 def get_latest_snapshot(db: Session, repository_id: uuid.UUID) -> Optional[RepositoryHealthSnapshot]:
     """Retrieve the most recent health snapshot for a repository."""
@@ -101,5 +108,39 @@ def compute_and_persist_health(db: Session, repository_id: uuid.UUID) -> Reposit
     db.add(snapshot)
     db.commit()
     db.refresh(snapshot)
+
+    if previous is not None:
+        drop = previous.overall_score - snapshot.overall_score
+        if drop >= settings.health_drop_notification_threshold:
+            try:
+                repo = db.query(Repository).filter(Repository.id == repository_id).first()
+                if repo:
+                    conn = db.query(GitHubConnection).filter(
+                        GitHubConnection.id == repo.connection_id
+                    ).first()
+                    if conn:
+                        severity = (
+                            "high"
+                            if drop >= 2 * settings.health_drop_notification_threshold
+                            else "medium"
+                        )
+                        message = "\n".join(snapshot.reasons) if snapshot.reasons else "Health score dropped."
+                        notification_dispatch_service.dispatch_notification(
+                            db,
+                            user_id=conn.user_id,
+                            repository_id=repository_id,
+                            notification_type="health_score_dropped",
+                            severity=severity,
+                            title="Health Score Dropped",
+                            message=message,
+                            reference_type="health_snapshot",
+                            reference_id=str(snapshot.id),
+                        )
+            except Exception:
+                logger.warning(
+                    "Failed to dispatch health score drop notification",
+                    exc_info=True,
+                    extra={"repository_id": str(repository_id), "snapshot_id": str(snapshot.id)},
+                )
 
     return snapshot

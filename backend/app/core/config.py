@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     
     bot_mention_handle: str = "@repomedic"
     bot_max_interactions_per_hour: int = 10
+    health_drop_notification_threshold: int = 15
     
     smtp_host: str | None = None
     smtp_port: int | None = None

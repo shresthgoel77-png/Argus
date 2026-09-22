@@ -1,0 +1,23 @@
+Failed to dispatch health score drop notification
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\services\health_service.py", line 128, in compute_and_persist_health
+    notification_dispatch_service.dispatch_notification(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        db,
+        ^^^
+    ...<7 lines>...
+        reference_id=str(snapshot.id),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\verify_prompt_6.py", line 99, in failing_dispatch
+    raise RuntimeError("Simulated Email API Failure")
+RuntimeError: Simulated Email API Failure
+--- STARTING MANUAL FIXTURE VERIFICATION ---
+1. First-ever snapshot computed. Notifications: 0 (Expected 0)
+2. Improvement (50 to 100). Notifications: 0 (Expected 0)
+3. Small drop below threshold. Notifications: 0 (Expected 0)
+4. Large drop. Notifications: 1 (Expected 1)
+   -> Type: health_score_dropped, Severity: medium
+   -> Reference: health_snapshot / 15cd4723-2c4f-4ec5-a4f5-af4fa907ed23
+5. Dispatch failure. Snapshot saved? True (ID: 720cdfac-df14-4b68-88a5-67fc145f090d)

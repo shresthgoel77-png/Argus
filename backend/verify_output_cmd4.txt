@@ -1,0 +1,8 @@
+--- STARTING MANUAL FIXTURE VERIFICATION ---
+1. First-ever snapshot computed. Notifications: 0 (Expected 0)
+2. Improvement (50 to 100). Notifications: 0 (Expected 0)
+3. Small drop below threshold. Notifications: 0 (Expected 0)
+4. Large drop. Notifications: 1 (Expected 1)
+   -> Type: health_score_dropped, Severity: medium
+   -> Reference: health_snapshot / 3eaf41fc-8189-40b4-a47f-df3c90957e90
+5. Dispatch failure. Snapshot saved? True (ID: 32b8365e-eb7a-4d75-9652-ec9b97580ed6)

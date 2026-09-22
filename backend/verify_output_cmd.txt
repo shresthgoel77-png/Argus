@@ -1,0 +1,3 @@
+--- STARTING MANUAL FIXTURE VERIFICATION ---
+Configured Threshold: 15
+

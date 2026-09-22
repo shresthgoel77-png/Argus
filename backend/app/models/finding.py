@@ -31,6 +31,12 @@ class Finding(Base):
 
     priority: Mapped[str | None] = mapped_column(String, nullable=True)
     fingerprint: Mapped[str | None] = mapped_column(String, nullable=True)
+    remediation_status: Mapped[str] = mapped_column(String, default="pending", nullable=False)
+    github_pr_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    pr_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    pr_number: Mapped[int | None] = mapped_column(nullable=True)
+    branch_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    patch_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     acknowledged_at: Mapped[datetime | None] = mapped_column(nullable=True)
     resolved_at: Mapped[datetime | None] = mapped_column(nullable=True)
     resolution_source: Mapped[str | None] = mapped_column(String, nullable=True)

@@ -40,12 +40,10 @@ class SMTPEmailProvider(BaseEmailProvider):
             return EmailSendResult(success=True)
             
         except smtplib.SMTPAuthenticationError:
-            # We don't log the error directly to avoid returning sensitive information
             return EmailSendResult(success=False, error_message="SMTP Authentication Error")
         except smtplib.SMTPConnectError:
             return EmailSendResult(success=False, error_message="SMTP Connection Error")
-        except smtplib.SMTPException as e:
-            return EmailSendResult(success=False, error_message=f"SMTP Exception: {str(e)}")
-        except Exception as e:
-            # General fallback to avoid crashing the server on unexpected send issues
-            return EmailSendResult(success=False, error_message=f"Unexpected Email Error: {str(e)}")
+        except smtplib.SMTPException:
+            return EmailSendResult(success=False, error_message="SMTP Send Error")
+        except Exception:
+            return EmailSendResult(success=False, error_message="SMTP Send Error")

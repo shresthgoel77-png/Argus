@@ -92,9 +92,9 @@ test.describe('Notifications e2e testing', () => {
         await expect(page.getByText('Repository Health Drop')).toBeVisible();
 
         // 5. Pagination
-        const nextButton = page.getByRole('button', { name: /next/i });
-        if (await nextButton.isVisible()) {
-            await nextButton.click();
+        const nextButton = page.locator('button:has-text("Next")').filter({ hasNot: page.locator('#next-logo') });
+        if (await nextButton.first().isVisible()) {
+            await nextButton.first().click();
             await page.waitForTimeout(500); // UI load
             await expect(page.getByText('An update occurred')).toBeVisible();
         }

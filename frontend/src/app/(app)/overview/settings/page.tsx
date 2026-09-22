@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { SectionHeading } from "@/components/rm/section-heading";
 import { GitHubSettingsCard } from "./github-settings-card";
 import { AIConnectionSettings } from "./ai-connection-settings";
+import { NotificationPreferencesSettings } from "./notification-preferences-settings";
 
 const settingsSections = [
     {
@@ -22,6 +23,7 @@ export default function SettingsPage() {
             <div className="grid gap-4 lg:grid-cols-3">
                 <GitHubSettingsCard />
                 <AIConnectionSettings />
+                <NotificationPreferencesSettings />
                 {settingsSections.map((section) => (
                     <Card key={section.title}>
                         <CardHeader>

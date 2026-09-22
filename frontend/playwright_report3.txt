@@ -1,0 +1,16 @@
+﻿
+
+
+
+Running 4 tests using 4 workers
+
+[1/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails
+[2/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:39:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ toggles preferences and saves successfully
+[3/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails
+[4/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:9:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ loads and displays current notification preferences
+  4 passed (11.3s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

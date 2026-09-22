@@ -1,0 +1,119 @@
+﻿
+
+
+Running 4 tests using 4 workers
+
+[1/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:9:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ loads and displays current notification preferences
+[2/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:39:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ toggles preferences and saves successfully
+[3/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails
+[4/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails
+  1) [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:9:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ loads and displays current notification preferences 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: locator('select')
+    Expected: "high"
+    Error: strict mode violation: locator('select') resolved to 3 elements:
+        1) <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">ΓÇª</select> aka getByLabel('ProviderGemini')
+        2) <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">ΓÇª</select> aka getByLabel('Modelgemini-3.8-flashgemini-3')
+        3) <select class="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">ΓÇª</select> aka getByLabel('Minimum Severity for')
+
+    Call log:
+      - Expect "toHaveValue" locator('select') with timeout 5000ms
+      - waiting for locator('select')
+
+
+      34 |         // Check if the select is set to high
+      35 |         const severitySelect = page.locator('select');
+    > 36 |         await expect(severitySelect).toHaveValue('high');
+         |                                      ^
+      37 |     });
+      38 |
+      39 |     test('toggles preferences and saves successfully', async ({ page }) => {
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\notification-preferences-settings.spec.ts:36:38
+
+    Error Context: test-results\tests-notification-prefere-2f9cc-nt-notification-preferences-chromium\error-context.md
+
+
+  2) [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:39:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ toggles preferences and saves successfully 
+
+    Error: locator.selectOption: Error: strict mode violation: locator('select') resolved to 3 elements:
+        1) <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">ΓÇª</select> aka getByLabel('ProviderGemini')
+        2) <select class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">ΓÇª</select> aka getByLabel('Modelgemini-3.8-flashgemini-3')
+        3) <select class="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">ΓÇª</select> aka getByLabel('Minimum Severity for')
+
+    Call log:
+      - waiting for locator('select')
+
+
+      73 |         // Change select
+      74 |         const severitySelect = page.locator('select');
+    > 75 |         await severitySelect.selectOption('info');
+         |                              ^
+      76 |         await expect(severitySelect).toHaveValue('info');
+      77 |
+      78 |         // Save
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\notification-preferences-settings.spec.ts:75:30
+
+    Error Context: test-results\tests-notification-prefere-7671f-nces-and-saves-successfully-chromium\error-context.md
+
+
+  3) [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=Failed to load notification preferences.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=Failed to load notification preferences.') with timeout 5000ms
+      - waiting for locator('text=Failed to load notification preferences.')
+
+
+       98 |         await page.goto('/overview/settings');
+       99 |
+    > 100 |         await expect(page.locator('text=Failed to load notification preferences.')).toBeVisible();
+          |                                                                                     ^
+      101 |     });
+      102 |
+      103 |     test('shows an error state if saving fails', async ({ page }) => {
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\notification-preferences-settings.spec.ts:100:85
+
+    Error Context: test-results\tests-notification-prefere-bbf1a-rror-state-if-loading-fails-chromium\error-context.md
+
+
+  4) [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=Failed to save notification preferences.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=Failed to save notification preferences.') with timeout 5000ms
+      - waiting for locator('text=Failed to save notification preferences.')
+
+
+      131 |         await saveBtn.click();
+      132 |
+    > 133 |         await expect(page.locator('text=Failed to save notification preferences.')).toBeVisible();
+          |                                                                                     ^
+      134 |     });
+      135 | });
+      136 |
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\notification-preferences-settings.spec.ts:133:85
+
+    Error Context: test-results\tests-notification-prefere-825c7-error-state-if-saving-fails-chromium\error-context.md
+
+
+  4 failed
+    [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:9:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ loads and displays current notification preferences 
+    [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:39:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ toggles preferences and saves successfully 
+    [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails 
+    [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails 
+
+[36m  Serving HTML report at http://localhost:51434. Press Ctrl+C to quit.[39m

@@ -1,0 +1,68 @@
+﻿
+
+
+
+Running 4 tests using 4 workers
+
+[1/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:9:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ loads and displays current notification preferences
+[2/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails
+[3/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails
+[4/4] [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:39:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ toggles preferences and saves successfully
+  1) [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=Failed to load notification preferences.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=Failed to load notification preferences.') with timeout 5000ms
+      - waiting for locator('text=Failed to load notification preferences.')
+
+
+       98 |         await page.goto('/overview/settings');
+       99 |
+    > 100 |         await expect(page.locator('text=Failed to load notification preferences.')).toBeVisible();
+          |                                                                                     ^
+      101 |     });
+      102 |
+      103 |     test('shows an error state if saving fails', async ({ page }) => {
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\notification-preferences-settings.spec.ts:100:85
+
+    Error Context: test-results\tests-notification-prefere-bbf1a-rror-state-if-loading-fails-chromium\error-context.md
+
+
+  2) [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('text=Failed to save notification preferences.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('text=Failed to save notification preferences.') with timeout 5000ms
+      - waiting for locator('text=Failed to save notification preferences.')
+
+
+      131 |         await saveBtn.click();
+      132 |
+    > 133 |         await expect(page.locator('text=Failed to save notification preferences.')).toBeVisible();
+          |                                                                                     ^
+      134 |     });
+      135 | });
+      136 |
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\notification-preferences-settings.spec.ts:133:85
+
+    Error Context: test-results\tests-notification-prefere-825c7-error-state-if-saving-fails-chromium\error-context.md
+
+
+  2 failed
+    [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails 
+    [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails 
+  2 passed (16.2s)
+
+[36m  Serving HTML report at http://localhost:57945. Press Ctrl+C to quit.[39m

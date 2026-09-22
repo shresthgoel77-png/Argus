@@ -9,6 +9,7 @@ import { AppMobileNav } from "@/components/layout/app-mobile-nav";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth/use-auth";
 import { Menu } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export function AppTopbar() {
     const router = useRouter();
@@ -44,6 +45,8 @@ export function AppTopbar() {
             <div className="flex-1">
                 <h1 className="text-sm font-semibold text-foreground">Dashboard</h1>
             </div>
+
+            <NotificationBell />
 
             {/* User affordance */}
             {isLoading ? (

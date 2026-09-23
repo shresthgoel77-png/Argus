@@ -85,14 +85,16 @@ class GitHubAppClient:
         )
         return self
 
-    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+    async def __aexit__(self, exc_type: Any, exc_val: Any,
+                        exc_tb: Any) -> None:
         if self._http is not None:
             await self._http.aclose()
             self._http = None
 
     # -- Internal helpers ---------------------------------------------------
 
-    async def _auth_headers(self, *, use_app_jwt: bool = False) -> dict[str, str]:
+    async def _auth_headers(
+            self, *, use_app_jwt: bool = False) -> dict[str, str]:
         """Build Authorization header using installation token or app JWT.
 
         Args:
@@ -136,13 +138,14 @@ class GitHubAppClient:
             params,
         )
 
-        kwargs = {"headers": auth_headers, "params": params}
         if json is not None:
-            kwargs["json"] = json
-            
-        response = await self._http.request(
-            method, url, **kwargs
-        )
+            response = await self._http.request(
+                method, url, headers=auth_headers, params=params, json=json
+            )
+        else:
+            response = await self._http.request(
+                method, url, headers=auth_headers, params=params
+            )
 
         logger.debug(
             "GitHub API response: %s %s -> %d",
@@ -156,7 +159,9 @@ class GitHubAppClient:
 
     # -- Public API ---------------------------------------------------------
 
-    async def post_issue_comment(self, owner: str, repo: str, issue_number: int, body: str) -> PostedComment:
+    async def post_issue_comment(
+        self, owner: str, repo: str, issue_number: int, body: str
+    ) -> PostedComment:
         """Post a comment to an issue or pull request.
 
         Defensively truncates the body to GitHub's max limit before sending.
@@ -164,7 +169,7 @@ class GitHubAppClient:
         """
         # GitHub limits issue comment bodies to 65536 characters.
         safe_body = body[:65536]
-        
+
         response = await self._request(
             "POST",
             f"/repos/{owner}/{repo}/issues/{issue_number}/comments",
@@ -254,7 +259,9 @@ class GitHubAppClient:
         except GitHubNotFoundError:
             return None
 
-    async def get_pull_request(self, full_name: str, number: int) -> dict[str, Any] | None:
+    async def get_pull_request(
+        self, full_name: str, number: int
+    ) -> dict[str, Any] | None:
         """Fetch one pull request resource without following related links."""
         try:
             response = await self._request("GET", f"/repos/{full_name}/pulls/{number}")
@@ -263,7 +270,9 @@ class GitHubAppClient:
         except GitHubNotFoundError:
             return None
 
-    async def get_issue(self, full_name: str, number: int) -> dict[str, Any] | None:
+    async def get_issue(
+        self, full_name: str, number: int
+    ) -> dict[str, Any] | None:
         """Fetch one issue resource without following related links."""
         try:
             response = await self._request("GET", f"/repos/{full_name}/issues/{number}")
@@ -285,7 +294,8 @@ class GitHubAppClient:
             raise GitHubAPIError("GitHub returned no collaborator permission")
         return permission
 
-    async def list_dependabot_alerts(self, full_name: str) -> list[dict[str, Any]]:
+    async def list_dependabot_alerts(
+            self, full_name: str) -> list[dict[str, Any]]:
         """List dependabot alerts for a repository with pagination."""
         all_alerts: list[dict[str, Any]] = []
         page = 1
@@ -298,10 +308,11 @@ class GitHubAppClient:
                 )
                 data = response.json()
                 if not isinstance(data, list):
-                    # In case the API returns an object instead of a list incorrectly, though it shouldn't
+                    # In case the API returns an object instead of a list
+                    # incorrectly, though it shouldn't
                     break
                 all_alerts.extend(data)
-                
+
                 link_header = response.headers.get("link", "")
                 if 'rel="next"' not in link_header:
                     break
@@ -309,7 +320,7 @@ class GitHubAppClient:
             except GitHubNotFoundError:
                 # 404 indicates dependable is disabled or repo not found
                 return []
-        
+
         return all_alerts
 
     async def get_branch_protection(
@@ -325,7 +336,9 @@ class GitHubAppClient:
         except GitHubNotFoundError:
             return None
 
-    async def list_repository_issues(self, full_name: str) -> list[dict[str, Any]]:
+    async def list_repository_issues(
+        self, full_name: str
+    ) -> list[dict[str, Any]]:
         """List open issues for a repository (includes pull requests per GitHub API)."""
         all_issues: list[dict[str, Any]] = []
         page = 1
@@ -334,23 +347,27 @@ class GitHubAppClient:
                 response = await self._request(
                     "GET",
                     f"/repos/{full_name}/issues",
-                    params={"state": "open", "per_page": _MAX_PER_PAGE, "page": page},
+                    params={
+                        "state": "open",
+                        "per_page": _MAX_PER_PAGE,
+                        "page": page},
                 )
                 data = response.json()
                 if not isinstance(data, list):
                     break
                 all_issues.extend(data)
-                
+
                 link_header = response.headers.get("link", "")
                 if 'rel="next"' not in link_header:
                     break
                 page += 1
             except GitHubNotFoundError:
                 return []
-        
+
         return all_issues
 
-    async def list_repository_pulls(self, full_name: str) -> list[dict[str, Any]]:
+    async def list_repository_pulls(
+            self, full_name: str) -> list[dict[str, Any]]:
         """List open pull requests for a repository."""
         all_prs: list[dict[str, Any]] = []
         page = 1
@@ -359,28 +376,32 @@ class GitHubAppClient:
                 response = await self._request(
                     "GET",
                     f"/repos/{full_name}/pulls",
-                    params={"state": "open", "per_page": _MAX_PER_PAGE, "page": page},
+                    params={
+                        "state": "open",
+                        "per_page": _MAX_PER_PAGE,
+                        "page": page},
                 )
                 data = response.json()
                 if not isinstance(data, list):
                     break
                 all_prs.extend(data)
-                
+
                 link_header = response.headers.get("link", "")
                 if 'rel="next"' not in link_header:
                     break
                 page += 1
             except GitHubNotFoundError:
                 return []
-        
+
         return all_prs
+
 
 async def get_branch_protection(
     installation_id: int, full_name: str, branch: str
 ) -> dict[str, Any] | None:
     """Fetch branch protection rules for a repository branch standalone."""
     from app.integrations.github.exceptions import GitHubNotFoundError
-    
+
     async with GitHubAppClient(installation_id) as client:
         try:
             response = await client._request(

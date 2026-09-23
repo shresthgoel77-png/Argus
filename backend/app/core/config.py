@@ -2,6 +2,7 @@ from typing import Literal, Any, List, Union
 from pydantic import field_validator, model_validator, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
     # To be extended with "clerk" etc. later
@@ -11,20 +12,20 @@ class Settings(BaseSettings):
     test_database_url: str | None = None
     log_level: str = "INFO"
     cors_origins: Union[List[str], str] = ["http://localhost:3000"]
-    
+
     github_app_id: str
     github_app_slug: str
     github_app_private_key: SecretStr
     github_app_webhook_secret: SecretStr
     github_app_install_state_ttl_seconds: int = 600
     ai_credential_encryption_key: SecretStr
-    
+
     bot_mention_handle: str = "@repomedic"
     bot_max_interactions_per_hour: int = 10
     health_drop_notification_threshold: int = 15
     stale_issue_days: int = 30
     stale_pr_days: int = 14
-    
+
     smtp_host: str | None = None
     smtp_port: int | None = None
     smtp_username: str | None = None
@@ -51,33 +52,64 @@ class Settings(BaseSettings):
         if not self.github_app_id:
             raise ValueError("GITHUB_APP_ID is required and must not be empty")
         if not self.github_app_slug:
-            raise ValueError("GITHUB_APP_SLUG is required and must not be empty")
-        if not self.github_app_private_key or not self.github_app_private_key.get_secret_value():
-            raise ValueError("GITHUB_APP_PRIVATE_KEY is required and must not be empty")
-        if not self.github_app_webhook_secret or not self.github_app_webhook_secret.get_secret_value():
-            raise ValueError("GITHUB_APP_WEBHOOK_SECRET is required and must not be empty")
-        
-        if not self.ai_credential_encryption_key or not self.ai_credential_encryption_key.get_secret_value():
-            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY is required and must not be empty")
-            
+            raise ValueError(
+                "GITHUB_APP_SLUG is required and "
+                "must not be empty"
+            )
+        if (not self.github_app_private_key or
+                not self.github_app_private_key.get_secret_value()):
+            raise ValueError(
+                "GITHUB_APP_PRIVATE_KEY is required and "
+                "must not be empty"
+            )
+        if (not self.github_app_webhook_secret or
+                not self.github_app_webhook_secret.get_secret_value()):
+            raise ValueError(
+                "GITHUB_APP_WEBHOOK_SECRET is required and "
+                "must not be empty"
+            )
+
+        if (not self.ai_credential_encryption_key or
+                not self.ai_credential_encryption_key.get_secret_value()):
+            raise ValueError(
+                "AI_CREDENTIAL_ENCRYPTION_KEY is required and "
+                "must not be empty"
+            )
+
         from cryptography.fernet import Fernet
         try:
             Fernet(self.ai_credential_encryption_key.get_secret_value())
         except Exception:
-            raise ValueError("AI_CREDENTIAL_ENCRYPTION_KEY is malformed, must be a valid Fernet key")
+            raise ValueError(
+                "AI_CREDENTIAL_ENCRYPTION_KEY is malformed, "
+                "must be a valid Fernet key"
+            )
 
         if self.app_env != "development":
             if not self.database_url:
-                raise ValueError("DATABASE_URL is required and must not be empty in non-development environments")
-        
+                raise ValueError(
+                    "DATABASE_URL is required and "
+                    "must not be empty in non-development environments"
+                )
+
         if self.app_env == "production":
             if self.auth_provider == "development":
-                raise ValueError("Development auth provider cannot be used in production environment")
+                raise ValueError(
+                    "Development auth provider cannot be "
+                    "used in production environment"
+                )
             if self.session_secret_key == "dev_secret_key_change_me_in_production":
-                raise ValueError("SESSION_SECRET_KEY must be overridden in production environment")
-                
+                raise ValueError(
+                    "SESSION_SECRET_KEY must be overridden "
+                    "in production environment"
+                )
+
         return self
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding='utf-8',
+        extra='ignore')
 
-settings = Settings()
+
+settings = Settings()  # type: ignore[call-arg]

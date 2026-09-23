@@ -32,7 +32,7 @@ class FindingListResponse(BaseModel):
     items: list[FindingResponse]
     total: int
     limit: int
-    offset: int
+    next_cursor: str | None = None
 
 
 class FindingStatusUpdateRequest(BaseModel):

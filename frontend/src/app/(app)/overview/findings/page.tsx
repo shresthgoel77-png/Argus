@@ -54,7 +54,8 @@ export default function FindingsPage() {
     const [repositories, setRepositories] = React.useState<Repository[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
-    const [offset, setOffset] = React.useState(0);
+    const [pageIndex, setPageIndex] = React.useState(0);
+    const [cursors, setCursors] = React.useState<(string | undefined)[]>([undefined]);
     const [retryKey, setRetryKey] = React.useState(0);
     const [selectedFinding, setSelectedFinding] = React.useState<FindingResponse | null>(null);
 
@@ -73,17 +74,28 @@ export default function FindingsPage() {
         let active = true;
         async function fetchFindings() {
             setIsLoading(true); setError(false);
-            const params: Record<string, string> = { limit: PAGE_SIZE.toString(), offset: offset.toString() };
+            const cursor = cursors[pageIndex];
+            const params: Record<string, string> = { limit: PAGE_SIZE.toString() };
+            if (cursor) params.cursor = cursor;
             if (filters.category) params.category = filters.category;
             if (filters.severity) params.severity = filters.severity;
             if (filters.priority) params.priority = filters.priority;
             if (filters.status) params.status = filters.status;
             const response = await listFindings(params);
-            if (active) { setResult(response); setError(response === null); setIsLoading(false); }
+            if (active) {
+                setResult(response); setError(response === null); setIsLoading(false);
+                if (response?.next_cursor) {
+                    setCursors(prev => {
+                        const next = [...prev];
+                        next[pageIndex + 1] = response.next_cursor ?? undefined;
+                        return next;
+                    });
+                }
+            }
         }
         void fetchFindings();
         return () => { active = false; };
-    }, [filters, offset, retryKey]);
+    }, [filters, pageIndex, cursors, retryKey]);
 
     React.useEffect(() => {
         let active = true;
@@ -92,15 +104,16 @@ export default function FindingsPage() {
     }, [retryKey]);
 
     const repositoryNames = React.useMemo(() => new Map(repositories.map((repository) => [repository.id, repository.full_name])), [repositories]);
-    const updateFilter = (key: keyof Filters, value: string) => { setFilters((current) => ({ ...current, [key]: value })); setOffset(0); };
-    const hasPreviousPage = offset > 0;
-    const hasNextPage = Boolean(result && offset + result.items.length < result.total);
+    const updateFilter = (key: keyof Filters, value: string) => { setFilters((current) => ({ ...current, [key]: value })); setPageIndex(0); setCursors([undefined]); };
+    const hasPreviousPage = pageIndex > 0;
+    const hasNextPage = Boolean(result?.next_cursor);
+    const offsetDisplay = pageIndex * PAGE_SIZE;
 
     return <div className="space-y-6">
         <SectionHeading eyebrow="Review" title="Findings" description="Review code health findings across your connected repositories." />
         <div className="rounded-lg border bg-card p-4 shadow-soft" aria-label="Finding filters"><div className="flex flex-wrap gap-3"><FilterSelect label="Category" value={filters.category} options={CATEGORIES} onChange={(value) => updateFilter("category", value)} /><FilterSelect label="Severity" value={filters.severity} options={SEVERITIES} onChange={(value) => updateFilter("severity", value)} /><FilterSelect label="Priority" value={filters.priority} options={PRIORITIES} onChange={(value) => updateFilter("priority", value)} /><FilterSelect label="Status" value={filters.status} options={STATUSES} onChange={(value) => updateFilter("status", value)} /></div></div>
         {isLoading ? <FindingsSkeleton /> : error ? <EmptyState icon={<AlertTriangle className="size-6" aria-hidden="true" />} title="Findings are temporarily unavailable" description="RepoMedic could not load findings from your workspace. Try again in a moment." action={<Button variant="outline" onClick={() => setRetryKey((key) => key + 1)}>Try again</Button>} /> : result && result.items.length > 0 ? <div className="space-y-3">{result.items.map((finding) => <FindingRow key={finding.id} finding={finding} repositoryName={repositoryNames.get(finding.repository_id) ?? "Repository unavailable"} onClick={() => setSelectedFinding(finding)} />)}</div> : <EmptyState icon={<Search className="size-6" aria-hidden="true" />} title="Your findings queue is clear" description="There are no findings matching these filters. New findings will appear here after RepoMedic analyzes a connected repository." />}
-        {!isLoading && !error && result ? <div className="flex items-center justify-between gap-4 border-t pt-4"><p className="text-sm text-muted-foreground">{result.total === 0 ? "No findings" : `Showing ${offset + 1}–${Math.min(offset + result.items.length, result.total)} of ${result.total}`}</p><div className="flex gap-2"><Button variant="outline" size="sm" disabled={!hasPreviousPage} onClick={() => setOffset((current) => Math.max(0, current - PAGE_SIZE))}><ChevronLeft className="size-4" aria-hidden="true" /> Previous</Button><Button variant="outline" size="sm" disabled={!hasNextPage} onClick={() => setOffset((current) => current + PAGE_SIZE)}>Next <ChevronRight className="size-4" aria-hidden="true" /></Button></div></div> : null}
+        {!isLoading && !error && result ? <div className="flex items-center justify-between gap-4 border-t pt-4"><p className="text-sm text-muted-foreground">{result.total === 0 ? "No findings" : `Showing ${offsetDisplay + 1}–${Math.min(offsetDisplay + result.items.length, result.total)} of ${result.total}`}</p><div className="flex gap-2"><Button variant="outline" size="sm" disabled={!hasPreviousPage} onClick={() => setPageIndex((current) => Math.max(0, current - 1))}><ChevronLeft className="size-4" aria-hidden="true" /> Previous</Button><Button variant="outline" size="sm" disabled={!hasNextPage} onClick={() => setPageIndex((current) => current + 1)}>Next <ChevronRight className="size-4" aria-hidden="true" /></Button></div></div> : null}
         <FindingDetailDialog finding={selectedFinding} isOpen={!!selectedFinding} onOpenChange={(open) => !open && setSelectedFinding(null)} onUpdate={handleUpdateFinding} />
     </div>;
 }

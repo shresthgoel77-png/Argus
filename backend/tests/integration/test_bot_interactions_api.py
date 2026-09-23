@@ -47,14 +47,15 @@ async def test_bot_interactions_are_owned_paginated_and_newest_first(
     add_interaction(db_session, test_user_repository, index=3)
 
     response = await authorized_client.get(
-        f"/api/v1/repositories/{test_user_repository.id}/bot-interactions?limit=2&offset=0"
+        f"/api/v1/repositories/{test_user_repository.id}/bot-interactions?limit=2"
     )
 
     assert response.status_code == 200
     data = response.json()
     assert data["total"] == 3
     assert data["limit"] == 2
-    assert data["offset"] == 0
+    assert "next_cursor" in data
+    assert data["next_cursor"] is not None
     assert [item["requester_github_login"] for item in data["items"]] == [
         "requester-1",
         "requester-2",
@@ -64,8 +65,9 @@ async def test_bot_interactions_are_owned_paginated_and_newest_first(
     assert data["items"][1]["skip_reason"] == "insufficient_permission"
     assert data["items"][1]["response_text"] is None
 
+    next_cursor = data["next_cursor"]
     next_page = await authorized_client.get(
-        f"/api/v1/repositories/{test_user_repository.id}/bot-interactions?limit=2&offset=2"
+        f"/api/v1/repositories/{test_user_repository.id}/bot-interactions?limit=2&cursor={next_cursor}"
     )
     assert [item["requester_github_login"] for item in next_page.json()["items"]] == [
         "requester-3"

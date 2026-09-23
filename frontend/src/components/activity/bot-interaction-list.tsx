@@ -80,7 +80,8 @@ export function BotInteractionList({ repositoryId }: { repositoryId: string }) {
     const [result, setResult] = React.useState<BotInteractionListResponse | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState(false);
-    const [offset, setOffset] = React.useState(0);
+    const [pageIndex, setPageIndex] = React.useState(0);
+    const [cursors, setCursors] = React.useState<(string | undefined)[]>([undefined]);
     const [retryKey, setRetryKey] = React.useState(0);
 
     React.useEffect(() => {
@@ -88,19 +89,26 @@ export function BotInteractionList({ repositoryId }: { repositoryId: string }) {
         async function fetchInteractions() {
             setIsLoading(true);
             setError(false);
-            const response = await listRepositoryBotInteractions(repositoryId, {
-                limit: PAGE_SIZE.toString(),
-                offset: offset.toString(),
-            });
+            const cursor = cursors[pageIndex];
+            const params: Record<string, string> = { limit: PAGE_SIZE.toString() };
+            if (cursor) params.cursor = cursor;
+            const response = await listRepositoryBotInteractions(repositoryId, params);
             if (active) {
                 setResult(response);
                 setError(response === null);
                 setIsLoading(false);
+                if (response?.next_cursor) {
+                    setCursors(prev => {
+                        const next = [...prev];
+                        next[pageIndex + 1] = response.next_cursor ?? undefined;
+                        return next;
+                    });
+                }
             }
         }
         void fetchInteractions();
         return () => { active = false; };
-    }, [offset, repositoryId, retryKey]);
+    }, [pageIndex, cursors, repositoryId, retryKey]);
 
     if (isLoading) return <InteractionsSkeleton />;
     if (error) {
@@ -123,21 +131,22 @@ export function BotInteractionList({ repositoryId }: { repositoryId: string }) {
         );
     }
 
-    const hasPreviousPage = offset > 0;
-    const hasNextPage = offset + result.items.length < result.total;
+    const hasPreviousPage = pageIndex > 0;
+    const hasNextPage = Boolean(result.next_cursor);
+    const offsetDisplay = pageIndex * PAGE_SIZE;
 
     return (
         <div className="space-y-3">
             {result.items.map((interaction) => <InteractionRow key={interaction.id} interaction={interaction} />)}
             <div className="flex items-center justify-between gap-4 border-t pt-4">
                 <p className="text-sm text-muted-foreground">
-                    Showing {offset + 1}-{Math.min(offset + result.items.length, result.total)} of {result.total}
+                    Showing {offsetDisplay + 1}-{Math.min(offsetDisplay + result.items.length, result.total)} of {result.total}
                 </p>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="sm" disabled={!hasPreviousPage} onClick={() => setOffset((current) => Math.max(0, current - PAGE_SIZE))}>
+                    <Button variant="outline" size="sm" disabled={!hasPreviousPage} onClick={() => setPageIndex((current) => Math.max(0, current - 1))}>
                         <ChevronLeft className="size-4" aria-hidden="true" /> Previous
                     </Button>
-                    <Button variant="outline" size="sm" disabled={!hasNextPage} onClick={() => setOffset((current) => current + PAGE_SIZE)}>
+                    <Button variant="outline" size="sm" disabled={!hasNextPage} onClick={() => setPageIndex((current) => current + 1)}>
                         Next <ChevronRight className="size-4" aria-hidden="true" />
                     </Button>
                 </div>

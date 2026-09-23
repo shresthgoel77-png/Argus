@@ -107,7 +107,7 @@ def get_repository_findings(
     priority: str | None = None,
     status_: str | None = None,
     limit: int = 50,
-    offset: int = 0,
+    cursor: str | None = None,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -118,22 +118,26 @@ def get_repository_findings(
     get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
 
     # 2. Re-use list_findings with the repository_id filter
-    total, items = list_findings(
-        db=db,
-        user_id=user.id,
-        repository_id=repository_id,
-        category=category,
-        severity=severity,
-        priority=priority,
-        status=status_,
-        limit=limit,
-        offset=offset
-    )
+    try:
+        total, items, next_cursor = list_findings(
+            db=db,
+            user_id=user.id,
+            repository_id=repository_id,
+            category=category,
+            severity=severity,
+            priority=priority,
+            status=status_,
+            limit=limit,
+            cursor=cursor
+        )
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid cursor")
+
     return FindingListResponse(
         items=[FindingResponse.model_validate(i) for i in items],
         total=total,
         limit=limit,
-        offset=offset
+        next_cursor=next_cursor
     )
 
 

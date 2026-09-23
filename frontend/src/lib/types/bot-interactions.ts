@@ -15,5 +15,5 @@ export interface BotInteractionListResponse {
     items: BotInteraction[];
     total: number;
     limit: number;
-    offset: number;
+    next_cursor?: string | null;
 }

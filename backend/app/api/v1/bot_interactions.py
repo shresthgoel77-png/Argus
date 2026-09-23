@@ -1,6 +1,7 @@
 import uuid
 
-from fastapi import APIRouter, Depends, Query
+from datetime import datetime
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
@@ -22,7 +23,7 @@ router = APIRouter(prefix="/repositories/{repository_id}", tags=["bot-interactio
 def list_repository_bot_interactions(
     repository_id: uuid.UUID,
     limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
+    cursor: str | None = Query(default=None),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -31,10 +32,29 @@ def list_repository_bot_interactions(
     query = (
         db.query(BotInteraction)
         .filter(BotInteraction.repository_id == repository_id)
-        .order_by(desc(BotInteraction.created_at), desc(BotInteraction.id))
     )
-    total = query.count()
-    interactions = query.limit(limit).offset(offset).all()
+
+    if cursor:
+        import base64
+        try:
+            from sqlalchemy import or_, and_
+            decoded = base64.urlsafe_b64decode(cursor.encode()).decode()
+            cursor_dt_str, cursor_id_str = decoded.split(',')
+            cursor_dt = datetime.fromisoformat(cursor_dt_str)
+            cursor_id = uuid.UUID(cursor_id_str)
+            query = query.filter(
+                or_(
+                    BotInteraction.created_at < cursor_dt,
+                    and_(BotInteraction.created_at == cursor_dt, BotInteraction.id < cursor_id)
+                )
+            )
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid cursor")
+
+    query = query.order_by(desc(BotInteraction.created_at), desc(BotInteraction.id))
+
+    total = db.query(BotInteraction).filter(BotInteraction.repository_id == repository_id).count()
+    interactions = query.limit(limit).all()
 
     items = [
         BotInteractionResponse(
@@ -55,9 +75,15 @@ def list_repository_bot_interactions(
         )
         for interaction in interactions
     ]
+    next_cursor = None
+    if len(interactions) == limit:
+        import base64
+        last = interactions[-1]
+        next_cursor = base64.urlsafe_b64encode(f"{last.created_at.isoformat()},{last.id}".encode()).decode()
+
     return BotInteractionListResponse(
         items=items,
         total=total,
         limit=limit,
-        offset=offset,
+        next_cursor=next_cursor,
     )

@@ -219,8 +219,8 @@ def list_findings(
     priority: Optional[str] = None,
     status: Optional[str] = None,
     limit: int = 50,
-    offset: int = 0,
-) -> tuple[int, list[Finding]]:
+    cursor: str | None = None,
+) -> tuple[int, list[Finding], str | None]:
     """List findings across all repositories owned by the user."""
     query = (
         db.query(Finding)
@@ -247,13 +247,36 @@ def list_findings(
     # Cap limit to 200 as per prompt
     limit = min(limit, 200)
 
+    if cursor:
+        import base64
+        try:
+            from sqlalchemy import or_, and_
+            decoded = base64.urlsafe_b64decode(cursor.encode()).decode()
+            cursor_dt_str, cursor_id_str = decoded.split(',')
+            cursor_dt = datetime.fromisoformat(cursor_dt_str)
+            cursor_id = uuid.UUID(cursor_id_str)
+            query = query.filter(
+                or_(
+                    Finding.detected_at < cursor_dt,
+                    and_(Finding.detected_at == cursor_dt, Finding.id < cursor_id)
+                )
+            )
+        except Exception as e:
+            raise ValueError("Invalid cursor format") from e
+
     items = (
-        query.order_by(desc(Finding.detected_at))
-        .offset(offset)
+        query.order_by(desc(Finding.detected_at), desc(Finding.id))
         .limit(limit)
         .all()
     )
-    return total, items
+
+    next_cursor = None
+    if len(items) == limit:
+        import base64
+        last = items[-1]
+        next_cursor = base64.urlsafe_b64encode(f"{last.detected_at.isoformat()},{last.id}".encode()).decode()
+
+    return total, items, next_cursor
 
 
 def get_finding_or_404(

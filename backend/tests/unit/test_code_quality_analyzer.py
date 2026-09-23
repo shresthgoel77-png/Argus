@@ -77,7 +77,31 @@ async def test_run_analyzer_verifies_sync_path_for_code_quality(mock_get_branch_
     
     mock_get_branch_protection.return_value = None
     
+
     result = await run_analyzer(db_session, "code_quality", test_user_repository)
     
     assert result.status == "success"
     assert result.sync_result is not None
+
+@pytest.mark.asyncio
+@patch("app.monitoring.analyzers.code_quality_analyzer.get_branch_protection")
+async def test_code_quality_analyzer_repository_scope(mock_get_branch_protection, code_quality_analyzer):
+    """Confirm the analyzer can be invoked given only a repository and client, independent of any event."""
+    context = MagicMock(spec=AnalyzerContext)
+    context.repository = MagicMock()
+    context.repository.full_name = "test/repo2"
+    context.repository.default_branch = "dev"
+    context.repository.id = 999
+    context.repository.connection.installation_id = 1111
+    context.client = AsyncMock()
+    context.normalized_event = None
+    
+    mock_get_branch_protection.return_value = None
+
+    findings = await code_quality_analyzer.analyze(context)
+    
+    assert len(findings) == 1
+    finding = findings[0]
+    assert finding.severity == "medium"
+    assert finding.type_ == "missing_branch_protection"
+    assert finding.evidence["default_branch"] == "dev"

@@ -1,8 +1,9 @@
+
 import uuid
 import pytest
 from app.models.finding import Finding
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
-from app.services.health_service import generate_reasons, compute_and_persist_health
+from app.services.health_service import generate_reasons, compute_and_persist_health, recalculate_repository_health
 
 class MockSession:
     def __init__(self):
@@ -240,6 +241,34 @@ def test_health_drop_notification_exception_handling(monkeypatch):
     monkeypatch.setattr("app.services.health_service.compute_overall_score", lambda c: 70)
     monkeypatch.setattr("app.services.health_service.get_latest_snapshot", lambda db, repo: RepositoryHealthSnapshot(overall_score=100))
     
+
     db = get_mock_db()
     snapshot = compute_and_persist_health(db, uuid.uuid4())
     assert snapshot in db.added # Persistence not aborted!
+
+def test_recalculate_repository_health_produces_identical_snapshot(monkeypatch):
+    """
+    Validates that recalculate_repository_health yields an identical scoring 
+    outcome to an on-demand recalculation given the exact same open findings state.
+    """
+    f = Finding(category="security", severity="critical", type="sql_injection")
+    monkeypatch.setattr("app.services.health_service.get_all_open_findings_for_repository", lambda db, repo: [f])
+    
+    prev = RepositoryHealthSnapshot(
+        overall_score=100, 
+        category_scores={"security": 100, "ci_cd": 100, "dependencies": 100, "issues": 100, "pull_requests": 100, "code_quality": 100}
+    )
+    monkeypatch.setattr("app.services.health_service.get_latest_snapshot", lambda db, repo: prev)
+    
+    db = MockSession()
+    repo_id = uuid.uuid4()
+    
+    on_demand_snapshot = compute_and_persist_health(db, repo_id)
+    
+    db2 = MockSession()
+    recalculated_snapshot = recalculate_repository_health(db2, repo_id)
+    
+    # Verify outputs are identical
+    assert recalculated_snapshot.overall_score == on_demand_snapshot.overall_score
+    assert recalculated_snapshot.category_scores == on_demand_snapshot.category_scores
+    assert recalculated_snapshot.reasons == on_demand_snapshot.reasons

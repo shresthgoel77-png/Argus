@@ -125,7 +125,40 @@ async def test_run_analyzer_verifies_sync_path_for_security(mock_client_class):
     mock_client_class.return_value = mock_client_instance
     mock_client_instance.list_dependabot_alerts.return_value = []
     
+
     result = await run_analyzer(db_session, "security", test_user_repository)
     
     assert result.status == "success"
     assert result.sync_result is not None
+
+@pytest.mark.asyncio
+async def test_security_analyzer_repository_scope(security_analyzer):
+    """Confirm the analyzer can be invoked given only a repository and client, independent of any event."""
+    context = MagicMock(spec=AnalyzerContext)
+    context.repository = MagicMock()
+    context.repository.full_name = "test/repo2"
+    context.repository.id = 999
+    context.client = AsyncMock()
+    context.normalized_event = None
+    
+    context.client.list_dependabot_alerts.return_value = [
+        {
+            "number": 10,
+            "state": "open",
+            "security_advisory": {
+                "summary": "High Risk",
+                "severity": "high"
+            },
+            "dependency": {
+                "package": {"name": "lodash"}
+            }
+        }
+    ]
+    
+    findings = await security_analyzer.analyze(context)
+    
+    assert len(findings) == 1
+    finding = findings[0]
+    assert finding.severity == "high"
+    assert finding.evidence["package_name"] == "lodash"
+    assert finding.type_ == "dependabot_alert_open"

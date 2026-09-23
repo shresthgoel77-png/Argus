@@ -84,6 +84,7 @@ def generate_reasons(
     return reasons
 
 
+
 def compute_and_persist_health(db: Session, repository_id: uuid.UUID) -> RepositoryHealthSnapshot:
     """
     Computes health scores based on all open findings, compares with previous snapshot
@@ -144,3 +145,11 @@ def compute_and_persist_health(db: Session, repository_id: uuid.UUID) -> Reposit
                 )
 
     return snapshot
+
+def recalculate_repository_health(db: Session, repository_id: uuid.UUID) -> RepositoryHealthSnapshot:
+    """
+    Recomputes RepositoryHealthSnapshot for a given repository unconditionally, 
+    independent of any event or analyzer run side effect.
+    """
+    # This delegates entirely to the existing Phase 8 implementation logic.
+    return compute_and_persist_health(db, repository_id)

@@ -97,5 +97,30 @@ async def test_run_analyzer_constructs_client(mock_client_class):
     
     # Since requires_client=True, the mock Client should have been called
     assert result.status == "success", f"Failed with: {getattr(result, 'error_message', 'unknown')}"
+
     assert result.sync_result is not None
     mock_client_class.assert_called_once_with(installation_id=test_user_repository.connection.installation_id)
+
+@pytest.mark.asyncio
+async def test_dependency_analyzer_repository_scope(dependency_analyzer):
+    """Confirm the analyzer can be invoked given only a repository and client, independent of any event."""
+    context = MagicMock(spec=AnalyzerContext)
+    context.repository = MagicMock()
+    context.repository.full_name = "test/repo2"
+    context.repository.id = 999
+    context.client = AsyncMock()
+    context.normalized_event = None
+    
+    async def get_content(full_name, path):
+        if path == "package.json":
+            return {"name": "test2"}
+        return None
+
+    context.client.get_repository_content.side_effect = get_content
+
+    findings = await dependency_analyzer.analyze(context)
+    
+    assert len(findings) == 1
+    finding = findings[0]
+    assert finding.severity == "medium"
+    assert finding.type_ == "missing_lockfile"

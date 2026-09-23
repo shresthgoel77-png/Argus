@@ -1,4 +1,0 @@
- M backend/app/core/config.py
-?? backend/pytest_final.txt
-?? git_diff_out.txt
-?? status_out.txt

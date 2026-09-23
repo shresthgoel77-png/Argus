@@ -1,0 +1,35 @@
+﻿git : warning: could 
+not open directory 
+'.pytest_cache/': 
+Permission denied
+At line:1 char:1
++ git status > 
+git_status_audit.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo     
+         : 
+NotSpecified: (warning 
+   : could ...rmission 
+deni    ed:String) [], 
+RemoteExc    eption
+    + 
+FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   pytest_full.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	git_status_audit.txt
+	test.db-journal
+
+no changes added to commit (use "git add" and/or "git commit -a")

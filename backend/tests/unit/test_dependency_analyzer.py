@@ -2,13 +2,15 @@ import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 
 from app.monitoring.analyzers.dependency_analyzer import DependencyAnalyzer
-from app.monitoring.analyzer_base import AnalyzerContext, FindingDraft
+from app.monitoring.analyzer_base import AnalyzerContext
 from app.integrations.github.exceptions import GitHubAuthError
 from app.monitoring.monitor_service import run_analyzer
+
 
 @pytest.fixture
 def dependency_analyzer():
     return DependencyAnalyzer()
+
 
 @pytest.fixture
 def mock_context():
@@ -19,8 +21,11 @@ def mock_context():
     context.client = AsyncMock()
     return context
 
+
 @pytest.mark.asyncio
-async def test_analyzer_manifest_present_no_lockfile(dependency_analyzer, mock_context):
+async def test_analyzer_manifest_present_no_lockfile(
+    dependency_analyzer, mock_context
+):
     async def get_content(full_name, path):
         if path == "package.json":
             return {"name": "test"}
@@ -37,8 +42,11 @@ async def test_analyzer_manifest_present_no_lockfile(dependency_analyzer, mock_c
     assert finding.evidence == {"manifest": "package.json"}
     assert finding.fingerprint == "dependency:123:package.json"
 
+
 @pytest.mark.asyncio
-async def test_analyzer_manifest_present_has_lockfile(dependency_analyzer, mock_context):
+async def test_analyzer_manifest_present_has_lockfile(
+    dependency_analyzer, mock_context
+):
     async def get_content(full_name, path):
         if path == "package.json":
             return {"name": "test"}
@@ -51,6 +59,7 @@ async def test_analyzer_manifest_present_has_lockfile(dependency_analyzer, mock_
     findings = await dependency_analyzer.analyze(mock_context)
     assert len(findings) == 0
 
+
 @pytest.mark.asyncio
 async def test_analyzer_manifest_absent(dependency_analyzer, mock_context):
     async def get_content(full_name, path):
@@ -62,12 +71,16 @@ async def test_analyzer_manifest_absent(dependency_analyzer, mock_context):
     findings = await dependency_analyzer.analyze(mock_context)
     assert len(findings) == 0
 
+
 @pytest.mark.asyncio
 async def test_analyzer_github_auth_error(dependency_analyzer, mock_context):
-    mock_context.client.get_repository_content.side_effect = GitHubAuthError("403 Forbidden")
+    mock_context.client.get_repository_content.side_effect = GitHubAuthError(
+        "403 Forbidden"
+    )
 
     findings = await dependency_analyzer.analyze(mock_context)
     assert len(findings) == 0
+
 
 @pytest.mark.asyncio
 @patch("app.monitoring.monitor_service.GitHubAppClient")
@@ -80,37 +93,44 @@ async def test_run_analyzer_constructs_client(mock_client_class):
     test_user_repository.connection.installation_id = 999
     db_session.commit = MagicMock()
     db_session.refresh = MagicMock()
-    
+
     mock_client_instance = AsyncMock()
     # When used as async context manager, __aenter__ returns the instance
     mock_client_instance.__aenter__.return_value = mock_client_instance
     mock_client_class.return_value = mock_client_instance
-    
-    # We will mock the analyzer as well to avoid DB commit issues with real finding
+
+    # We will mock the analyzer as well to avoid DB commit issues with real
+    # finding
     async def get_content(full_name, path):
         return None
 
     mock_client_instance.get_repository_content.side_effect = get_content
-    
+
     # Run the real dependency analyzer through the service
     result = await run_analyzer(db_session, "dependency", test_user_repository)
-    
+
     # Since requires_client=True, the mock Client should have been called
-    assert result.status == "success", f"Failed with: {getattr(result, 'error_message', 'unknown')}"
+    assert result.status == "success", f"Failed with: {
+        getattr(
+            result, 'error_message', 'unknown')}"
 
     assert result.sync_result is not None
-    mock_client_class.assert_called_once_with(installation_id=test_user_repository.connection.installation_id)
+    mock_client_class.assert_called_once_with(
+        installation_id=test_user_repository.connection.installation_id
+    )
+
 
 @pytest.mark.asyncio
 async def test_dependency_analyzer_repository_scope(dependency_analyzer):
-    """Confirm the analyzer can be invoked given only a repository and client, independent of any event."""
+    """Confirm the analyzer can be invoked given only a repository and client,
+    independent of any event."""
     context = MagicMock(spec=AnalyzerContext)
     context.repository = MagicMock()
     context.repository.full_name = "test/repo2"
     context.repository.id = 999
     context.client = AsyncMock()
     context.normalized_event = None
-    
+
     async def get_content(full_name, path):
         if path == "package.json":
             return {"name": "test2"}
@@ -119,7 +139,7 @@ async def test_dependency_analyzer_repository_scope(dependency_analyzer):
     context.client.get_repository_content.side_effect = get_content
 
     findings = await dependency_analyzer.analyze(context)
-    
+
     assert len(findings) == 1
     finding = findings[0]
     assert finding.severity == "medium"

@@ -1,0 +1,177 @@
+﻿app/services/health_service.py:22:1: E302 expected 2 blank lines, found 1
+app/services/health_service.py:22:80: E501 line too long (101 > 79 characters)
+app/services/health_service.py:54:80: E501 line too long (93 > 79 characters)
+app/services/health_service.py:64:80: E501 line too long (96 > 79 characters)
+app/services/health_service.py:70:80: E501 line too long (84 > 79 characters)
+app/services/health_service.py:78:80: E501 line too long (98 > 79 characters)
+app/services/health_service.py:88:1: E303 too many blank lines (3)
+app/services/health_service.py:88:80: E501 line too long (98 > 79 characters)
+app/services/health_service.py:90:80: E501 line too long (86 > 79 characters)
+app/services/health_service.py:100:80: E501 line too long (87 > 79 characters)
+app/services/health_service.py:117:80: E501 line too long (90 > 79 characters)
+app/services/health_service.py:125:80: E501 line too long (86 > 79 characters)
+app/services/health_service.py:128:80: E501 line too long (110 > 79 characters)
+app/services/health_service.py:144:80: E501 line too long (97 > 79 characters)
+app/services/health_service.py:149:1: E302 expected 2 blank lines, found 1
+app/services/health_service.py:149:80: E501 line too long (101 > 79 characters)
+app/services/health_service.py:151:80: W291 trailing whitespace
+tests/services/test_health_service.py:3:1: F401 'pytest' imported but unused
+tests/services/test_health_service.py:6:80: E501 line too long (115 > 79 characters)
+tests/services/test_health_service.py:8:1: E302 expected 2 blank lines, found 1
+tests/services/test_health_service.py:11:5: E301 expected 1 blank line, found 0
+tests/services/test_health_service.py:13:5: E301 expected 1 blank line, found 0
+tests/services/test_health_service.py:15:5: E301 expected 1 blank line, found 0
+tests/services/test_health_service.py:23:1: E302 expected 2 blank lines, found 1
+tests/services/test_health_service.py:24:80: E501 line too long (84 > 79 characters)
+tests/services/test_health_service.py:28:1: E302 expected 2 blank lines, found 1
+tests/services/test_health_service.py:35:1: E302 expected 2 blank lines, found 1
+tests/services/test_health_service.py:45:1: E302 expected 2 blank lines, found 1
+tests/services/test_health_service.py:46:80: E501 line too long (112 > 79 characters)
+tests/services/test_health_service.py:47:80: E501 line too long (97 > 79 characters)
+tests/services/test_health_service.py:48:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:51:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:60:80: E501 line too long (113 > 79 characters)
+tests/services/test_health_service.py:61:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:62:80: E501 line too long (182 > 79 characters)
+tests/services/test_health_service.py:63:80: E501 line too long (97 > 79 characters)
+tests/services/test_health_service.py:64:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:67:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:75:80: E501 line too long (112 > 79 characters)
+tests/services/test_health_service.py:76:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:77:80: E501 line too long (180 > 79 characters)
+tests/services/test_health_service.py:78:80: E501 line too long (97 > 79 characters)
+tests/services/test_health_service.py:79:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:82:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:90:80: E501 line too long (113 > 79 characters)
+tests/services/test_health_service.py:91:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:92:80: E501 line too long (180 > 79 characters)
+tests/services/test_health_service.py:93:80: E501 line too long (97 > 79 characters)
+tests/services/test_health_service.py:94:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:97:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:128:5: F401 'sqlalchemy.orm.Query' imported but unused
+tests/services/test_health_service.py:129:5: E306 expected 1 blank line before a nested definition, found 0
+tests/services/test_health_service.py:133:9: E306 expected 1 blank line before a nested definition, found 0
+tests/services/test_health_service.py:135:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:140:80: E501 line too long (81 > 79 characters)
+tests/services/test_health_service.py:142:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:144:80: E501 line too long (87 > 79 characters)
+tests/services/test_health_service.py:145:80: E501 line too long (80 > 79 characters)
+tests/services/test_health_service.py:149:5: F401 'app.services.health_service' imported but unused
+tests/services/test_health_service.py:151:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:153:5: E306 expected 1 blank line before a nested definition, found 0
+tests/services/test_health_service.py:155:80: E501 line too long (94 > 79 characters)
+tests/services/test_health_service.py:156:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:157:80: E501 line too long (112 > 79 characters)
+tests/services/test_health_service.py:158:80: E501 line too long (92 > 79 characters)
+tests/services/test_health_service.py:159:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:162:9: E306 expected 1 blank line before a nested definition, found 0
+tests/services/test_health_service.py:166:17: E306 expected 1 blank line before a nested definition, found 0
+tests/services/test_health_service.py:181:80: E501 line too long (90 > 79 characters)
+tests/services/test_health_service.py:182:80: E501 line too long (136 > 79 characters)
+tests/services/test_health_service.py:185:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:187:80: E501 line too long (90 > 79 characters)
+tests/services/test_health_service.py:188:80: E501 line too long (136 > 79 characters)
+tests/services/test_health_service.py:193:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:196:80: E501 line too long (90 > 79 characters)
+tests/services/test_health_service.py:197:80: E501 line too long (136 > 79 characters)
+tests/services/test_health_service.py:201:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:204:80: E501 line too long (91 > 79 characters)
+tests/services/test_health_service.py:205:80: E501 line too long (135 > 79 characters)
+tests/services/test_health_service.py:211:5: F401 'app.services.health_service' imported but unused
+tests/services/test_health_service.py:213:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:216:9: E306 expected 1 blank line before a nested definition, found 0
+tests/services/test_health_service.py:220:17: E306 expected 1 blank line before a nested definition, found 0
+tests/services/test_health_service.py:236:80: E501 line too long (100 > 79 characters)
+tests/services/test_health_service.py:237:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:238:80: E501 line too long (112 > 79 characters)
+tests/services/test_health_service.py:239:80: E501 line too long (92 > 79 characters)
+tests/services/test_health_service.py:241:80: E501 line too long (90 > 79 characters)
+tests/services/test_health_service.py:242:80: E501 line too long (136 > 79 characters)
+tests/services/test_health_service.py:243:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:245:5: E303 too many blank lines (2)
+tests/services/test_health_service.py:247:32: E261 at least two spaces before inline comment
+tests/services/test_health_service.py:249:1: E302 expected 2 blank lines, found 1
+tests/services/test_health_service.py:249:80: E501 line too long (80 > 79 characters)
+tests/services/test_health_service.py:251:77: W291 trailing whitespace
+tests/services/test_health_service.py:252:80: E501 line too long (83 > 79 characters)
+tests/services/test_health_service.py:255:80: E501 line too long (113 > 79 characters)
+tests/services/test_health_service.py:256:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:258:27: W291 trailing whitespace
+tests/services/test_health_service.py:259:80: E501 line too long (134 > 79 characters)
+tests/services/test_health_service.py:261:80: E501 line too long (97 > 79 characters)
+tests/services/test_health_service.py:262:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:265:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:267:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:270:1: W293 blank line contains whitespace
+tests/services/test_health_service.py:272:80: E501 line too long (82 > 79 characters)
+tests/services/test_health_service.py:273:80: E501 line too long (86 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:4:1: F811 redefinition of unused 'AsyncMock' from line 2
+tests/unit/test_code_quality_analyzer.py:4:1: F811 redefinition of unused 'MagicMock' from line 2
+tests/unit/test_code_quality_analyzer.py:10:1: E302 expected 2 blank lines, found 1
+tests/unit/test_code_quality_analyzer.py:14:1: E302 expected 2 blank lines, found 1
+tests/unit/test_code_quality_analyzer.py:25:1: E302 expected 2 blank lines, found 1
+tests/unit/test_code_quality_analyzer.py:27:80: E501 line too long (106 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:35:80: E501 line too long (80 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:37:1: E302 expected 2 blank lines, found 1
+tests/unit/test_code_quality_analyzer.py:39:80: E501 line too long (110 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:51:80: E501 line too long (80 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:53:1: E302 expected 2 blank lines, found 1
+tests/unit/test_code_quality_analyzer.py:55:80: E501 line too long (107 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:60:80: E501 line too long (80 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:62:1: E402 module level import not at top of file
+tests/unit/test_code_quality_analyzer.py:64:1: E302 expected 2 blank lines, found 1
+tests/unit/test_code_quality_analyzer.py:67:80: E501 line too long (111 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:73:1: W293 blank line contains whitespace
+tests/unit/test_code_quality_analyzer.py:77:1: W293 blank line contains whitespace
+tests/unit/test_code_quality_analyzer.py:79:1: W293 blank line contains whitespace
+tests/unit/test_code_quality_analyzer.py:81:5: E303 too many blank lines (2)
+tests/unit/test_code_quality_analyzer.py:81:80: E501 line too long (81 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:82:1: W293 blank line contains whitespace
+tests/unit/test_code_quality_analyzer.py:86:1: E302 expected 2 blank lines, found 1
+tests/unit/test_code_quality_analyzer.py:88:80: E501 line too long (105 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:89:80: E501 line too long (107 > 79 characters)
+tests/unit/test_code_quality_analyzer.py:98:1: W293 blank line contains whitespace
+tests/unit/test_code_quality_analyzer.py:102:1: W293 blank line contains whitespace
+tests/unit/test_dependency_analyzer.py:5:1: F401 'app.monitoring.analyzer_base.FindingDraft' imported but unused
+tests/unit/test_dependency_analyzer.py:9:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:13:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:22:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:23:80: E501 line too long (88 > 79 characters)
+tests/unit/test_dependency_analyzer.py:40:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:41:80: E501 line too long (89 > 79 characters)
+tests/unit/test_dependency_analyzer.py:54:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:65:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:67:80: E501 line too long (93 > 79 characters)
+tests/unit/test_dependency_analyzer.py:72:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:83:1: W293 blank line contains whitespace
+tests/unit/test_dependency_analyzer.py:88:1: W293 blank line contains whitespace
+tests/unit/test_dependency_analyzer.py:89:80: E501 line too long (83 > 79 characters)
+tests/unit/test_dependency_analyzer.py:94:1: W293 blank line contains whitespace
+tests/unit/test_dependency_analyzer.py:97:1: W293 blank line contains whitespace
+tests/unit/test_dependency_analyzer.py:99:80: E501 line too long (100 > 79 characters)
+tests/unit/test_dependency_analyzer.py:102:80: E501 line too long (110 > 79 characters)
+tests/unit/test_dependency_analyzer.py:104:1: E302 expected 2 blank lines, found 1
+tests/unit/test_dependency_analyzer.py:106:80: E501 line too long (107 > 79 characters)
+tests/unit/test_dependency_analyzer.py:113:1: W293 blank line contains whitespace
+tests/unit/test_dependency_analyzer.py:122:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:5:1: F401 'app.monitoring.analyzer_base.FindingDraft' imported but unused
+tests/unit/test_security_analyzer.py:9:1: E302 expected 2 blank lines, found 1
+tests/unit/test_security_analyzer.py:13:1: E302 expected 2 blank lines, found 1
+tests/unit/test_security_analyzer.py:22:1: E302 expected 2 blank lines, found 1
+tests/unit/test_security_analyzer.py:61:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:63:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:82:1: E302 expected 2 blank lines, found 1
+tests/unit/test_security_analyzer.py:89:1: E302 expected 2 blank lines, found 1
+tests/unit/test_security_analyzer.py:91:80: E501 line too long (93 > 79 characters)
+tests/unit/test_security_analyzer.py:96:1: E302 expected 2 blank lines, found 1
+tests/unit/test_security_analyzer.py:97:80: E501 line too long (81 > 79 characters)
+tests/unit/test_security_analyzer.py:107:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:122:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:127:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:129:5: E303 too many blank lines (2)
+tests/unit/test_security_analyzer.py:130:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:134:1: E302 expected 2 blank lines, found 1
+tests/unit/test_security_analyzer.py:136:80: E501 line too long (107 > 79 characters)
+tests/unit/test_security_analyzer.py:143:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:157:1: W293 blank line contains whitespace
+tests/unit/test_security_analyzer.py:159:1: W293 blank line contains whitespace

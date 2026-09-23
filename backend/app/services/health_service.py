@@ -19,7 +19,10 @@ from app.services.health_score_service import (
 
 logger = get_logger(__name__)
 
-def get_latest_snapshot(db: Session, repository_id: uuid.UUID) -> Optional[RepositoryHealthSnapshot]:
+
+def get_latest_snapshot(
+    db: Session, repository_id: uuid.UUID
+) -> Optional[RepositoryHealthSnapshot]:
     """Retrieve the most recent health snapshot for a repository."""
     return (
         db.query(RepositoryHealthSnapshot)
@@ -51,7 +54,8 @@ def generate_reasons(
     if not deltas:
         return ["No change since last check."]
 
-    # Sort descending by magnitude of change, then alphabetically by category for determinism
+    # Sort descending by magnitude of change, then alphabetically by category
+    # for determinism
     deltas.sort(key=lambda x: (-abs(x[1]), x[0]))
 
     reasons = []
@@ -61,13 +65,20 @@ def generate_reasons(
             break
 
         if delta > 0:
-            reasons.append(f"{cat.replace('_', ' ').title()} score improved by {delta} points.")
+            msg = (
+                f"{cat.replace('_', ' ').title()} "
+                f"score improved by {delta} points."
+            )
+            reasons.append(msg)
         else:
             # Drop reason
             examples = []
             seen_types = set()
             for finding in open_findings:
-                if FINDING_CATEGORY_TO_HEALTH_CATEGORY.get(finding.category) == cat:
+                if (
+                    FINDING_CATEGORY_TO_HEALTH_CATEGORY.get(finding.category)
+                    == cat
+                ):
                     type_str = f"[{finding.severity}] {finding.type}"
                     if type_str not in seen_types:
                         seen_types.add(type_str)
@@ -75,7 +86,10 @@ def generate_reasons(
                         if len(examples) == 2:
                             break
 
-            base_reason = f"{cat.replace('_', ' ').title()} score dropped by {abs(delta)} points."
+            base_reason = f"{
+                cat.replace(
+                    '_', ' ').title()} score dropped by {
+                abs(delta)} points."
             if examples:
                 examples_str = ", ".join(examples)
                 base_reason += f" Examples: {examples_str}."
@@ -84,11 +98,12 @@ def generate_reasons(
     return reasons
 
 
-
-def compute_and_persist_health(db: Session, repository_id: uuid.UUID) -> RepositoryHealthSnapshot:
+def compute_and_persist_health(
+    db: Session, repository_id: uuid.UUID
+) -> RepositoryHealthSnapshot:
     """
-    Computes health scores based on all open findings, compares with previous snapshot
-    to generate reasons, and persists a new snapshot.
+    Computes health scores based on all open findings, compares with
+    previous snapshot to generate reasons, and persists a new snapshot.
     """
     open_findings = get_all_open_findings_for_repository(db, repository_id)
 
@@ -97,7 +112,9 @@ def compute_and_persist_health(db: Session, repository_id: uuid.UUID) -> Reposit
 
     previous = get_latest_snapshot(db, repository_id)
 
-    reasons = generate_reasons(previous, category_scores, overall_score, open_findings)
+    reasons = generate_reasons(
+        previous, category_scores, overall_score, open_findings
+    )
 
     snapshot = RepositoryHealthSnapshot(
         repository_id=repository_id,
@@ -114,18 +131,29 @@ def compute_and_persist_health(db: Session, repository_id: uuid.UUID) -> Reposit
         drop = previous.overall_score - snapshot.overall_score
         if drop >= settings.health_drop_notification_threshold:
             try:
-                repo = db.query(Repository).filter(Repository.id == repository_id).first()
+                repo = (
+                    db.query(Repository)
+                    .filter(Repository.id == repository_id)
+                    .first()
+                )
                 if repo:
-                    conn = db.query(GitHubConnection).filter(
-                        GitHubConnection.id == repo.connection_id
-                    ).first()
+                    conn = (
+                        db.query(GitHubConnection)
+                        .filter(GitHubConnection.id == repo.connection_id)
+                        .first()
+                    )
                     if conn:
                         severity = (
                             "high"
-                            if drop >= 2 * settings.health_drop_notification_threshold
+                            if drop
+                            >= 2 * settings.health_drop_notification_threshold
                             else "medium"
                         )
-                        message = "\n".join(snapshot.reasons) if snapshot.reasons else "Health score dropped."
+                        message = (
+                            "\n".join(snapshot.reasons)
+                            if snapshot.reasons
+                            else "Health score dropped."
+                        )
                         notification_dispatch_service.dispatch_notification(
                             db,
                             user_id=conn.user_id,
@@ -141,14 +169,20 @@ def compute_and_persist_health(db: Session, repository_id: uuid.UUID) -> Reposit
                 logger.warning(
                     "Failed to dispatch health score drop notification",
                     exc_info=True,
-                    extra={"repository_id": str(repository_id), "snapshot_id": str(snapshot.id)},
+                    extra={
+                        "repository_id": str(repository_id),
+                        "snapshot_id": str(snapshot.id),
+                    },
                 )
 
     return snapshot
 
-def recalculate_repository_health(db: Session, repository_id: uuid.UUID) -> RepositoryHealthSnapshot:
+
+def recalculate_repository_health(
+    db: Session, repository_id: uuid.UUID
+) -> RepositoryHealthSnapshot:
     """
-    Recomputes RepositoryHealthSnapshot for a given repository unconditionally, 
+    Recomputes RepositoryHealthSnapshot for a given repository unconditionally,
     independent of any event or analyzer run side effect.
     """
     # This delegates entirely to the existing Phase 8 implementation logic.

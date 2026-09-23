@@ -1,9 +1,11 @@
 import pytest
+from unittest.mock import AsyncMock, MagicMock
+from datetime import datetime, timezone, timedelta
 from app.monitoring.analyzers.issue_analyzer import IssueAnalyzer
 from app.monitoring.analyzer_base import AnalyzerContext
 from app.integrations.github.webhook_events import NormalizedWebhookEvent, RepoRef
 from app.models.repository import Repository
-
+import app.monitoring.analyzers.issue_analyzer as issue_analyzer_mdl
 def create_context(
     event_type: str, 
     action: str, 
@@ -68,3 +70,35 @@ def test_issue_analyzer_flags_none_body():
     assert len(findings) == 1
     assert findings[0].severity == "info"
     assert findings[0].type_ == "issue_opened_without_description"
+
+@pytest.mark.asyncio
+async def test_scan_repository_for_stale_issues():
+    analyzer = IssueAnalyzer()
+    db = MagicMock()
+    import uuid
+    repo = Repository(id=uuid.uuid4(), github_repo_id=1, full_name="my/repo")
+    client = AsyncMock()
+    
+    stale_date = datetime.now(timezone.utc) - timedelta(days=35)
+    fresh_date = datetime.now(timezone.utc) - timedelta(days=5)
+    
+    client.list_repository_issues.return_value = [
+        {"number": 1, "updated_at": stale_date.isoformat(), "html_url": "url1"},
+        {"number": 2, "updated_at": fresh_date.isoformat(), "html_url": "url2"},
+        {"number": 3, "updated_at": stale_date.isoformat(), "html_url": "url3", "pull_request": {}}
+    ]
+    
+    original_finding_service = issue_analyzer_mdl.finding_service
+    issue_analyzer_mdl.finding_service = MagicMock()
+    
+    try:
+        await analyzer.scan_repository_for_stale_issues(db, repo, client)
+        
+        client.list_repository_issues.assert_called_once_with("my/repo")
+        issue_analyzer_mdl.finding_service.create_finding.assert_called_once()
+        kwargs = issue_analyzer_mdl.finding_service.create_finding.call_args.kwargs
+        assert kwargs["fingerprint"] == "stale_issue_1"
+        assert kwargs["type_"] == "stale_issue"
+        assert kwargs["severity"] == "info"
+    finally:
+        issue_analyzer_mdl.finding_service = original_finding_service

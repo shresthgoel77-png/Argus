@@ -325,6 +325,56 @@ class GitHubAppClient:
         except GitHubNotFoundError:
             return None
 
+    async def list_repository_issues(self, full_name: str) -> list[dict[str, Any]]:
+        """List open issues for a repository (includes pull requests per GitHub API)."""
+        all_issues: list[dict[str, Any]] = []
+        page = 1
+        while True:
+            try:
+                response = await self._request(
+                    "GET",
+                    f"/repos/{full_name}/issues",
+                    params={"state": "open", "per_page": _MAX_PER_PAGE, "page": page},
+                )
+                data = response.json()
+                if not isinstance(data, list):
+                    break
+                all_issues.extend(data)
+                
+                link_header = response.headers.get("link", "")
+                if 'rel="next"' not in link_header:
+                    break
+                page += 1
+            except GitHubNotFoundError:
+                return []
+        
+        return all_issues
+
+    async def list_repository_pulls(self, full_name: str) -> list[dict[str, Any]]:
+        """List open pull requests for a repository."""
+        all_prs: list[dict[str, Any]] = []
+        page = 1
+        while True:
+            try:
+                response = await self._request(
+                    "GET",
+                    f"/repos/{full_name}/pulls",
+                    params={"state": "open", "per_page": _MAX_PER_PAGE, "page": page},
+                )
+                data = response.json()
+                if not isinstance(data, list):
+                    break
+                all_prs.extend(data)
+                
+                link_header = response.headers.get("link", "")
+                if 'rel="next"' not in link_header:
+                    break
+                page += 1
+            except GitHubNotFoundError:
+                return []
+        
+        return all_prs
+
 async def get_branch_protection(
     installation_id: int, full_name: str, branch: str
 ) -> dict[str, Any] | None:

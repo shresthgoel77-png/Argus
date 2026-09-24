@@ -57,6 +57,22 @@ async def test_repo_health_lazy_compute_and_post(db_session, authorized_client: 
     assert "overall_score" in data
     assert data["previous_score"] is None
     
+    # Add a SECOND finding to FORCE a score change, ensuring a new snapshot is persisted!
+    finding2 = Finding(
+        id=uuid.uuid4(),
+        repository_id=test_user_repository.id,
+        category="security",
+        type="test_sec2",
+        title="Sec Finding 2",
+        description="test 2",
+        severity="critical",
+        status="open",
+        source="cli",
+        evidence={},
+    )
+    db_session.add(finding2)
+    db_session.commit()
+
     # Trigger a health run via POST
     response2 = await authorized_client.post(
         f"/api/v1/repositories/{test_user_repository.id}/health-runs"
@@ -75,9 +91,17 @@ async def test_repo_health_history_pagination(db_session, authorized_client: Asy
     db_session.query(RepositoryHealthSnapshot).filter(RepositoryHealthSnapshot.repository_id == test_user_repository.id).delete()
     db_session.commit()
     
-    # Trigger 3 health runs
-    for _ in range(3):
-        await authorized_client.post(f"/api/v1/repositories/{test_user_repository.id}/health-runs")
+    # Insert 3 snapshots directly instead of relying on POST to generate duplicates, 
+    # since we now correctly deduplicate unchanged runs
+    for i in range(3):
+        snap = RepositoryHealthSnapshot(
+            repository_id=test_user_repository.id,
+            overall_score=100-i,
+            category_scores={"security":100-i},
+            reasons=["Manually inserted"]
+        )
+        db_session.add(snap)
+    db_session.commit()
         
     response = await authorized_client.get(
         f"/api/v1/repositories/{test_user_repository.id}/health/history?limit=2&offset=0"

@@ -115,6 +115,9 @@ def compute_and_persist_health(
     reasons = generate_reasons(
         previous, category_scores, overall_score, open_findings
     )
+    
+    if previous is not None and overall_score == previous.overall_score and reasons == ["No change since last check."]:
+        return previous
 
     snapshot = RepositoryHealthSnapshot(
         repository_id=repository_id,

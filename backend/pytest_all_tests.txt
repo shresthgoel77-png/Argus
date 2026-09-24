@@ -1,0 +1,704 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 473 items
+
+tests/integration/api/v1/test_findings.py::test_get_findings_list PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_findings_list_filters PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_repository_findings PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_repository_findings_unowned PASSED [  0%]
+tests/integration/api/v1/test_findings.py::test_get_finding_detail PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_get_finding_detail_unowned PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_patch_finding_status PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_patch_finding_status_conflict PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_patch_finding_unowned PASSED [  1%]
+tests/integration/api/v1/test_findings.py::test_unauthenticated PASSED   [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_success PASSED [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_not_configured PASSED [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_failed_provider PASSED [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_trigger_analysis_unowned_finding PASSED [  2%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_get_latest_analysis_none PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_get_latest_analysis_success PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_get_latest_analysis_unowned_finding PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_list_analyses_history PASSED [  3%]
+tests/integration/api/v1/test_findings_ai_analysis.py::test_list_analyses_unowned_finding PASSED [  4%]
+tests/integration/api/v1/test_internal_scheduled_monitoring.py::test_scheduler_secret_is_required_and_does_not_run_cycle PASSED [  4%]
+tests/integration/api/v1/test_internal_scheduled_monitoring.py::test_scheduler_secret_runs_cycle_and_returns_safe_summary PASSED [  4%]
+tests/integration/api/v1/test_internal_scheduled_monitoring.py::test_scheduler_route_is_excluded_from_public_schema PASSED [  4%]
+tests/integration/api/v1/test_internal_scheduled_monitoring.py::test_production_requires_scheduler_secret PASSED [  4%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_success PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_not_configured PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_failed_provider PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_trigger_repo_analysis_unowned PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_success PASSED [  5%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_none PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_get_latest_repo_analysis_unowned PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_success PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_empty PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_history_repo_analysis_unowned PASSED [  6%]
+tests/integration/api/v1/test_repositories_ai_summary.py::test_unauthenticated PASSED [  7%]
+tests/integration/api/v1/test_repositories_dashboard_integration.py::test_get_dashboard_overview PASSED [  7%]
+tests/integration/services/test_finding_service.py::test_create_finding PASSED [  7%]
+tests/integration/services/test_finding_service.py::test_create_finding_fingerprint_conflict_updates_existing_row PASSED [  7%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_auto_resolves_missing PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_leaves_ignored_missing_finding_untouched PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_sync_findings_for_run_updates_present_finding PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_list_findings_for_repository PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_create_finding_triggers_dispatch_on_new_critical PASSED [  8%]
+tests/integration/services/test_finding_service.py::test_create_finding_does_not_trigger_on_deduplication PASSED [  9%]
+tests/integration/services/test_finding_service.py::test_create_finding_does_not_trigger_on_low_severity PASSED [  9%]
+tests/integration/services/test_finding_service.py::test_create_finding_dispatch_failure_does_not_rollback PASSED [  9%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_new PASSED [  9%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_idempotent_update PASSED [  9%]
+tests/integration/services/test_github_connection_service.py::test_upsert_connection_ownership_reassignment PASSED [ 10%]
+tests/integration/services/test_github_connection_service.py::test_list_connections PASSED [ 10%]
+tests/integration/services/test_github_connection_service.py::test_get_connection_or_404 PASSED [ 10%]
+tests/integration/services/test_github_connection_service.py::test_handle_installation_status_change PASSED [ 10%]
+tests/integration/services/test_github_event_service.py::test_record_event_success PASSED [ 10%]
+tests/integration/services/test_github_event_service.py::test_record_event_duplicate_returns_none PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_status_transitions PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_mark_failed_strips_secrets PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_concurrent_insert_race PASSED [ 11%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_duplicate PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_unknown_installation PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_known_installation_suspend PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_removed_repos PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_reaction_failure_marks_failed PASSED [ 12%]
+tests/integration/services/test_github_event_service.py::test_process_webhook_event_analyzes_pull_request PASSED [ 13%]
+tests/integration/services/test_pr_integration.py::test_process_webhook_event_analyzes_pull_request PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_list_available_repositories_flags_already_added PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_add_repository_idempotency PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_add_repository_rejects_unauthorized PASSED [ 13%]
+tests/integration/services/test_repository_service.py::test_set_monitoring_enabled_ownership PASSED [ 14%]
+tests/integration/services/test_repository_service.py::test_disable_monitoring_for_removed_repositories PASSED [ 14%]
+tests/integration/services/test_verify_prompt_6.py::test_verify_end_to_end_health_drop PASSED [ 14%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_merges_sources_and_paginates PASSED [ 14%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_empty_repository PASSED [ 15%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_api_paginates_without_payload_or_duplicates PASSED [ 15%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_api_filters_by_source PASSED [ 15%]
+tests/integration/test_activity_feed_api.py::test_activity_feed_api_rejects_unowned_repository PASSED [ 15%]
+tests/integration/test_ai_connection_api.py::test_create_connection_returns_safe_status PASSED [ 15%]
+tests/integration/test_ai_connection_api.py::test_invalid_api_key_is_sanitized PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_provider_errors_are_sanitized[provider_error0-429-The AI provider is rate limited. Please try again later.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_provider_errors_are_sanitized[provider_error1-503-The AI provider is currently unavailable. Please try again later.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_unsupported_provider_or_model_is_sanitized[<lambda>-supported-model-The selected AI provider or model is not supported.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_unsupported_provider_or_model_is_sanitized[<lambda>-unsupported-model-The selected AI provider or model is not supported.] PASSED [ 16%]
+tests/integration/test_ai_connection_api.py::test_get_unconfigured_connection_returns_false PASSED [ 17%]
+tests/integration/test_ai_connection_api.py::test_get_configured_connection_returns_safe_status PASSED [ 17%]
+tests/integration/test_ai_connection_api.py::test_delete_connection_is_idempotent_and_has_no_body PASSED [ 17%]
+tests/integration/test_auth_flow.py::test_auth_flow_e2e PASSED           [ 17%]
+tests/integration/test_auth_flow.py::test_dev_login_fails_non_development_provider PASSED [ 17%]
+tests/integration/test_bot_interactions_api.py::test_bot_interactions_are_owned_paginated_and_newest_first PASSED [ 18%]
+tests/integration/test_bot_interactions_api.py::test_bot_interactions_returns_404_for_unowned_repository PASSED [ 18%]
+tests/integration/test_finding_lifecycle.py::test_partial_unique_index_on_finding PASSED [ 18%]
+tests/integration/test_finding_lifecycle.py::test_partial_unique_index_allows_multiple_resolved PASSED [ 18%]
+tests/integration/test_finding_lifecycle.py::test_partial_unique_index_ignores_null_fingerprint PASSED [ 19%]
+tests/integration/test_finding_model.py::test_finding_insert PASSED      [ 19%]
+tests/integration/test_github_api.py::test_github_install_flow PASSED    [ 19%]
+tests/integration/test_github_api.py::test_github_install_callback_rejections PASSED [ 19%]
+tests/integration/test_github_api.py::test_github_endpoints_unauthenticated PASSED [ 19%]
+tests/integration/test_github_event_model.py::test_create_github_event_required_fields_only PASSED [ 20%]
+tests/integration/test_github_event_model.py::test_github_event_delivery_id_unique PASSED [ 20%]
+tests/integration/test_github_models.py::test_valid_connection_and_repo PASSED [ 20%]
+tests/integration/test_github_models.py::test_duplicate_connection PASSED [ 20%]
+tests/integration/test_github_models.py::test_duplicate_repo PASSED      [ 20%]
+tests/integration/test_migrations.py::test_alembic_upgrade_head_completes PASSED [ 21%]
+tests/integration/test_migrations.py::test_alembic_downgrade_upgrade_smoke_test PASSED [ 21%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_unauthenticated PASSED [ 21%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_not_found_or_unowned PASSED [ 21%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_malformed PASSED [ 21%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_success PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_skipped_disabled PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_monitoring_api_dependency_analyzer PASSED [ 22%]
+tests/integration/test_monitoring_api.py::test_dependency_monitor_run_repeat_updates_existing_finding PASSED [ 22%]
+tests/integration/test_notification_preferences_api.py::test_get_preferences_auto_creates PASSED [ 23%]
+tests/integration/test_notification_preferences_api.py::test_update_preferences PASSED [ 23%]
+tests/integration/test_notification_preferences_api.py::test_auth_scoping_isolation PASSED [ 23%]
+tests/integration/test_notification_preferences_api.py::test_unauthenticated_requests_rejected PASSED [ 23%]
+tests/integration/test_notifications_api.py::test_get_notifications PASSED [ 23%]
+tests/integration/test_notifications_api.py::test_get_notifications_unread_only PASSED [ 24%]
+tests/integration/test_notifications_api.py::test_unread_count_and_mark_read PASSED [ 24%]
+tests/integration/test_notifications_api.py::test_mark_all_read PASSED   [ 24%]
+tests/integration/test_notifications_api.py::test_mark_read_ownership_scoping PASSED [ 24%]
+tests/integration/test_notifications_api.py::test_get_notifications_ownership_scoping PASSED [ 24%]
+tests/integration/test_repo_health_api.py::test_repo_health_api_unauthenticated PASSED [ 25%]
+tests/integration/test_repo_health_api.py::test_repo_health_api_not_found_or_unowned PASSED [ 25%]
+tests/integration/test_repo_health_api.py::test_repo_health_lazy_compute_and_post FAILED [ 25%]
+tests/integration/test_repo_health_api.py::test_repo_health_history_pagination FAILED [ 25%]
+tests/integration/test_repositories_api.py::test_repositories_endpoints_unauthenticated PASSED [ 26%]
+tests/integration/test_repositories_api.py::test_repositories_happy_path PASSED [ 26%]
+tests/integration/test_repositories_api.py::test_repositories_ownership_protection PASSED [ 26%]
+tests/integration/test_repositories_api.py::test_repository_refresh_happy_path PASSED [ 26%]
+tests/integration/test_repositories_api.py::test_repository_refresh_disabled PASSED [ 26%]
+tests/integration/test_repositories_api.py::test_repository_refresh_ownership_protection PASSED [ 27%]
+tests/integration/test_repository_health_snapshot_model.py::test_repository_health_snapshot_creation PASSED [ 27%]
+tests/integration/test_stale_scan.py::test_rescanning_stale_issue_does_not_create_duplicate PASSED [ 27%]
+tests/integration/test_user_model.py::test_create_user PASSED            [ 27%]
+tests/integration/test_user_model.py::test_email_uniqueness PASSED       [ 27%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_new_delivery PASSED [ 28%]
+tests/integration/test_webhooks_api.py::test_webhook_valid_duplicate_delivery PASSED [ 28%]
+tests/integration/test_webhooks_api.py::test_webhook_invalid_missing_signature PASSED [ 28%]
+tests/integration/test_webhooks_api.py::test_webhook_missing_delivery_or_event PASSED [ 28%]
+tests/integration/test_webhooks_api.py::test_webhook_malformed_json_valid_signature PASSED [ 28%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_suspend PASSED [ 29%]
+tests/integration/test_webhooks_api.py::test_webhook_installation_created PASSED [ 29%]
+tests/services/test_ai_analysis_service.py::test_not_configured_raises_without_persisting_row PASSED [ 29%]
+tests/services/test_ai_analysis_service.py::test_invalid_connection_status_raises_without_persisting_row PASSED [ 29%]
+tests/services/test_ai_analysis_service.py::test_success_persists_completed_analysis PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error0-ai_provider_invalid_api_key-The configured AI provider rejected the API key.] PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error1-ai_provider_rate_limited-The AI provider is rate limited.] PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error2-ai_provider_unavailable-The AI provider is unavailable.] PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_provider_failure_persists_sanitized_failed_analysis[provider_error3-ai_provider_invalid_response-The AI provider returned an invalid response.] PASSED [ 30%]
+tests/services/test_ai_analysis_service.py::test_unexpected_failure_is_sanitized_and_persisted PASSED [ 31%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_success_persists_repository_scoped_analysis PASSED [ 31%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_not_configured_raises_without_persisting_row PASSED [ 31%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error0-The configured AI provider rejected the API key.] PASSED [ 31%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error1-The AI provider is rate limited.] PASSED [ 31%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error2-The AI provider is unavailable.] PASSED [ 32%]
+tests/services/test_ai_analysis_service.py::test_repository_summary_provider_failure_is_sanitized_and_repository_scoped[provider_error3-The AI provider returned an invalid response.] PASSED [ 32%]
+tests/services/test_ai_analysis_service.py::test_latest_and_list_analysis_are_ordered_and_paginated PASSED [ 32%]
+tests/services/test_finding_lifecycle_service.py::test_acknowledge_finding_valid_transitions PASSED [ 32%]
+tests/services/test_finding_lifecycle_service.py::test_acknowledge_finding_invalid_transitions PASSED [ 32%]
+tests/services/test_finding_lifecycle_service.py::test_resolve_finding_valid_transitions PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_resolve_finding_no_op PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_resolve_finding_invalid_transitions PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_ignore_finding_valid_transitions PASSED [ 33%]
+tests/services/test_finding_lifecycle_service.py::test_ignore_finding_no_op PASSED [ 34%]
+tests/services/test_finding_lifecycle_service.py::test_ignore_finding_invalid_transitions PASSED [ 34%]
+tests/services/test_finding_lifecycle_service.py::test_reopen_finding_valid_transitions PASSED [ 34%]
+tests/services/test_finding_lifecycle_service.py::test_reopen_finding_no_op PASSED [ 34%]
+tests/services/test_finding_lifecycle_service.py::test_auto_resolve_finding_valid_transitions PASSED [ 34%]
+tests/services/test_finding_lifecycle_service.py::test_auto_resolve_finding_no_op PASSED [ 35%]
+tests/services/test_health_service.py::test_generate_reasons_first_snapshot PASSED [ 35%]
+tests/services/test_health_service.py::test_generate_reasons_no_change PASSED [ 35%]
+tests/services/test_health_service.py::test_generate_reasons_improvement PASSED [ 35%]
+tests/services/test_health_service.py::test_generate_reasons_drop PASSED [ 35%]
+tests/services/test_health_service.py::test_compute_and_persist_health_zero_findings PASSED [ 36%]
+tests/services/test_health_service.py::test_compute_and_persist_health_critical_finding PASSED [ 36%]
+tests/services/test_health_service.py::test_compute_and_persist_health_resolved_finding PASSED [ 36%]
+tests/services/test_health_service.py::test_compute_and_persist_health_no_changes PASSED [ 36%]
+tests/services/test_health_service.py::test_generate_reasons_cap_five PASSED [ 36%]
+tests/services/test_health_service.py::test_finding_service_includes_acknowledged PASSED [ 37%]
+tests/services/test_health_service.py::test_health_drop_notification_thresholds PASSED [ 37%]
+tests/services/test_health_service.py::test_health_drop_notification_exception_handling PASSED [ 37%]
+tests/services/test_health_service.py::test_recalculate_repository_health_produces_identical_snapshot PASSED [ 37%]
+tests/services/test_notification_dispatch_service.py::test_email_enabled_and_severity_met_sends_email PASSED [ 38%]
+tests/services/test_notification_dispatch_service.py::test_email_disabled_does_not_send_email PASSED [ 38%]
+tests/services/test_notification_dispatch_service.py::test_severity_below_threshold_does_not_send_email PASSED [ 38%]
+tests/services/test_notification_dispatch_service.py::test_provider_failure_is_persisted_without_propagating PASSED [ 38%]
+tests/services/test_notification_dispatch_service.py::test_provider_returned_failure_is_persisted_without_raw_message PASSED [ 38%]
+tests/services/test_notification_preference_service.py::test_get_or_create_preference_new_user PASSED [ 39%]
+tests/services/test_notification_preference_service.py::test_update_preference_round_trip PASSED [ 39%]
+tests/services/test_notification_service.py::test_create_and_list_notifications PASSED [ 39%]
+tests/services/test_notification_service.py::test_mark_read_and_permissions PASSED [ 39%]
+tests/services/test_notification_service.py::test_mark_all_read PASSED   [ 39%]
+tests/services/test_trend_service.py::test_get_health_trend_no_history PASSED [ 40%]
+tests/services/test_trend_service.py::test_get_health_trend_one_snapshot PASSED [ 40%]
+tests/services/test_trend_service.py::test_get_health_trend_improving PASSED [ 40%]
+tests/services/test_trend_service.py::test_get_finding_velocity PASSED   [ 40%]
+tests/test_db_connection.py::test_connection PASSED                      [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_no_mention_no_interaction PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_unknown_intent_posts_help PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_unknown_intent_insufficient_permission_silent PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_authorization_denied_no_ai_no_post PASSED [ 41%]
+tests/unit/bot/test_bot_orchestration_service.py::test_happy_path_end_to_end PASSED [ 42%]
+tests/unit/bot/test_bot_orchestration_service.py::test_provider_failure_no_github_post PASSED [ 42%]
+tests/unit/bot/test_bot_orchestration_service.py::test_github_post_failure PASSED [ 42%]
+tests/unit/bot/test_bot_orchestration_service.py::test_api_key_not_logged PASSED [ 42%]
+tests/unit/bot/test_bot_orchestration_service.py::test_each_authorization_denial_creates_skipped_row PASSED [ 42%]
+tests/unit/bot/test_context_builder.py::test_ci_status_uses_existing_finding PASSED [ 43%]
+tests/unit/bot/test_context_builder.py::test_ci_status_without_finding_is_static PASSED [ 43%]
+tests/unit/bot/test_context_builder.py::test_pr_summary_falls_back_to_one_github_read PASSED [ 43%]
+tests/unit/bot/test_context_builder.py::test_issue_explain_falls_back_to_one_github_read PASSED [ 43%]
+tests/unit/bot/test_context_builder.py::test_repo_attention_aggregates_findings_and_latest_reasons PASSED [ 43%]
+tests/unit/bot/test_context_builder.py::test_bot_and_finding_context_share_delimiter_output PASSED [ 44%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_simple PASSED [ 44%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_punctuation PASSED [ 44%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_no_mention PASSED [ 44%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_mid_word PASSED [ 45%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_in_code_block PASSED [ 45%]
+tests/unit/bot/test_mention_parser.py::test_extract_mention_in_quote PASSED [ 45%]
+tests/unit/bot/test_question_parser.py::test_classify_pr_summary PASSED  [ 45%]
+tests/unit/bot/test_question_parser.py::test_classify_pr_summary_downgrades_on_issue PASSED [ 45%]
+tests/unit/bot/test_question_parser.py::test_classify_ci_status PASSED   [ 46%]
+tests/unit/bot/test_question_parser.py::test_classify_repo_attention PASSED [ 46%]
+tests/unit/bot/test_question_parser.py::test_classify_issue_explain PASSED [ 46%]
+tests/unit/bot/test_question_parser.py::test_classify_unknown PASSED     [ 46%]
+tests/unit/bot/test_question_parser.py::test_ci_keyword_boundary PASSED  [ 46%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_gemini_provider_is_registered PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_valid_key_returns_without_exception PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_invalid_key_maps_to_invalid_api_key[401] PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_invalid_key_maps_to_invalid_api_key[403] PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_rate_limit_maps_to_rate_limited PASSED [ 47%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_server_errors_map_to_unavailable[response0] PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_server_errors_map_to_unavailable[response1] PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_timeout_maps_to_unavailable_without_key_leak PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_network_error_maps_to_unavailable_without_key_leak PASSED [ 48%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_default_timeout_is_passed_to_request PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_returns_validated_result_and_preserves_boundaries PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_rejects_invalid_structured_response[response0] PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_rejects_invalid_structured_response[response1] PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_rejects_invalid_structured_response[response2] PASSED [ 49%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_returns_validated_result PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_rejects_invalid_structured_response[response0] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_rejects_invalid_structured_response[response1] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_repository_summary_rejects_invalid_structured_response[response2] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_preserves_mapped_transport_errors[error0] PASSED [ 50%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_preserves_mapped_transport_errors[error1] PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_analysis_preserves_mapped_transport_errors[error2] PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_invalid_key_maps_to_invalid_api_key[401] PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_invalid_key_maps_to_invalid_api_key[403] PASSED [ 51%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_rate_limit_maps_to_rate_limited PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generation_timeout_maps_to_unavailable PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_returns_validated_result_and_preserves_boundaries PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_rejects_invalid_structured_response[response0] PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_rejects_invalid_structured_response[response1] PASSED [ 52%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_rejects_invalid_structured_response[response2] PASSED [ 53%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_preserves_mapped_transport_errors[error0] PASSED [ 53%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_preserves_mapped_transport_errors[error1] PASSED [ 53%]
+tests/unit/integrations/ai/test_gemini_provider.py::test_generate_bot_response_preserves_mapped_transport_errors[error2] PASSED [ 53%]
+tests/unit/integrations/ai/test_registry.py::test_ai_provider_registry PASSED [ 53%]
+tests/unit/integrations/ai/test_registry.py::test_ai_provider_exceptions PASSED [ 54%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_not_configured PASSED [ 54%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_successful_send_with_tls PASSED [ 54%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_auth_failure PASSED [ 54%]
+tests/unit/integrations/email/test_smtp_provider.py::test_smtp_connection_failure PASSED [ 54%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_pull_request PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_issues PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_issue_comment PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_workflow_run PASSED [ 55%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_push PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_installation PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_installation_repositories PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_malformed_non_dict_payload PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_partially_malformed_repository PASSED [ 56%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_malformed_installation PASSED [ 57%]
+tests/unit/integrations/github/test_webhook_events.py::test_parse_unsupported_event_with_valid_shapes PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_empty_repository PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_low_severity_only PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_no_snapshot PASSED [ 57%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_with_snapshot_and_limit PASSED [ 58%]
+tests/unit/services/test_needs_attention_service.py::test_get_needs_attention_priority_ordering PASSED [ 58%]
+tests/unit/services/test_repository_summary_context_builder.py::test_build_repository_summary_context_with_findings_and_snapshot PASSED [ 58%]
+tests/unit/services/test_repository_summary_context_builder.py::test_build_repository_summary_context_no_findings_no_snapshot PASSED [ 58%]
+tests/unit/services/test_repository_summary_context_builder.py::test_build_repository_summary_context_repo_not_found PASSED [ 58%]
+tests/unit/test_ai_analysis.py::test_aianalysis_creation PASSED          [ 59%]
+tests/unit/test_ai_analysis.py::test_aianalysis_fk_cascade PASSED        [ 59%]
+tests/unit/test_ai_analysis.py::test_aianalysis_query_ordering PASSED    [ 59%]
+tests/unit/test_ai_connection_model.py::test_ai_connection_model_unique_user_id PASSED [ 59%]
+tests/unit/test_ai_connection_model.py::test_ai_connection_no_plaintext_keys PASSED [ 60%]
+tests/unit/test_ai_connection_model.py::test_ai_connection_fields PASSED [ 60%]
+tests/unit/test_ai_connection_service.py::test_create_connection_validates_before_persisting PASSED [ 60%]
+tests/unit/test_ai_connection_service.py::test_create_connection_rejects_unsupported_model_without_provider_call PASSED [ 60%]
+tests/unit/test_ai_connection_service.py::test_create_connection_replaces_existing_row_and_status_is_safe PASSED [ 60%]
+tests/unit/test_ai_connection_service.py::test_delete_connection_is_idempotent PASSED [ 61%]
+tests/unit/test_ai_connection_service.py::test_get_connection_status_returns_none_when_unconfigured PASSED [ 61%]
+tests/unit/test_ai_context_builder.py::test_ci_category PASSED           [ 61%]
+tests/unit/test_ai_context_builder.py::test_pull_request_category PASSED [ 61%]
+tests/unit/test_ai_context_builder.py::test_issue_category PASSED        [ 61%]
+tests/unit/test_ai_context_builder.py::test_dependency_category PASSED   [ 62%]
+tests/unit/test_ai_context_builder.py::test_security_category PASSED     [ 62%]
+tests/unit/test_ai_context_builder.py::test_code_quality_category PASSED [ 62%]
+tests/unit/test_ai_context_builder.py::test_repository_activity_category PASSED [ 62%]
+tests/unit/test_ai_context_builder.py::test_fake_instructions_injection PASSED [ 63%]
+tests/unit/test_ai_context_builder.py::test_graceful_degradation_missing_fields PASSED [ 63%]
+tests/unit/test_analyzer_registry.py::test_registry_is_empty_by_default PASSED [ 63%]
+tests/unit/test_analyzer_registry.py::test_register_and_get_analyzer PASSED [ 63%]
+tests/unit/test_analyzer_registry.py::test_get_unknown_analyzer PASSED   [ 63%]
+tests/unit/test_auth_config_safety.py::test_settings_development_auth PASSED [ 64%]
+tests/unit/test_auth_config_safety.py::test_settings_test_env_auth PASSED [ 64%]
+tests/unit/test_auth_config_safety.py::test_settings_production_auth_safety FAILED [ 64%]
+tests/unit/test_auth_factory_safety.py::test_factory_returns_dev_in_non_prod PASSED [ 64%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_dev_in_production PASSED [ 64%]
+tests/unit/test_auth_factory_safety.py::test_factory_raises_on_unrecognized PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_monitoring_disabled_short_circuits PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_owner_unresolved_short_circuits PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_ai_not_configured_short_circuits PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_insufficient_permission PASSED [ 65%]
+tests/unit/test_authorization_service.py::test_permission_check_failure_denies PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_rate_limit_counts_only_trailing_hour PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_rate_limit_denies_trailing_hour_interaction PASSED [ 66%]
+tests/unit/test_authorization_service.py::test_authorizes_write_permission PASSED [ 66%]
+tests/unit/test_bot_interaction.py::test_create_bot_interaction PASSED   [ 67%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_fks PASSED      [ 67%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_unique_github_event_id PASSED [ 67%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_invalid_intent_rejected PASSED [ 67%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_composite_index PASSED [ 67%]
+tests/unit/test_bot_interaction.py::test_bot_interaction_count_query PASSED [ 68%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_ignores_non_workflow_run PASSED [ 68%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_ignores_non_completed PASSED [ 68%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_ignores_success PASSED  [ 68%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_failure_gives_high_severity PASSED [ 68%]
+tests/unit/test_ci_analyzer.py::test_ci_analyzer_cancelled_gives_low_severity PASSED [ 69%]
+tests/unit/test_code_quality_analyzer.py::test_analyzer_branch_protected PASSED [ 69%]
+tests/unit/test_code_quality_analyzer.py::test_analyzer_branch_not_protected PASSED [ 69%]
+tests/unit/test_code_quality_analyzer.py::test_analyzer_github_auth_error PASSED [ 69%]
+tests/unit/test_code_quality_analyzer.py::test_run_analyzer_verifies_sync_path_for_code_quality PASSED [ 69%]
+tests/unit/test_code_quality_analyzer.py::test_code_quality_analyzer_repository_scope PASSED [ 70%]
+tests/unit/test_config.py::test_config_loads_valid_values PASSED         [ 70%]
+tests/unit/test_config.py::test_config_invalid_app_env_fails PASSED      [ 70%]
+tests/unit/test_config.py::test_config_cors_origins_parsing PASSED       [ 70%]
+tests/unit/test_config.py::test_config_cors_origins_json_parsing PASSED  [ 71%]
+tests/unit/test_config.py::test_config_non_dev_requires_db PASSED        [ 71%]
+tests/unit/test_config.py::test_config_empty_github_app_id_fails PASSED  [ 71%]
+tests/unit/test_config.py::test_config_empty_github_app_slug_fails PASSED [ 71%]
+tests/unit/test_config.py::test_config_empty_github_app_private_key_fails PASSED [ 71%]
+tests/unit/test_config.py::test_config_empty_github_app_webhook_secret_fails PASSED [ 72%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_manifest_present_no_lockfile PASSED [ 72%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_manifest_present_has_lockfile PASSED [ 72%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_manifest_absent PASSED [ 72%]
+tests/unit/test_dependency_analyzer.py::test_analyzer_github_auth_error PASSED [ 72%]
+tests/unit/test_dependency_analyzer.py::test_run_analyzer_constructs_client PASSED [ 73%]
+tests/unit/test_dependency_analyzer.py::test_dependency_analyzer_repository_scope PASSED [ 73%]
+tests/unit/test_development_auth_adapter.py::test_unauthenticated PASSED [ 73%]
+tests/unit/test_development_auth_adapter.py::test_login_and_resolve PASSED [ 73%]
+tests/unit/test_development_auth_adapter.py::test_logout PASSED          [ 73%]
+tests/unit/test_development_auth_adapter.py::test_invalid_tampered_cookie PASSED [ 74%]
+tests/unit/test_encryption.py::test_encryption_round_trip PASSED         [ 74%]
+tests/unit/test_encryption.py::test_decryption_tampered_token PASSED     [ 74%]
+tests/unit/test_encryption.py::test_decryption_garbage_token PASSED      [ 74%]
+tests/unit/test_encryption.py::test_settings_fails_when_key_missing PASSED [ 75%]
+tests/unit/test_encryption.py::test_settings_fails_when_key_malformed PASSED [ 75%]
+tests/unit/test_error_handling.py::test_app_error_handler_returns_correct_shape PASSED [ 75%]
+tests/unit/test_error_handling.py::test_global_exception_handler_returns_safe_500 PASSED [ 75%]
+tests/unit/test_error_handling.py::test_global_exception_handler_ignores_websocket PASSED [ 75%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_is_well_formed_and_verifiable PASSED [ 76%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_iat_is_backdated PASSED [ 76%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_exp_within_10_minutes PASSED [ 76%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_uses_rs256_algorithm PASSED [ 76%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_caching_returns_same_token PASSED [ 76%]
+tests/unit/test_github_app_auth.py::TestGenerateAppJWT::test_jwt_refreshes_when_near_expiry PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_fetches_token_from_github PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_caches_token_before_expiry PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_refreshes_token_when_near_expiry PASSED [ 77%]
+tests/unit/test_github_app_auth.py::TestGetInstallationAccessToken::test_raises_on_github_error_response PASSED [ 78%]
+tests/unit/test_github_client.py::TestGetInstallation::test_returns_installation_dict PASSED [ 78%]
+tests/unit/test_github_client.py::TestGetInstallation::test_uses_app_jwt_auth PASSED [ 78%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_single_page PASSED [ 78%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_multi_page_pagination PASSED [ 78%]
+tests/unit/test_github_client.py::TestListInstallationRepositories::test_empty_repositories PASSED [ 79%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[401-GitHubAuthError] PASSED [ 79%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[403-GitHubAuthError] PASSED [ 79%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[404-GitHubNotFoundError] PASSED [ 79%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[429-GitHubRateLimitError] PASSED [ 79%]
+tests/unit/test_github_client.py::TestErrorMapping::test_status_code_maps_to_correct_exception[500-GitHubAPIError] PASSED [ 80%]
+tests/unit/test_github_client.py::TestGetRepositoryContent::test_success PASSED [ 80%]
+tests/unit/test_github_client.py::TestGetRepositoryContent::test_returns_none_on_404 PASSED [ 80%]
+tests/unit/test_github_client.py::TestGetRepositoryContent::test_raises_github_auth_error_on_403 PASSED [ 80%]
+tests/unit/test_github_client.py::TestListDependabotAlerts::test_pagination PASSED [ 80%]
+tests/unit/test_github_client.py::TestListDependabotAlerts::test_returns_empty_list_on_404 PASSED [ 81%]
+tests/unit/test_github_client.py::TestListDependabotAlerts::test_raises_github_auth_error_on_403 PASSED [ 81%]
+tests/unit/test_github_client.py::TestGetBranchProtection::test_success PASSED [ 81%]
+tests/unit/test_github_client.py::TestGetBranchProtection::test_returns_none_on_404 PASSED [ 81%]
+tests/unit/test_github_client.py::TestGetBranchProtection::test_raises_github_auth_error_on_403 PASSED [ 82%]
+tests/unit/test_github_client.py::TestGetCollaboratorPermission::test_returns_permission_with_installation_auth PASSED [ 82%]
+tests/unit/test_github_client.py::TestPostIssueComment::test_success_and_truncation PASSED [ 82%]
+tests/unit/test_github_client.py::TestPostIssueComment::test_returns_github_not_found PASSED [ 82%]
+tests/unit/test_github_client.py::TestPostIssueComment::test_raises_github_auth_error_on_403 PASSED [ 82%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_api_error_is_app_error PASSED [ 83%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_auth_error_is_github_api_error PASSED [ 83%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_not_found_error_is_github_api_error PASSED [ 83%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_github_rate_limit_error_is_github_api_error PASSED [ 83%]
+tests/unit/test_github_exceptions.py::TestInheritance::test_all_are_catchable_as_app_error PASSED [ 83%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[401-GitHubAuthError-github_auth_error] PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[403-GitHubAuthError-github_auth_error] PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[404-GitHubNotFoundError-github_not_found] PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[429-GitHubRateLimitError-github_rate_limit] PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[500-GitHubAPIError-github_api_error] PASSED [ 84%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[502-GitHubAPIError-github_api_error] PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_maps_status_to_correct_subclass[422-GitHubAPIError-github_api_error] PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_preserves_response_status PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestFromResponse::test_handles_non_json_body PASSED [ 85%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_api_error_defaults PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_auth_error_defaults PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_not_found_defaults PASSED [ 86%]
+tests/unit/test_github_exceptions.py::TestDefaultAttributes::test_github_rate_limit_defaults PASSED [ 86%]
+tests/unit/test_health.py::test_health_endpoint PASSED                   [ 86%]
+tests/unit/test_health_score_service.py::test_zero_findings PASSED       [ 87%]
+tests/unit/test_health_score_service.py::test_single_critical_finding PASSED [ 87%]
+tests/unit/test_health_score_service.py::test_multiple_criticals_clamp_at_zero PASSED [ 87%]
+tests/unit/test_health_score_service.py::test_overall_score_averages_all_categories PASSED [ 87%]
+tests/unit/test_health_score_service.py::test_unmapped_category_is_ignored PASSED [ 87%]
+tests/unit/test_health_score_service.py::test_compute_overall_empty PASSED [ 88%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_ignores_non_issue PASSED [ 88%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_ignores_edited_action PASSED [ 88%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_ignores_non_empty_body PASSED [ 88%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_flags_empty_body_string PASSED [ 89%]
+tests/unit/test_issue_analyzer.py::test_issue_analyzer_flags_none_body PASSED [ 89%]
+tests/unit/test_issue_analyzer.py::test_scan_repository_for_stale_issues PASSED [ 89%]
+tests/unit/test_logging.py::test_configure_logging_development PASSED    [ 89%]
+tests/unit/test_logging.py::test_configure_logging_production PASSED     [ 89%]
+tests/unit/test_logging.py::test_json_formatter_preserves_safe_correlation_context PASSED [ 90%]
+tests/unit/test_logging.py::test_get_logger PASSED                       [ 90%]
+tests/unit/test_monitor_service.py::test_run_analyzer_skipped_when_monitoring_disabled PASSED [ 90%]
+tests/unit/test_monitor_service.py::test_run_analyzer_unknown_analyzer PASSED [ 90%]
+tests/unit/test_monitor_service.py::test_run_analyzer_exception_containment PASSED [ 90%]
+tests/unit/test_monitor_service.py::test_run_analyzer_success_persists_findings PASSED [ 91%]
+tests/unit/test_monitor_service.py::test_run_analyzer_full_state_uses_sync_result PASSED [ 91%]
+tests/unit/test_monitor_service.py::test_run_analyzer_success_computes_health PASSED [ 91%]
+tests/unit/test_monitor_service.py::test_run_analyzer_exception_no_health_recomputation PASSED [ 91%]
+tests/unit/test_monitor_service.py::test_run_analyzer_health_exception_swallowed PASSED [ 91%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-info-low] PASSED [ 92%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-info-low] PASSED [ 92%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[performance-info-low] PASSED [ 92%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-low-low] PASSED [ 92%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-medium-medium] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-high-high] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[quality-critical-critical] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-low-medium] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-medium-high] PASSED [ 93%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-high-critical] PASSED [ 94%]
+tests/unit/test_priority_service.py::test_compute_priority_table_driven[security-critical-critical] PASSED [ 94%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_ignores_non_pull_request PASSED [ 94%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_ignores_edited_action PASSED [ 94%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_ignores_non_empty_body PASSED [ 94%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_flags_empty_body_string PASSED [ 95%]
+tests/unit/test_pull_request_analyzer.py::test_pr_analyzer_flags_none_body PASSED [ 95%]
+tests/unit/test_pull_request_analyzer.py::test_scan_repository_for_stale_prs PASSED [ 95%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_force_push_default_branch PASSED [ 95%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_force_push_non_default_branch PASSED [ 95%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_non_forced_push PASSED [ 96%]
+tests/unit/test_repository_activity_analyzer.py::test_activity_analyzer_non_push_event PASSED [ 96%]
+tests/unit/test_scheduled_monitoring_service.py::test_all_monitoring_checks_run_for_healthy_repository PASSED [ 96%]
+tests/unit/test_scheduled_monitoring_service.py::test_monitoring_check_failure_does_not_block_remaining_checks PASSED [ 96%]
+tests/unit/test_scheduled_monitoring_service.py::test_monitoring_service_never_raises_when_a_check_fails PASSED [ 97%]
+tests/unit/test_scheduled_monitoring_service.py::test_monitoring_logs_reuse_one_correlation_id PASSED [ 97%]
+tests/unit/test_scheduled_monitoring_service.py::test_global_monitoring_cycle_skips_disabled PASSED [ 97%]
+tests/unit/test_scheduled_monitoring_service.py::test_global_monitoring_cycle_isolates_failures FAILED [ 97%]
+tests/unit/test_security_analyzer.py::test_analyzer_returns_open_alerts PASSED [ 97%]
+tests/unit/test_security_analyzer.py::test_analyzer_no_alerts PASSED     [ 98%]
+tests/unit/test_security_analyzer.py::test_analyzer_github_auth_error PASSED [ 98%]
+tests/unit/test_security_analyzer.py::test_analyzer_missing_fields_graceful PASSED [ 98%]
+tests/unit/test_security_analyzer.py::test_run_analyzer_verifies_sync_path_for_security PASSED [ 98%]
+tests/unit/test_security_analyzer.py::test_security_analyzer_repository_scope PASSED [ 98%]
+tests/unit/test_webhook_security.py::test_verify_signature_correct PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_wrong_secret PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_tampered_body PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_missing_header PASSED [ 99%]
+tests/unit/test_webhook_security.py::test_verify_signature_malformed_header PASSED [100%]
+
+================================== FAILURES ===================================
+___________________ test_repo_health_lazy_compute_and_post ____________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001D09853A3F0>
+authorized_client = <httpx.AsyncClient object at 0x000001D098507DD0>
+test_user_repository = <app.models.repository.Repository object at 0x000001D0986A0910>
+
+    @pytest.mark.asyncio
+    async def test_repo_health_lazy_compute_and_post(db_session, authorized_client: AsyncClient, test_user_repository: Repository):
+        # Ensure no snapshots exist
+        count = db_session.query(RepositoryHealthSnapshot).filter(RepositoryHealthSnapshot.repository_id == test_user_repository.id).count()
+        assert count == 0
+    
+        # Add a mock finding for the respository so we have something to score
+        finding = Finding(
+            id=uuid.uuid4(),
+            repository_id=test_user_repository.id,
+            category="security",
+            type="test_sec",
+            title="Sec Finding",
+            description="test",
+            severity="high",
+            status="open",
+            source="cli",
+            evidence={},
+        )
+        db_session.add(finding)
+        db_session.commit()
+    
+        # Access health endpoint - should lazily compute
+        response = await authorized_client.get(
+            f"/api/v1/repositories/{test_user_repository.id}/health"
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "overall_score" in data
+        assert data["previous_score"] is None
+    
+        # Trigger a health run via POST
+        response2 = await authorized_client.post(
+            f"/api/v1/repositories/{test_user_repository.id}/health-runs"
+        )
+        assert response2.status_code == 200
+        data2 = response2.json()
+        assert "overall_score" in data2
+>       assert data2["previous_score"] == data["overall_score"]
+E       assert None == 97
+
+tests\integration\test_repo_health_api.py:67: AssertionError
+_____________________ test_repo_health_history_pagination _____________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001D09853B110>
+authorized_client = <httpx.AsyncClient object at 0x000001D098685610>
+test_user_repository = <app.models.repository.Repository object at 0x000001D0986E6350>
+
+    @pytest.mark.asyncio
+    async def test_repo_health_history_pagination(db_session, authorized_client: AsyncClient, test_user_repository: Repository):
+        # Ensure no snapshots exist
+        db_session.query(RepositoryHealthSnapshot).filter(RepositoryHealthSnapshot.repository_id == test_user_repository.id).delete()
+        db_session.commit()
+    
+        # Trigger 3 health runs
+        for _ in range(3):
+            await authorized_client.post(f"/api/v1/repositories/{test_user_repository.id}/health-runs")
+    
+        response = await authorized_client.get(
+            f"/api/v1/repositories/{test_user_repository.id}/health/history?limit=2&offset=0"
+        )
+        assert response.status_code == 200
+        data = response.json()
+>       assert data["total"] == 3
+E       assert 1 == 3
+
+tests\integration\test_repo_health_api.py:87: AssertionError
+____________________ test_settings_production_auth_safety _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D097CE4A60>
+
+    def test_settings_production_auth_safety(monkeypatch):
+        monkeypatch.setenv("APP_ENV", "production")
+        monkeypatch.setenv("AUTH_PROVIDER", "development")
+        monkeypatch.setenv("DATABASE_URL", "sqlite:///test.db")
+        monkeypatch.delenv("CORS_ORIGINS", raising=False)
+    
+        with pytest.raises(ValueError) as exc_info:
+            Settings(_env_file=None)
+    
+>       assert "Development auth provider cannot be used in production environment" in str(exc_info.value)
+E       assert 'Development auth provider cannot be used in production environment' in "1 validation error for Settings\n  Value error, SCHEDULER_SHARED_SECRET is required and must not be empty in production environment [type=value_error, input_value={'app_env': 'production',...AxMjM0NTY3ODlhYmNkZWY='}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error"
+E        +  where "1 validation error for Settings\n  Value error, SCHEDULER_SHARED_SECRET is required and must not be empty in production environment [type=value_error, input_value={'app_env': 'production',...AxMjM0NTY3ODlhYmNkZWY='}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error" = str(1 validation error for Settings\n  Value error, SCHEDULER_SHARED_SECRET is required and must not be empty in production environment [type=value_error, input_value={'app_env': 'production',...AxMjM0NTY3ODlhYmNkZWY='}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error)
+E        +    where 1 validation error for Settings\n  Value error, SCHEDULER_SHARED_SECRET is required and must not be empty in production environment [type=value_error, input_value={'app_env': 'production',...AxMjM0NTY3ODlhYmNkZWY='}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error = <ExceptionInfo 1 validation error for Settings\n  Value error, SCHEDULER_SHARED_SECRET is required and must not be empty in production...M0NTY3ODlhYmNkZWY='}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error tblen=3>.value
+
+tests\unit\test_auth_config_safety.py:34: AssertionError
+_______________ test_global_monitoring_cycle_isolates_failures ________________
+
+db_session = <sqlalchemy.orm.session.Session object at 0x000001D0988999A0>
+enabled_repository = <app.models.repository.Repository object at 0x000001D098E58AF0>
+test_user = <app.models.user.User object at 0x000001D098E5B110>
+
+    @pytest.mark.asyncio
+    async def test_global_monitoring_cycle_isolates_failures(db_session, enabled_repository, test_user):
+        from app.models.repository import Repository
+        from app.models.github_connection import GitHubConnection
+    
+        # Create another repo that will fail
+>       conn = GitHubConnection(
+            user_id=test_user.id,
+            github_account_id=999,
+            account_name="test2",
+            account_type="User",
+            installation_id=999,
+            access_token="token2",
+        )
+
+tests\unit\test_scheduled_monitoring_service.py:246: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+<string>:4: in __init__
+    ???
+venv\Lib\site-packages\sqlalchemy\orm\state.py:596: in _initialize_instance
+    with util.safe_reraise():
+         ^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\util\langhelpers.py:122: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+venv\Lib\site-packages\sqlalchemy\orm\state.py:594: in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.models.github_connection.GitHubConnection object at 0x000001D098E5B610>
+kwargs = {'access_token': 'token2', 'account_name': 'test2', 'account_type': 'User', 'github_account_id': 999, ...}
+cls_ = <class 'app.models.github_connection.GitHubConnection'>
+k = 'github_account_id'
+
+    def _declarative_constructor(self: Any, **kwargs: Any) -> None:
+        """A simple constructor that allows initialization from kwargs.
+    
+        Sets attributes on the constructed instance using the names and
+        values in ``kwargs``.
+    
+        Only keys that are present as
+        attributes of the instance's class are allowed. These could be,
+        for example, any mapped columns or relationships.
+        """
+        cls_ = type(self)
+        for k in kwargs:
+            if not hasattr(cls_, k):
+>               raise TypeError(
+                    "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+                )
+E               TypeError: 'github_account_id' is an invalid keyword argument for GitHubConnection
+
+venv\Lib\site-packages\sqlalchemy\orm\decl_base.py:2193: TypeError
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\schemas\notification.py:24
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\schemas\notification.py:24: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Notification(NotificationBase):
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+tests/integration/api/v1/test_repositories_dashboard_integration.py::test_get_dashboard_overview
+tests/services/test_trend_service.py::test_get_health_trend_no_history
+tests/services/test_trend_service.py::test_get_health_trend_one_snapshot
+tests/services/test_trend_service.py::test_get_health_trend_improving
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\services\trend_service.py:15: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    cutoff_date = datetime.utcnow() - timedelta(days=window_days)
+
+tests/integration/api/v1/test_repositories_dashboard_integration.py::test_get_dashboard_overview
+tests/services/test_trend_service.py::test_get_finding_velocity
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\services\trend_service.py:47: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    cutoff_date = datetime.utcnow() - timedelta(days=window_days)
+
+tests/integration/test_ai_connection_api.py::test_invalid_api_key_is_sanitized
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\anyio\_backends\_asyncio.py:1100: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    result = context.run(func, *args)
+
+tests/integration/test_finding_lifecycle.py::test_partial_unique_index_on_finding
+tests/integration/test_github_event_model.py::test_github_event_delivery_id_unique
+tests/integration/test_github_models.py::test_duplicate_connection
+tests/integration/test_github_models.py::test_duplicate_repo
+tests/integration/test_user_model.py::test_email_uniqueness
+tests/unit/test_ai_connection_model.py::test_ai_connection_model_unique_user_id
+tests/unit/test_bot_interaction.py::test_bot_interaction_fks
+tests/unit/test_bot_interaction.py::test_bot_interaction_unique_github_event_id
+tests/unit/test_bot_interaction.py::test_bot_interaction_invalid_intent_rejected
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\conftest.py:71: SAWarning: transaction already deassociated from connection
+    transaction.rollback()
+
+tests/unit/test_bot_interaction.py::test_bot_interaction_count_query
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\tests\unit\test_bot_interaction.py:177: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/test_repo_health_api.py::test_repo_health_lazy_compute_and_post
+FAILED tests/integration/test_repo_health_api.py::test_repo_health_history_pagination
+FAILED tests/unit/test_auth_config_safety.py::test_settings_production_auth_safety
+FAILED tests/unit/test_scheduled_monitoring_service.py::test_global_monitoring_cycle_isolates_failures
+============ 4 failed, 469 passed, 22 warnings in 79.96s (0:01:19) ============

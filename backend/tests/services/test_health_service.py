@@ -152,6 +152,7 @@ def test_compute_and_persist_health_no_changes(monkeypatch):
             "pull_requests": 100,
             "code_quality": 100,
         },
+        reasons=["No change since last check."],
     )
     monkeypatch.setattr(
         "app.services.health_service.get_latest_snapshot",

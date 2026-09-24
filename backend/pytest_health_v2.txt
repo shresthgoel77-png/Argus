@@ -1,0 +1,246 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 13 items
+
+tests/services/test_health_service.py::test_generate_reasons_first_snapshot PASSED [  7%]
+tests/services/test_health_service.py::test_generate_reasons_no_change PASSED [ 15%]
+tests/services/test_health_service.py::test_generate_reasons_improvement PASSED [ 23%]
+tests/services/test_health_service.py::test_generate_reasons_drop PASSED [ 30%]
+tests/services/test_health_service.py::test_compute_and_persist_health_zero_findings PASSED [ 38%]
+tests/services/test_health_service.py::test_compute_and_persist_health_critical_finding PASSED [ 46%]
+tests/services/test_health_service.py::test_compute_and_persist_health_resolved_finding PASSED [ 53%]
+tests/services/test_health_service.py::test_compute_and_persist_health_no_changes FAILED [ 61%]
+tests/services/test_health_service.py::test_generate_reasons_cap_five PASSED [ 69%]
+tests/services/test_health_service.py::test_finding_service_includes_acknowledged PASSED [ 76%]
+tests/services/test_health_service.py::test_health_drop_notification_thresholds FAILED [ 84%]
+tests/services/test_health_service.py::test_health_drop_notification_exception_handling FAILED [ 92%]
+tests/services/test_health_service.py::test_recalculate_repository_health_produces_identical_snapshot PASSED [100%]
+
+================================== FAILURES ===================================
+_________________ test_compute_and_persist_health_no_changes __________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000221162467A0>
+
+    def test_compute_and_persist_health_no_changes(monkeypatch):
+        f = Finding(category="security", severity="critical", type="cve-1234")
+        monkeypatch.setattr(
+            "app.services.health_service.get_all_open_findings_for_repository",
+            lambda db, repo: [f],
+        )
+    
+        prev = RepositoryHealthSnapshot(
+            overall_score=93,
+            category_scores={
+                "security": 60,
+                "ci_cd": 100,
+                "dependencies": 100,
+                "issues": 100,
+                "pull_requests": 100,
+                "code_quality": 100,
+            },
+        )
+        monkeypatch.setattr(
+            "app.services.health_service.get_latest_snapshot",
+            lambda db, repo: prev,
+        )
+    
+        db = MockSession()
+        repo_id = uuid.uuid4()
+    
+        snapshot = compute_and_persist_health(db, repo_id)
+        assert snapshot.overall_score == int(round((60 + 100 * 5) / 6))
+>       assert snapshot.reasons == ["No change since last check."]
+E       AssertionError: assert None == ['No change since last check.']
+E        +  where None = <app.models.repository_health_snapshot.RepositoryHealthSnapshot object at 0x00000221160C3550>.reasons
+
+tests\services\test_health_service.py:166: AssertionError
+__________________ test_health_drop_notification_thresholds ___________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002211633D450>
+
+    def test_health_drop_notification_thresholds(monkeypatch):
+        from app.services import notification_dispatch_service
+    
+        dispatched = []
+    
+        def mock_dispatch(*args, **kwargs):
+            dispatched.append(kwargs)
+    
+        monkeypatch.setattr(
+            notification_dispatch_service, "dispatch_notification", mock_dispatch
+        )
+    
+        monkeypatch.setattr(
+            "app.services.health_service.get_all_open_findings_for_repository",
+            lambda db, repo: [],
+        )
+        monkeypatch.setattr(
+            "app.services.health_service.compute_category_scores", lambda f: {}
+        )
+    
+        def get_mock_db():
+            db = MockSession()
+    
+            def mock_query(model):
+                class MockQuery:
+                    def filter(self, *args, **kwargs):
+                        return self
+    
+                    def first(self):
+                        if model.__name__ == "Repository":
+    
+                            class R:
+                                connection_id = uuid.uuid4()
+    
+                            return R()
+                        if model.__name__ == "GitHubConnection":
+    
+                            class C:
+                                user_id = uuid.uuid4()
+    
+                            return C()
+                        return None
+    
+                return MockQuery()
+    
+            db.query = mock_query
+            return db
+    
+        # 1. 14 point drop
+        monkeypatch.setattr(
+            "app.services.health_service.compute_overall_score", lambda c: 86
+        )
+        monkeypatch.setattr(
+            "app.services.health_service.get_latest_snapshot",
+            lambda db, repo: RepositoryHealthSnapshot(overall_score=100),
+        )
+        compute_and_persist_health(get_mock_db(), uuid.uuid4())
+        assert len(dispatched) == 0
+    
+        # 2. 15 point drop (threshold) -> medium
+        monkeypatch.setattr(
+            "app.services.health_service.compute_overall_score", lambda c: 85
+        )
+        monkeypatch.setattr(
+            "app.services.health_service.get_latest_snapshot",
+            lambda db, repo: RepositoryHealthSnapshot(overall_score=100),
+        )
+        compute_and_persist_health(get_mock_db(), uuid.uuid4())
+>       assert len(dispatched) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests\services\test_health_service.py:293: AssertionError
+______________ test_health_drop_notification_exception_handling _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002211633D350>
+
+    def test_health_drop_notification_exception_handling(monkeypatch):
+        from app.services import notification_dispatch_service
+    
+        def get_mock_db():
+            db = MockSession()
+    
+            def mock_query(model):
+                class MockQuery:
+                    def filter(self, *args, **kwargs):
+                        return self
+    
+                    def first(self):
+                        if model.__name__ == "Repository":
+    
+                            class R:
+                                connection_id = uuid.uuid4()
+    
+                            return R()
+                        if model.__name__ == "GitHubConnection":
+    
+                            class C:
+                                user_id = uuid.uuid4()
+    
+                            return C()
+                        return None
+    
+                return MockQuery()
+    
+            db.query = mock_query
+            return db
+    
+        def mock_dispatch_raise(*args, **kwargs):
+            raise ValueError("Simulated dispatch failure")
+    
+        monkeypatch.setattr(
+            notification_dispatch_service,
+            "dispatch_notification",
+            mock_dispatch_raise,
+        )
+    
+        monkeypatch.setattr(
+            "app.services.health_service.get_all_open_findings_for_repository",
+            lambda db, repo: [],
+        )
+        monkeypatch.setattr(
+            "app.services.health_service.compute_category_scores", lambda f: {}
+        )
+        # 30 point drop
+        monkeypatch.setattr(
+            "app.services.health_service.compute_overall_score", lambda c: 70
+        )
+        monkeypatch.setattr(
+            "app.services.health_service.get_latest_snapshot",
+            lambda db, repo: RepositoryHealthSnapshot(overall_score=100),
+        )
+    
+        db = get_mock_db()
+        snapshot = compute_and_persist_health(db, uuid.uuid4())
+>       assert snapshot in db.added  # Persistence not aborted!
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert <app.models.repository_health_snapshot.RepositoryHealthSnapshot object at 0x00000221163427B0> in []
+E        +  where [] = <test_health_service.MockSession object at 0x0000022116245040>.added
+
+tests\services\test_health_service.py:381: AssertionError
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\schemas\notification.py:24
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\schemas\notification.py:24: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Notification(NotificationBase):
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/services/test_health_service.py::test_compute_and_persist_health_no_changes - AssertionError: assert None == ['No change since last check.']
+ +  where None = <app.models.repository_health_snapshot.RepositoryHealthSnapshot object at 0x00000221160C3550>.reasons
+FAILED tests/services/test_health_service.py::test_health_drop_notification_thresholds - assert 0 == 1
+ +  where 0 = len([])
+FAILED tests/services/test_health_service.py::test_health_drop_notification_exception_handling - assert <app.models.repository_health_snapshot.RepositoryHealthSnapshot object at 0x00000221163427B0> in []
+ +  where [] = <test_health_service.MockSession object at 0x0000022116245040>.added
+================== 3 failed, 10 passed, 5 warnings in 0.67s ===================

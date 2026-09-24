@@ -1,0 +1,7 @@
+name = "argus-scheduler"
+main = "src/index.ts"
+compatibility_date = "2024-03-20"
+
+# This triggers the worker every 6 hours
+[triggers]
+crons = ["0 */6 * * *"]

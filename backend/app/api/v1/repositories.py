@@ -19,6 +19,10 @@ from app.services.repository_service import (
     set_monitoring_enabled,
     get_repository_or_404
 )
+from app.services.scheduled_monitoring_service import (
+    run_monitoring_checks_for_repository,
+    RepositoryCheckResult
+)
 from app.integrations.github.client import GitHubAppClient
 from app.schemas.finding import FindingListResponse, FindingResponse
 from app.services.finding_service import list_findings
@@ -139,6 +143,24 @@ def get_repository_findings(
         limit=limit,
         next_cursor=next_cursor
     )
+
+
+@router.post("/{repository_id}/refresh", response_model=RepositoryCheckResult)
+async def refresh_repository(
+    repository_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Manually triggers the full set of monitoring checks for a single repository.
+    """
+    repository = get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    if not repository.monitoring_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Monitoring is not enabled for this repository"
+        )
+    return await run_monitoring_checks_for_repository(db, repository)
 
 
 @router.get("/{repository_id}/activity", response_model=ActivityFeedResponse)

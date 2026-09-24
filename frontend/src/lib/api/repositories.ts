@@ -97,3 +97,19 @@ export async function getDashboardOverview(repositoryId: string): Promise<Dashbo
         return null;
     }
 }
+
+export async function refreshRepository(repositoryId: string): Promise<any | null> {
+    try {
+        const res = await fetchClient(`/api/v1/repositories/${repositoryId}/refresh`, {
+            method: "POST"
+        });
+        if (!res.ok) {
+            console.error("refreshRepository failed with status:", res.status);
+            return null;
+        }
+        return await res.json();
+    } catch (error) {
+        console.error("Network error during refreshRepository:", error);
+        return null;
+    }
+}

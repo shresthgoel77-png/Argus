@@ -26,6 +26,7 @@ def test_repositories_endpoints_unauthenticated(client):
     assert client.get("/api/v1/repositories").status_code == 401
     assert client.post("/api/v1/repositories", json={"connection_id": str(uuid.uuid4()), "github_repo_id": 999}).status_code == 401
     assert client.patch(f"/api/v1/repositories/{uuid.uuid4()}", json={"monitoring_enabled": True}).status_code == 401
+    assert client.post(f"/api/v1/repositories/{uuid.uuid4()}/refresh").status_code == 401
 
 
 def test_repositories_happy_path(client, db_session, monkeypatch):
@@ -167,3 +168,102 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
     # Try to toggle monitoring on this other user's repository
     res_toggle = client.patch(f"/api/v1/repositories/{other_repo.id}", json={"monitoring_enabled": True})
     assert res_toggle.status_code == 404
+
+
+def test_repository_refresh_happy_path(client, db_session, monkeypatch):
+    client.post("/api/v1/auth/dev-login")
+    user = db_session.query(User).first()
+
+    connection = GitHubConnection(
+        user_id=user.id,
+        installation_id=123,
+        account_login="test_org",
+        account_type="Organization"
+    )
+    db_session.add(connection)
+    db_session.commit()
+
+    repo = Repository(
+        connection_id=connection.id,
+        github_repo_id=999,
+        full_name="test_org/repo",
+        monitoring_enabled=True
+    )
+    db_session.add(repo)
+    db_session.commit()
+
+    # Mock the monitoring logic so it does not actually run checks
+    from app.services.scheduled_monitoring_service import RepositoryCheckResult
+    
+    async def mock_run_checks(db, repository):
+        return RepositoryCheckResult(
+            correlation_id="test-corr",
+            status="success",
+        )
+        
+    monkeypatch.setattr(
+        "app.api.v1.repositories.run_monitoring_checks_for_repository",
+        mock_run_checks
+    )
+
+    res = client.post(f"/api/v1/repositories/{repo.id}/refresh")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert data["correlation_id"] == "test-corr"
+
+
+def test_repository_refresh_disabled(client, db_session):
+    client.post("/api/v1/auth/dev-login")
+    user = db_session.query(User).first()
+
+    connection = GitHubConnection(
+        user_id=user.id,
+        installation_id=123,
+        account_login="test_org",
+        account_type="Organization"
+    )
+    db_session.add(connection)
+    db_session.commit()
+
+    repo = Repository(
+        connection_id=connection.id,
+        github_repo_id=999,
+        full_name="test_org/repo",
+        monitoring_enabled=False
+    )
+    db_session.add(repo)
+    db_session.commit()
+
+    res = client.post(f"/api/v1/repositories/{repo.id}/refresh")
+    assert res.status_code == 400
+    assert "not enabled" in res.json()["detail"]
+
+
+def test_repository_refresh_ownership_protection(client, db_session):
+    client.post("/api/v1/auth/dev-login")
+    
+    other_user = User(email="other@example.com", auth_provider="github", external_auth_id="gh_999")
+    db_session.add(other_user)
+    db_session.commit()
+    
+    other_conn = GitHubConnection(
+        user_id=other_user.id,
+        installation_id=99999,
+        account_login="other_org",
+        account_type="Organization"
+    )
+    db_session.add(other_conn)
+    db_session.commit()
+    
+    other_repo = Repository(
+        connection_id=other_conn.id,
+        github_repo_id=2001,
+        full_name="other_org/repo1",
+        monitoring_enabled=True
+    )
+    db_session.add(other_repo)
+    db_session.commit()
+
+    res = client.post(f"/api/v1/repositories/{other_repo.id}/refresh")
+    assert res.status_code == 404

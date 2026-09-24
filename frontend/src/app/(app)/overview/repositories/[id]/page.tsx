@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Loader2, Play } from "lucide-react";
+import { ChevronLeft, Loader2, Play, RefreshCw } from "lucide-react";
 
 import { EmptyState } from "@/components/rm/empty-state";
 import { SectionHeading } from "@/components/rm/section-heading";
@@ -16,7 +16,7 @@ import {
     getRepositoryHealthHistory,
     triggerHealthRun
 } from "@/lib/api/health";
-import { getRepositories } from "@/lib/api/repositories";
+import { getRepositories, refreshRepository } from "@/lib/api/repositories";
 import type {
     RepositoryHealthSnapshot,
     HealthSnapshotHistoryItem,
@@ -61,6 +61,7 @@ export default function RepositoryHealthPage(props: PageProps) {
     const [history, setHistory] = React.useState<HealthSnapshotHistoryItem[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
     const [isTriggering, setIsTriggering] = React.useState(false);
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
     const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
@@ -99,6 +100,16 @@ export default function RepositoryHealthPage(props: PageProps) {
             setRefreshKey((k) => k + 1); // Refresh data on success
         } finally {
             setIsTriggering(false);
+        }
+    };
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        try {
+            await refreshRepository(id);
+            setRefreshKey((k) => k + 1); // Refresh data on success
+        } finally {
+            setIsRefreshing(false);
         }
     };
 
@@ -144,14 +155,24 @@ export default function RepositoryHealthPage(props: PageProps) {
                         description="View deep health analytics and scores."
                     />
                 </div>
-                <Button onClick={handleTrigger} disabled={isTriggering || !repository.monitoring_enabled}>
-                    {isTriggering ? (
-                        <Loader2 className="size-4 mr-2 animate-spin" />
-                    ) : (
-                        <Play className="size-4 mr-2" />
-                    )}
-                    {isTriggering ? "Running..." : "Run Health Check"}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" onClick={handleRefresh} disabled={isRefreshing || !repository.monitoring_enabled}>
+                        {isRefreshing ? (
+                            <Loader2 className="size-4 mr-2 animate-spin" />
+                        ) : (
+                            <RefreshCw className="size-4 mr-2" />
+                        )}
+                        {isRefreshing ? "Refreshing..." : "Refresh Now"}
+                    </Button>
+                    <Button onClick={handleTrigger} disabled={isTriggering || !repository.monitoring_enabled}>
+                        {isTriggering ? (
+                            <Loader2 className="size-4 mr-2 animate-spin" />
+                        ) : (
+                            <Play className="size-4 mr-2" />
+                        )}
+                        {isTriggering ? "Running..." : "Run Health Check"}
+                    </Button>
+                </div>
             </div>
 
             {!repository.monitoring_enabled ? (

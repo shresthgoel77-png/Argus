@@ -5,6 +5,9 @@ import pytest
 
 from app.services.scheduled_monitoring_service import (
     run_monitoring_checks_for_repository,
+    run_scheduled_monitoring_cycle,
+    GlobalRunSummary,
+    RepositoryCheckResult
 )
 
 
@@ -223,3 +226,54 @@ async def test_monitoring_logs_reuse_one_correlation_id(
     assert {
         call.kwargs["extra"]["correlation_id"] for call in log_calls
     } == {result.correlation_id}
+
+
+@pytest.mark.asyncio
+async def test_global_monitoring_cycle_skips_disabled(db_session, test_user_repository):
+    test_user_repository.monitoring_enabled = False
+    db_session.commit()
+
+    summary = await run_scheduled_monitoring_cycle(db_session)
+    assert summary.attempted == 0
+
+
+@pytest.mark.asyncio
+async def test_global_monitoring_cycle_isolates_failures(db_session, enabled_repository, test_user):
+    from app.models.repository import Repository
+    from app.models.github_connection import GitHubConnection
+
+    # Create another repo that will fail
+    conn = GitHubConnection(
+        user_id=test_user.id,
+        github_account_id=999,
+        account_name="test2",
+        account_type="User",
+        installation_id=999,
+        access_token="token2",
+    )
+    db_session.add(conn)
+    db_session.commit()
+    
+    repo2 = Repository(
+        connection_id=conn.id,
+        github_repo_id=999,
+        full_name="test/repo2",
+        default_branch="main",
+        monitoring_enabled=True,
+    )
+    db_session.add(repo2)
+    db_session.commit()
+
+    with patch(
+        "app.services.scheduled_monitoring_service.run_monitoring_checks_for_repository",
+        side_effect=[
+            RepositoryCheckResult(correlation_id="1", status="success"),
+            RepositoryCheckResult(correlation_id="2", status="failed")
+        ]
+    ):
+        summary = await run_scheduled_monitoring_cycle(db_session)
+
+    assert summary.attempted == 2
+    assert summary.succeeded == 1
+    assert summary.fully_failed == 1
+    assert summary.partially_failed == 0

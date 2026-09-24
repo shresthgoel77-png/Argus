@@ -1,6 +1,7 @@
 import uuid
 import inspect
 from typing import Awaitable, Callable
+import time
 
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
@@ -25,6 +26,16 @@ class RepositoryCheckResult(BaseModel):
     status: str
     checks: dict[str, CheckResult] = Field(default_factory=dict)
     reason: str | None = None
+
+
+class GlobalRunSummary(BaseModel):
+    correlation_id: str
+    attempted: int = 0
+    succeeded: int = 0
+    partially_failed: int = 0
+    fully_failed: int = 0
+    skipped: int = 0
+    total_duration: float = 0.0
 
 
 async def run_monitoring_checks_for_repository(
@@ -140,3 +151,59 @@ async def run_monitoring_checks_for_repository(
         },
     )
     return result
+
+
+async def run_scheduled_monitoring_cycle(db: Session) -> GlobalRunSummary:
+    correlation_id = str(uuid.uuid4())
+    logger.info(
+        "Starting global scheduled monitoring cycle",
+        extra={"correlation_id": correlation_id}
+    )
+    
+    start_time = time.perf_counter()
+    summary = GlobalRunSummary(correlation_id=correlation_id)
+    
+    # Query all repositories with monitoring_enabled = True
+    repositories = db.query(Repository).filter(Repository.monitoring_enabled == True).all()
+    
+    for repo in repositories:
+        summary.attempted += 1
+        try:
+            repo_result = await run_monitoring_checks_for_repository(db, repo)
+            if repo_result.status == "success":
+                summary.succeeded += 1
+            elif repo_result.status == "partial_failure":
+                summary.partially_failed += 1
+            elif repo_result.status == "failed":
+                summary.fully_failed += 1
+            elif repo_result.status == "skipped":
+                summary.skipped += 1
+            else:
+                # Should not happen ideally, but count as failed or unknown
+                summary.fully_failed += 1
+        except Exception as exc:
+            summary.fully_failed += 1
+            logger.error(
+                "Repository monitoring completely failed during global cycle",
+                exc_info=True,
+                extra={
+                    "repository_id": str(repo.id),
+                    "correlation_id": correlation_id
+                }
+            )
+            
+    summary.total_duration = time.perf_counter() - start_time
+    
+    logger.info(
+        "Finished global scheduled monitoring cycle",
+        extra={
+            "correlation_id": correlation_id,
+            "attempted": summary.attempted,
+            "succeeded": summary.succeeded,
+            "partially_failed": summary.partially_failed,
+            "fully_failed": summary.fully_failed,
+            "skipped": summary.skipped,
+            "duration": summary.total_duration,
+        }
+    )
+    return summary

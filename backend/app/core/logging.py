@@ -16,6 +16,14 @@ class JSONFormatter(logging.Formatter):
             "name": record.name,
             "message": record.getMessage(),
         }
+
+        fields = (
+            "correlation_id", "repository_id", "check", "status", "reason"
+        )
+        for field in fields:
+            value = getattr(record, field, None)
+            if value is not None:
+                log_record[field] = value
         
         # Add basic exception traceback if available
         if record.exc_info:

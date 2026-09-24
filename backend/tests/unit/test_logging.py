@@ -1,6 +1,6 @@
 import json
 import logging
-from app.core.logging import configure_logging, get_logger
+from app.core.logging import JSONFormatter, configure_logging, get_logger
 from app.core.config import settings
 
 def test_configure_logging_development(monkeypatch, capsys):
@@ -39,6 +39,31 @@ def test_configure_logging_production(monkeypatch, capsys):
     assert parsed["message"] == "Testing prod log"
     assert parsed["name"] == "test_prod"
     assert "timestamp" in parsed
+
+
+def test_json_formatter_preserves_safe_correlation_context():
+    formatter = JSONFormatter()
+    record = logging.LogRecord(
+        "monitoring",
+        logging.INFO,
+        pathname="",
+        lineno=1,
+        msg="Monitoring check completed",
+        args=(),
+        exc_info=None,
+    )
+    record.correlation_id = "run-123"
+    record.repository_id = "repository-123"
+    record.check = "health"
+    record.repository_content = "must not be logged"
+
+    parsed = json.loads(formatter.format(record))
+
+    assert parsed["correlation_id"] == "run-123"
+    assert parsed["repository_id"] == "repository-123"
+    assert parsed["check"] == "health"
+    assert "repository_content" not in parsed
+
 
 def test_get_logger():
     logger = get_logger("my_custom_logger")

@@ -1,0 +1,6 @@
+﻿tests/integration/api/v1/test_internal_scheduled_monitoring.py:14:80: E501 line too long (82 > 79 characters)
+tests/integration/api/v1/test_internal_scheduled_monitoring.py:34:1: W293 blank line contains whitespace
+tests/integration/api/v1/test_internal_scheduled_monitoring.py:37:1: W293 blank line contains whitespace
+tests/integration/api/v1/test_internal_scheduled_monitoring.py:43:80: E501 line too long (83 > 79 characters)
+tests/integration/api/v1/test_internal_scheduled_monitoring.py:67:1: W293 blank line contains whitespace
+tests/integration/api/v1/test_internal_scheduled_monitoring.py:84:1: W293 blank line contains whitespace

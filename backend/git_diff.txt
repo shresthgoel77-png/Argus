@@ -1,0 +1,64 @@
+﻿diff --git a/backend/app/api/v1/router.py b/backend/app/api/v1/router.py
+index ca1b2dd..4c8ee50 100644
+--- a/backend/app/api/v1/router.py
++++ b/backend/app/api/v1/router.py
+@@ -10,6 +10,7 @@ from app.api.v1 import repo_health
+ from app.api.v1 import ai_connections
+ from app.api.v1 import bot_interactions
+ from app.api.v1 import notification_preferences
++from app.api.v1 import internal
+ from app.api.routes import notifications
+ 
+ api_router = APIRouter()
+@@ -25,5 +26,14 @@ api_router.include_router(findings.router)
+ api_router.include_router(repo_health.router)
+ api_router.include_router(ai_connections.router)
+ api_router.include_router(bot_interactions.router)
+-api_router.include_router(notification_preferences.router, prefix="/notifications", tags=["notifications"])
+-api_router.include_router(notifications.router, prefix="/notifications", tags=["notifications"])
++api_router.include_router(
++    notification_preferences.router,
++    prefix="/notifications",
++    tags=["notifications"],
++)
++api_router.include_router(
++    notifications.router,
++    prefix="/notifications",
++    tags=["notifications"],
++)
++api_router.include_router(internal.router)
+diff --git a/backend/app/core/config.py b/backend/app/core/config.py
+index 72096ad..78b65c8 100644
+--- a/backend/app/core/config.py
++++ b/backend/app/core/config.py
+@@ -19,6 +19,7 @@ class Settings(BaseSettings):
+     github_app_webhook_secret: SecretStr
+     github_app_install_state_ttl_seconds: int = 600
+     ai_credential_encryption_key: SecretStr
++    scheduler_shared_secret: SecretStr | None = None
+ 
+     bot_mention_handle: str = "@repomedic"
+     bot_max_interactions_per_hour: int = 10
+@@ -93,12 +94,21 @@ class Settings(BaseSettings):
+                 )
+ 
+         if self.app_env == "production":
++            if (not self.scheduler_shared_secret or
++                    not self.scheduler_shared_secret.get_secret_value()):
++                raise ValueError(
++                    "SCHEDULER_SHARED_SECRET is required and "
++                    "must not be empty in production environment"
++                )
+             if self.auth_provider == "development":
+                 raise ValueError(
+                     "Development auth provider cannot be "
+                     "used in production environment"
+                 )
+-            if self.session_secret_key == "dev_secret_key_change_me_in_production":
++            if (
++                self.session_secret_key ==
++                "dev_secret_key_change_me_in_production"
++            ):
+                 raise ValueError(
+                     "SESSION_SECRET_KEY must be overridden "
+                     "in production environment"

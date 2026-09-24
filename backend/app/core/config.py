@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     github_app_webhook_secret: SecretStr
     github_app_install_state_ttl_seconds: int = 600
     ai_credential_encryption_key: SecretStr
+    scheduler_shared_secret: SecretStr | None = None
 
     bot_mention_handle: str = "@repomedic"
     bot_max_interactions_per_hour: int = 10
@@ -93,12 +94,21 @@ class Settings(BaseSettings):
                 )
 
         if self.app_env == "production":
+            if (not self.scheduler_shared_secret or
+                    not self.scheduler_shared_secret.get_secret_value()):
+                raise ValueError(
+                    "SCHEDULER_SHARED_SECRET is required and "
+                    "must not be empty in production environment"
+                )
             if self.auth_provider == "development":
                 raise ValueError(
                     "Development auth provider cannot be "
                     "used in production environment"
                 )
-            if self.session_secret_key == "dev_secret_key_change_me_in_production":
+            if (
+                self.session_secret_key ==
+                "dev_secret_key_change_me_in_production"
+            ):
                 raise ValueError(
                     "SESSION_SECRET_KEY must be overridden "
                     "in production environment"

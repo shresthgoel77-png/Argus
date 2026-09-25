@@ -15,7 +15,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     display_name: Mapped[str | None] = mapped_column(String, nullable=True)
     auth_provider: Mapped[str] = mapped_column(String, nullable=False)
-    external_auth_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    external_auth_id: Mapped[str | None] = mapped_column(
+        String, unique=True, index=True, nullable=True
+    )
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(

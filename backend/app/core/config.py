@@ -5,8 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
-    # To be extended with "clerk" etc. later
-    auth_provider: Literal["development"] = "development"
+    auth_provider: Literal["development", "clerk"] = "development"
     session_secret_key: str = "dev_secret_key_change_me_in_production"
     database_url: str
     test_database_url: str | None = None
@@ -20,6 +19,11 @@ class Settings(BaseSettings):
     github_app_install_state_ttl_seconds: int = 600
     ai_credential_encryption_key: SecretStr
     scheduler_shared_secret: SecretStr | None = None
+
+    # Clerk auth config (required when auth_provider == "clerk")
+    clerk_secret_key: SecretStr | None = None
+    clerk_jwt_key: str | None = None
+    clerk_authorized_parties: List[str] | None = None
 
     bot_mention_handle: str = "@repomedic"
     bot_max_interactions_per_hour: int = 10
@@ -37,6 +41,20 @@ class Settings(BaseSettings):
     @field_validator("cors_origins", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            v_stripped = v.strip()
+            if v_stripped.startswith("[") and v_stripped.endswith("]"):
+                import json
+                try:
+                    return json.loads(v_stripped)
+                except ValueError:
+                    pass
+            return [i.strip() for i in v.split(",") if i.strip()]
+        return v
+
+    @field_validator("clerk_authorized_parties", mode="before")
+    @classmethod
+    def assemble_clerk_authorized_parties(cls, v: Any) -> Any:
         if isinstance(v, str):
             v_stripped = v.strip()
             if v_stripped.startswith("[") and v_stripped.endswith("]"):
@@ -105,6 +123,16 @@ class Settings(BaseSettings):
                     "Development auth provider cannot be "
                     "used in production environment"
                 )
+            if self.auth_provider == "clerk":
+                if (
+                    (not self.clerk_secret_key or
+                     not self.clerk_secret_key.get_secret_value())
+                    and not self.clerk_jwt_key
+                ):
+                    raise ValueError(
+                        "Clerk auth requires CLERK_SECRET_KEY or "
+                        "CLERK_JWT_KEY in production environment"
+                    )
             if (
                 self.session_secret_key ==
                 "dev_secret_key_change_me_in_production"

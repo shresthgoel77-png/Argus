@@ -4,6 +4,7 @@
 import React, { createContext, useCallback, useEffect, useState, ReactNode } from "react";
 import { AuthUser } from "./types";
 import { getCurrentUser, devLogin, logout as apiLogout } from "../api/auth";
+import { isClerkEnabled } from "./config";
 
 export interface AuthContextType {
     user: AuthUser | null;
@@ -16,7 +17,11 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+// ---------------------------------------------------------------------------
+// Development-adapter provider (Phase 3 — unchanged logic)
+// ---------------------------------------------------------------------------
+
+function DevAuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -88,4 +93,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+// ---------------------------------------------------------------------------
+// Environment-conditional provider
+// ---------------------------------------------------------------------------
+
+import dynamic from "next/dynamic";
+
+const ClerkAuthProvider = dynamic(
+    () => import("./clerk-adapter").then((mod) => mod.ClerkAuthProvider),
+    { ssr: false }
+);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+    if (isClerkEnabled()) {
+        return <ClerkAuthProvider>{children}</ClerkAuthProvider>;
+    }
+
+    return <DevAuthProvider>{children}</DevAuthProvider>;
 }

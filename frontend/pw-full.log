@@ -1,0 +1,2246 @@
+﻿node.exe : [WebServer] 
+INFO:     Started 
+server process [28500]
+At line:1 char:1
++ & "C:\users\hp\.vscod
+e/node.exe" "C:\users\h
+p\.vscode/node_modules/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([WebServer] I   
+ NF...process [2850    
+0]:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[WebServer] INFO:     
+Waiting for 
+application startup.
+[WebServer] 2026-09-26 
+02:42:17 - app.main - 
+INFO - Application 
+starting up...
+[WebServer] INFO:     
+Application startup 
+complete.
+[WebServer] INFO:     
+Uvicorn running on 
+http://127.0.0.1:8000 
+(Press CTRL+C to quit)
+[WebServer] ΓÜá The 
+"middleware" file 
+convention is 
+deprecated. Please use 
+"proxy" instead.
+[WebServer] 
+[WebServer]   To 
+migrate automatically, 
+run:
+[WebServer]   npx 
+@next/codemod@canary 
+middleware-to-proxy .
+[WebServer] 
+[WebServer]   Learn 
+more: https://nextjs.or
+g/docs/messages/middlew
+are-to-proxy
+
+Running 29 tests using 8 workers
+
+[WebServer] 2026-09-26 
+02:42:55 - asyncio - 
+ERROR - Exception in 
+callback _ProactorBaseP
+ipeTransport._call_conn
+ection_lost()
+[WebServer] handle: 
+<Handle _ProactorBasePi
+peTransport._call_conne
+ction_lost()>
+[WebServer] Traceback 
+(most recent call 
+last):
+[WebServer]   File "C:\
+Python314\Lib\asyncio\e
+vents.py", line 94, in 
+_run
+[WebServer]     self._c
+ontext.run(self._callba
+ck, *self._args)
+[WebServer]     ~~~~~~~
+~~~~~~~~~~^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Python314\Lib\asyncio\p
+roactor_events.py", 
+line 165, in 
+_call_connection_lost
+[WebServer]     self._s
+ock.shutdown(socket.SHU
+T_RDWR)
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~^^^^^^^^^^^
+^^^^^^^
+[WebServer] 
+ConnectionResetError: 
+[WinError 10054] An 
+existing connection 
+was forcibly closed by 
+the remote host
+[WebServer] 2026-09-26 
+02:42:55 - asyncio - 
+ERROR - Exception in 
+callback _ProactorBaseP
+ipeTransport._call_conn
+ection_lost()
+[WebServer] handle: 
+<Handle _ProactorBasePi
+peTransport._call_conne
+ction_lost()>
+[WebServer] Traceback 
+(most recent call 
+last):
+[WebServer]   File "C:\
+Python314\Lib\asyncio\e
+vents.py", line 94, in 
+_run
+[WebServer]     self._c
+ontext.run(self._callba
+ck, *self._args)
+[WebServer]     ~~~~~~~
+~~~~~~~~~~^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Python314\Lib\asyncio\p
+roactor_events.py", 
+line 165, in 
+_call_connection_lost
+[WebServer]     self._s
+ock.shutdown(socket.SHU
+T_RDWR)
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~^^^^^^^^^^^
+^^^^^^^
+[WebServer] 
+ConnectionResetError: 
+[WinError 10054] An 
+existing connection 
+was forcibly closed by 
+the remote host
+  Γ£ô   2 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:14:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic login allows access to protected routes (30.3s)
+  Γ£ô   9 [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:86:9 ΓÇ║ Finding AI analysis ΓÇ║ shows the sanitized API error and allows retry (1.5s)
+  Γ£ô  10 [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:102:9 ΓÇ║ Finding AI analysis ΓÇ║ loads a prior analysis on mount (1.2s)
+  Γ£ÿ   8 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route (32.2s)
+  Γ£ÿ   4 [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:54:9 ΓÇ║ Finding AI analysis ΓÇ║ shows a real loading state while analysis is being generated (32.2s)
+  Γ£ÿ   7 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access (31.9s)
+  Γ£ÿ   1 [chromium] ΓÇ║ e2e\tests\activity-page.spec.ts:9:9 ΓÇ║ Activity page ΓÇ║ renders mixed-source activity and handles source filtering, pagination, and bot-interaction expansion (31.7s)
+  Γ£ÿ   6 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly (32.2s)
+[WebServer] 2026-09-26 
+02:43:02 - 
+app.api.errors - ERROR 
+- Unhandled server 
+error: (sqlite3.Integri
+tyError) UNIQUE 
+constraint failed: noti
+fication_preferences.us
+er_id
+[WebServer] [SQL: 
+INSERT INTO notificatio
+n_preferences (id, 
+user_id, 
+email_enabled, 
+min_severity_email, 
+created_at, 
+updated_at) VALUES (?, 
+?, ?, ?, ?, ?)]
+[WebServer] 
+[parameters: ('bc70df83
+dfe14da7897f6e9a12e7138
+d', '426d920f000a4854a1
+1eefc950bea33c', 0, 
+'high', '2026-09-25 
+21:13:02.292004', 
+'2026-09-25 
+21:13:02.292009')]
+[WebServer] 
+(Background on this 
+error at: https://sqlal
+che.me/e/20/gkpj)
+[WebServer] Traceback 
+(most recent call 
+last):
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1969, in 
+_exec_single_context
+[WebServer]     self.di
+alect.do_execute(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~^
+[WebServer]         
+cursor, str_statement, 
+effective_parameters, 
+context
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\default.
+py", line 952, in 
+do_execute
+[WebServer]     cursor.
+execute(statement, 
+parameters)
+[WebServer]     ~~~~~~~
+~~~~~~~^^^^^^^^^^^^^^^^
+^^^^^^^
+[WebServer] sqlite3.Int
+egrityError: UNIQUE 
+constraint failed: noti
+fication_preferences.us
+er_id
+[WebServer] 
+[WebServer] The above 
+exception was the 
+direct cause of the 
+following exception:
+[WebServer] 
+[WebServer] Traceback 
+(most recent call 
+last):
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\error
+s.py", line 164, in 
+__call__
+[WebServer]     await 
+self.app(scope, 
+receive, _send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\cors.
+py", line 96, in 
+__call__
+[WebServer]     await s
+elf.simple_response(sco
+pe, receive, send, requ
+est_headers=headers)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\cors.
+py", line 154, in 
+simple_response
+[WebServer]     await 
+self.app(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\sessi
+ons.py", line 88, in 
+__call__
+[WebServer]     await 
+self.app(scope, 
+receive, send_wrapper)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\excep
+tions.py", line 63, in 
+__call__
+[WebServer]     await w
+rap_app_handling_except
+ions(self.app, 
+conn)(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 53, in 
+wrapped_app
+[WebServer]     raise 
+exc
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 42, in 
+wrapped_app
+[WebServer]     await 
+app(scope, receive, 
+sender)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\middleware\asyncex
+itstack.py", line 18, 
+in __call__
+[WebServer]     await 
+self.app(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\routing.py", 
+line 670, in __call__
+[WebServer]     await s
+elf.middleware_stack(sc
+ope, receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+2734, in app
+[WebServer]     await 
+route.handle(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1780, in handle
+[WebServer]     await s
+elf.original_router.han
+dle(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+2789, in handle
+[WebServer]     await i
+ncluded_router._handle_
+selected(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1791, in 
+_handle_selected
+[WebServer]     await 
+route.handle(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1780, in handle
+[WebServer]     await s
+elf.original_router.han
+dle(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+2789, in handle
+[WebServer]     await i
+ncluded_router._handle_
+selected(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1800, in 
+_handle_selected
+[WebServer]     await o
+riginal_route.handle(sc
+ope, receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1279, in handle
+[WebServer]     await 
+app(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+158, in app
+[WebServer]     await w
+rap_app_handling_except
+ions(app, 
+request)(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 53, in 
+wrapped_app
+[WebServer]     raise 
+exc
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 42, in 
+wrapped_app
+[WebServer]     await 
+app(scope, receive, 
+sender)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+144, in app
+[WebServer]     
+response = await 
+f(request)
+[WebServer]            
+    ^^^^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+706, in app
+[WebServer]     
+raw_response = await 
+run_endpoint_function(
+[WebServer]            
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+[WebServer]     ...<3 
+lines>...
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+354, in 
+run_endpoint_function
+[WebServer]     return 
+await run_in_threadpool
+(dependant.call, 
+**values)
+[WebServer]            
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\concurrency.py",
+ line 34, in 
+run_in_threadpool
+[WebServer]     return 
+await anyio.to_thread.r
+un_sync(func)
+[WebServer]            
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\any
+io\to_thread.py", line 
+65, in run_sync
+[WebServer]     return 
+await get_async_backend
+().run_sync_in_worker_t
+hread(
+[WebServer]            
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^
+[WebServer]         
+func, args, abandon_on_
+cancel=abandon_on_cance
+l, limiter=limiter
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\any
+io\_backends\_asyncio.p
+y", line 2706, in run_s
+ync_in_worker_thread
+[WebServer]     return 
+await future
+[WebServer]            
+^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\any
+io\_backends\_asyncio.p
+y", line 1100, in run
+[WebServer]     result 
+= context.run(func, 
+*args)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\app
+\api\v1\notification_pr
+eferences.py", line 
+20, in get_preferences
+[WebServer]     return 
+notification_preference
+_service.get_or_create_
+preference(db=db, user_
+id=current_user.id)
+[WebServer]            
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\app
+\services\notification_
+preference_service.py",
+ line 15, in get_or_cre
+ate_preference
+[WebServer]     
+db.commit()
+[WebServer]     
+~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 2035, in commit
+[WebServer]     trans.c
+ommit(_to_root=True)
+[WebServer]     ~~~~~~~
+~~~~~^^^^^^^^^^^^^^^
+[WebServer]   File 
+"<string>", line 2, in 
+commit
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\state_chang
+es.py", line 137, in 
+_go
+[WebServer]     
+ret_value = fn(self, 
+*arg, **kw)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 1316, in commit
+[WebServer]     
+self._prepare_impl()
+[WebServer]     
+~~~~~~~~~~~~~~~~~~^^
+[WebServer]   File 
+"<string>", line 2, in 
+_prepare_impl
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\state_chang
+es.py", line 137, in 
+_go
+[WebServer]     
+ret_value = fn(self, 
+*arg, **kw)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 1290, in 
+_prepare_impl
+[WebServer]     
+self.session.flush()
+[WebServer]     
+~~~~~~~~~~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 4353, in flush
+[WebServer]     
+self._flush(objects)
+[WebServer]     
+~~~~~~~~~~~^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 4488, in _flush
+[WebServer]     with 
+util.safe_reraise():
+[WebServer]          
+~~~~~~~~~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\util\langhelper
+s.py", line 122, in 
+__exit__
+[WebServer]     raise e
+xc_value.with_traceback
+(exc_tb)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 4449, in _flush
+[WebServer]     
+flush_context.execute()
+[WebServer]     
+~~~~~~~~~~~~~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\unitofwork.
+py", line 465, in 
+execute
+[WebServer]     
+rec.execute(self)
+[WebServer]     
+~~~~~~~~~~~^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\unitofwork.
+py", line 641, in 
+execute
+[WebServer]     util.pr
+eloaded.orm_persistence
+.save_obj(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~^
+[WebServer]         
+self.mapper,
+[WebServer]         
+^^^^^^^^^^^^
+[WebServer]         uow
+.states_for_mapper_hier
+archy(self.mapper, 
+False, False),
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
+[WebServer]         
+uow,
+[WebServer]         
+^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\persistence
+.py", line 94, in 
+save_obj
+[WebServer]     _emit_i
+nsert_statements(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~^
+[WebServer]         
+base_mapper,
+[WebServer]         
+^^^^^^^^^^^^
+[WebServer]     ...<3 
+lines>...
+[WebServer]         
+insert,
+[WebServer]         
+^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\persistence
+.py", line 1234, in 
+_emit_insert_statements
+[WebServer]     result 
+= connection.execute(
+[WebServer]         
+statement,
+[WebServer]         
+params,
+[WebServer]         exe
+cution_options=executio
+n_options,
+[WebServer]     )
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1421, in execute
+[WebServer]     return 
+meth(
+[WebServer]         
+self,
+[WebServer]         
+distilled_parameters,
+[WebServer]         
+execution_options or 
+NO_OPTIONS,
+[WebServer]     )
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\sql\elements.py
+", line 526, in 
+_execute_on_connection
+[WebServer]     return 
+connection._execute_cla
+useelement(
+[WebServer]            
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~^
+[WebServer]         
+self, 
+distilled_params, 
+execution_options
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1643, in 
+_execute_clauseelement
+[WebServer]     ret = 
+self._execute_context(
+[WebServer]         
+dialect,
+[WebServer]     ...<8 
+lines>...
+[WebServer]         
+cache_hit=cache_hit,
+[WebServer]     )
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1848, in 
+_execute_context
+[WebServer]     return 
+self._exec_single_conte
+xt(
+[WebServer]            
+~~~~~~~~~~~~~~~~~~~~~~~
+~~^
+[WebServer]         
+dialect, context, 
+statement, parameters
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1988, in 
+_exec_single_context
+[WebServer]     self._h
+andle_dbapi_exception(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~^
+[WebServer]         e, 
+str_statement, 
+effective_parameters, 
+cursor, context
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 2365, in 
+_handle_dbapi_exception
+[WebServer]     raise s
+qlalchemy_exception.wit
+h_traceback(exc_info[2]
+) from e
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1969, in 
+_exec_single_context
+[WebServer]     self.di
+alect.do_execute(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~^
+[WebServer]         
+cursor, str_statement, 
+effective_parameters, 
+context
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\default.
+py", line 952, in 
+do_execute
+[WebServer]     cursor.
+execute(statement, 
+parameters)
+[WebServer]     ~~~~~~~
+~~~~~~~^^^^^^^^^^^^^^^^
+^^^^^^^
+[WebServer] sqlalchemy.
+exc.IntegrityError: (sq
+lite3.IntegrityError) 
+UNIQUE constraint 
+failed: notification_pr
+eferences.user_id
+[WebServer] [SQL: 
+INSERT INTO notificatio
+n_preferences (id, 
+user_id, 
+email_enabled, 
+min_severity_email, 
+created_at, 
+updated_at) VALUES (?, 
+?, ?, ?, ?, ?)]
+[WebServer] 
+[parameters: ('bc70df83
+dfe14da7897f6e9a12e7138
+d', '426d920f000a4854a1
+1eefc950bea33c', 0, 
+'high', '2026-09-25 
+21:13:02.292004', 
+'2026-09-25 
+21:13:02.292009')]
+[WebServer] 
+(Background on this 
+error at: https://sqlal
+che.me/e/20/gkpj)
+[WebServer] ERROR:    
+Exception in ASGI 
+application
+[WebServer] Traceback 
+(most recent call 
+last):
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1969, in 
+_exec_single_context
+[WebServer]     self.di
+alect.do_execute(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~^
+[WebServer]         
+cursor, str_statement, 
+effective_parameters, 
+context
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\default.
+py", line 952, in 
+do_execute
+[WebServer]     cursor.
+execute(statement, 
+parameters)
+[WebServer]     ~~~~~~~
+~~~~~~~^^^^^^^^^^^^^^^^
+^^^^^^^
+[WebServer] sqlite3.Int
+egrityError: UNIQUE 
+constraint failed: noti
+fication_preferences.us
+er_id
+[WebServer] 
+[WebServer] The above 
+exception was the 
+direct cause of the 
+following exception:
+[WebServer] 
+[WebServer] Traceback 
+(most recent call 
+last):
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\uvi
+corn\protocols\http\htt
+ptools_impl.py", line 
+422, in run_asgi
+[WebServer]     result 
+= await app(  # type: i
+gnore[func-returns-valu
+e]
+[WebServer]            
+  ^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^
+[WebServer]         
+self.scope, 
+self.receive, self.send
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\uvi
+corn\middleware\proxy_h
+eaders.py", line 63, 
+in __call__
+[WebServer]     return 
+await self.app(scope, 
+receive, send)
+[WebServer]            
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\applications.py", 
+line 1163, in __call__
+[WebServer]     await s
+uper().__call__(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\applications.py"
+, line 96, in __call__
+[WebServer]     await s
+elf.middleware_stack(sc
+ope, receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\error
+s.py", line 186, in 
+__call__
+[WebServer]     raise 
+exc
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\error
+s.py", line 164, in 
+__call__
+[WebServer]     await 
+self.app(scope, 
+receive, _send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\cors.
+py", line 96, in 
+__call__
+[WebServer]     await s
+elf.simple_response(sco
+pe, receive, send, requ
+est_headers=headers)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\cors.
+py", line 154, in 
+simple_response
+[WebServer]     await 
+self.app(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\sessi
+ons.py", line 88, in 
+__call__
+[WebServer]     await 
+self.app(scope, 
+receive, send_wrapper)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\middleware\excep
+tions.py", line 63, in 
+__call__
+[WebServer]     await w
+rap_app_handling_except
+ions(self.app, 
+conn)(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 53, in 
+wrapped_app
+[WebServer]     raise 
+exc
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 42, in 
+wrapped_app
+[WebServer]     await 
+app(scope, receive, 
+sender)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\middleware\asyncex
+itstack.py", line 18, 
+in __call__
+[WebServer]     await 
+self.app(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\routing.py", 
+line 670, in __call__
+[WebServer]     await s
+elf.middleware_stack(sc
+ope, receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+2734, in app
+[WebServer]     await 
+route.handle(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1780, in handle
+[WebServer]     await s
+elf.original_router.han
+dle(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+2789, in handle
+[WebServer]     await i
+ncluded_router._handle_
+selected(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1791, in 
+_handle_selected
+[WebServer]     await 
+route.handle(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1780, in handle
+[WebServer]     await s
+elf.original_router.han
+dle(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+2789, in handle
+[WebServer]     await i
+ncluded_router._handle_
+selected(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1800, in 
+_handle_selected
+[WebServer]     await o
+riginal_route.handle(sc
+ope, receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+1279, in handle
+[WebServer]     await 
+app(scope, receive, 
+send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+158, in app
+[WebServer]     await w
+rap_app_handling_except
+ions(app, 
+request)(scope, 
+receive, send)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 53, in 
+wrapped_app
+[WebServer]     raise 
+exc
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\_exception_handl
+er.py", line 42, in 
+wrapped_app
+[WebServer]     await 
+app(scope, receive, 
+sender)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+144, in app
+[WebServer]     
+response = await 
+f(request)
+[WebServer]            
+    ^^^^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+706, in app
+[WebServer]     
+raw_response = await 
+run_endpoint_function(
+[WebServer]            
+        ^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+[WebServer]     ...<3 
+lines>...
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\fas
+tapi\routing.py", line 
+354, in 
+run_endpoint_function
+[WebServer]     return 
+await run_in_threadpool
+(dependant.call, 
+**values)
+[WebServer]            
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sta
+rlette\concurrency.py",
+ line 34, in 
+run_in_threadpool
+[WebServer]     return 
+await anyio.to_thread.r
+un_sync(func)
+[WebServer]            
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\any
+io\to_thread.py", line 
+65, in run_sync
+[WebServer]     return 
+await get_async_backend
+().run_sync_in_worker_t
+hread(
+[WebServer]            
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^
+[WebServer]         
+func, args, abandon_on_
+cancel=abandon_on_cance
+l, limiter=limiter
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\any
+io\_backends\_asyncio.p
+y", line 2706, in run_s
+ync_in_worker_thread
+[WebServer]     return 
+await future
+[WebServer]            
+^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\any
+io\_backends\_asyncio.p
+y", line 1100, in run
+[WebServer]     result 
+= context.run(func, 
+*args)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\app
+\api\v1\notification_pr
+eferences.py", line 
+20, in get_preferences
+[WebServer]     return 
+notification_preference
+_service.get_or_create_
+preference(db=db, user_
+id=current_user.id)
+[WebServer]            
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\app
+\services\notification_
+preference_service.py",
+ line 15, in get_or_cre
+ate_preference
+[WebServer]     
+db.commit()
+[WebServer]     
+~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 2035, in commit
+[WebServer]     trans.c
+ommit(_to_root=True)
+[WebServer]     ~~~~~~~
+~~~~~^^^^^^^^^^^^^^^
+[WebServer]   File 
+"<string>", line 2, in 
+commit
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\state_chang
+es.py", line 137, in 
+_go
+[WebServer]     
+ret_value = fn(self, 
+*arg, **kw)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 1316, in commit
+[WebServer]     
+self._prepare_impl()
+[WebServer]     
+~~~~~~~~~~~~~~~~~~^^
+[WebServer]   File 
+"<string>", line 2, in 
+_prepare_impl
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\state_chang
+es.py", line 137, in 
+_go
+[WebServer]     
+ret_value = fn(self, 
+*arg, **kw)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 1290, in 
+_prepare_impl
+[WebServer]     
+self.session.flush()
+[WebServer]     
+~~~~~~~~~~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 4353, in flush
+[WebServer]     
+self._flush(objects)
+[WebServer]     
+~~~~~~~~~~~^^^^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 4488, in _flush
+[WebServer]     with 
+util.safe_reraise():
+[WebServer]          
+~~~~~~~~~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\util\langhelper
+s.py", line 122, in 
+__exit__
+[WebServer]     raise e
+xc_value.with_traceback
+(exc_tb)
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\session.py"
+, line 4449, in _flush
+[WebServer]     
+flush_context.execute()
+[WebServer]     
+~~~~~~~~~~~~~~~~~~~~~^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\unitofwork.
+py", line 465, in 
+execute
+[WebServer]     
+rec.execute(self)
+[WebServer]     
+~~~~~~~~~~~^^^^^^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\unitofwork.
+py", line 641, in 
+execute
+[WebServer]     util.pr
+eloaded.orm_persistence
+.save_obj(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~^
+[WebServer]         
+self.mapper,
+[WebServer]         
+^^^^^^^^^^^^
+[WebServer]         uow
+.states_for_mapper_hier
+archy(self.mapper, 
+False, False),
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^
+[WebServer]         
+uow,
+[WebServer]         
+^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\persistence
+.py", line 94, in 
+save_obj
+[WebServer]     _emit_i
+nsert_statements(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~^
+[WebServer]         
+base_mapper,
+[WebServer]         
+^^^^^^^^^^^^
+[WebServer]     ...<3 
+lines>...
+[WebServer]         
+insert,
+[WebServer]         
+^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\orm\persistence
+.py", line 1234, in 
+_emit_insert_statements
+[WebServer]     result 
+= connection.execute(
+[WebServer]         
+statement,
+[WebServer]         
+params,
+[WebServer]         exe
+cution_options=executio
+n_options,
+[WebServer]     )
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1421, in execute
+[WebServer]     return 
+meth(
+[WebServer]         
+self,
+[WebServer]         
+distilled_parameters,
+[WebServer]         
+execution_options or 
+NO_OPTIONS,
+[WebServer]     )
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\sql\elements.py
+", line 526, in 
+_execute_on_connection
+[WebServer]     return 
+connection._execute_cla
+useelement(
+[WebServer]            
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~^
+[WebServer]         
+self, 
+distilled_params, 
+execution_options
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1643, in 
+_execute_clauseelement
+[WebServer]     ret = 
+self._execute_context(
+[WebServer]         
+dialect,
+[WebServer]     ...<8 
+lines>...
+[WebServer]         
+cache_hit=cache_hit,
+[WebServer]     )
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1848, in 
+_execute_context
+[WebServer]     return 
+self._exec_single_conte
+xt(
+[WebServer]            
+~~~~~~~~~~~~~~~~~~~~~~~
+~~^
+[WebServer]         
+dialect, context, 
+statement, parameters
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1988, in 
+_exec_single_context
+[WebServer]     self._h
+andle_dbapi_exception(
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~^
+[WebServer]         e, 
+str_statement, 
+effective_parameters, 
+cursor, context
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 2365, in 
+_handle_dbapi_exception
+[WebServer]     raise s
+qlalchemy_exception.wit
+h_traceback(exc_info[2]
+) from e
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\base.py"
+, line 1969, in 
+_exec_single_context
+[WebServer]     self.di
+alect.do_execute(
+  Γ£ÿ   3 [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:47:9 ΓÇ║ Finding AI analysis ΓÇ║ shows the unconfigured state and links to Settings (32.8s)
+[WebServer]     ~~~~~~~
+~~~~~~~~~~~~~~~~^
+[WebServer]         
+cursor, str_statement, 
+effective_parameters, 
+context
+[WebServer]         ^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+^^^
+[WebServer]     )
+[WebServer]     ^
+[WebServer]   File "C:\
+Users\HP\Desktop\.vscod
+e\Argus  og\backend\ven
+v\Lib\site-packages\sql
+alchemy\engine\default.
+py", line 952, in 
+do_execute
+[WebServer]     cursor.
+execute(statement, 
+parameters)
+[WebServer]     ~~~~~~~
+~~~~~~~^^^^^^^^^^^^^^^^
+^^^^^^^
+[WebServer] sqlalchemy.
+exc.IntegrityError: (sq
+lite3.IntegrityError) 
+UNIQUE constraint 
+failed: notification_pr
+eferences.user_id
+[WebServer] [SQL: 
+INSERT INTO notificatio
+n_preferences (id, 
+user_id, 
+email_enabled, 
+min_severity_email, 
+created_at, 
+updated_at) VALUES (?, 
+?, ?, ?, ?, ?)]
+[WebServer] 
+[parameters: ('bc70df83
+dfe14da7897f6e9a12e7138
+d', '426d920f000a4854a1
+1eefc950bea33c', 0, 
+'high', '2026-09-25 
+21:13:02.292004', 
+'2026-09-25 
+21:13:02.292009')]
+[WebServer] 
+(Background on this 
+error at: https://sqlal
+che.me/e/20/gkpj)
+  Γ£ÿ   5 [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:72:9 ΓÇ║ Finding AI analysis ΓÇ║ renders every field from a successful analysis (31.9s)
+  Γ£ô  11 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:14:9 ΓÇ║ GitHub Settings Flow ΓÇ║ shows Connect GitHub button when no connections exist and navigates on click (8.1s)
+  Γ£ô  13 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:73:9 ΓÇ║ GitHub Settings Flow ΓÇ║ callback page shows success state when completeInstall succeeds (6.6s)
+  Γ£ô  14 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:90:9 ΓÇ║ GitHub Settings Flow ΓÇ║ callback page shows inline error state when completeInstall fails (6.7s)
+  Γ£ô  17 [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:87:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if loading fails (6.5s)
+  Γ£ô  16 [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:9:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ loads and displays current notification preferences (6.7s)
+[WebServer] [browser] 
+completeInstall failed 
+with status: 400 
+[WebServer]     at 
+completeInstall (src/li
+b/api/github.ts:46:21)
+[WebServer]     at 
+async GitHubCallbackPag
+e.useEffect.handleCallb
+ack (src/app/(app)/gith
+ub/callback/page.tsx:26
+:28)
+[WebServer]   44 |     
+    const res = await f
+etchClient(`/api/v1/git
+hub/install/callback?${
+urlParams.toString()}`)
+;
+[WebServer]   45 |     
+    if (!res.ok) {
+[WebServer] > 46 |     
+        console.error("
+completeInstall failed 
+with status:", 
+res.status);
+[WebServer]      |     
+                ^
+[WebServer]   47 |     
+        return null;
+[WebServer]   48 |     
+    }
+[WebServer]   49 |     
+    return await 
+res.json() as 
+GitHubConnection; (src/
+lib/api/github.ts:46:21
+)
+[WebServer] [browser] 
+completeInstall failed 
+with status: 400 
+[WebServer]     at 
+completeInstall (src/li
+b/api/github.ts:46:21)
+[WebServer]     at 
+async GitHubCallbackPag
+e.useEffect.handleCallb
+ack (src/app/(app)/gith
+ub/callback/page.tsx:26
+:28)
+[WebServer]   44 |     
+    const res = await f
+etchClient(`/api/v1/git
+hub/install/callback?${
+urlParams.toString()}`)
+;
+[WebServer]   45 |     
+    if (!res.ok) {
+[WebServer] > 46 |     
+        console.error("
+completeInstall failed 
+with status:", 
+res.status);
+[WebServer]      |     
+                ^
+[WebServer]   47 |     
+        return null;
+[WebServer]   48 |     
+    }
+[WebServer]   49 |     
+    return await 
+res.json() as 
+GitHubConnection; (src/
+lib/api/github.ts:46:21
+)
+  Γ£ô  18 [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:103:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ shows an error state if saving fails (6.5s)
+  Γ£ô  15 [chromium] ΓÇ║ e2e\tests\notification-preferences-settings.spec.ts:39:9 ΓÇ║ Notification Preferences Settings Flow ΓÇ║ toggles preferences and saves successfully (6.9s)
+  Γ£ô  12 [chromium] ΓÇ║ e2e\tests\github-settings.spec.ts:50:9 ΓÇ║ GitHub Settings Flow ΓÇ║ shows existing connections list when data is available (7.5s)
+  Γ£ô  23 [chromium] ΓÇ║ e2e\tests\overview-page.spec.ts:180:9 ΓÇ║ Overview dashboard ΓÇ║ shows a dashboard error state (2.0s)
+[WebServer] [browser] 
+getDashboardOverview 
+failed with status: 
+500 
+[WebServer]     at 
+getDashboardOverview (s
+rc/lib/api/repositories
+.ts:91:21)
+[WebServer]     at 
+async loadOverview (src
+/app/(app)/overview/pag
+e.tsx:59:34)
+[WebServer]   89 |     
+    const res = await f
+etchClient(`/api/v1/rep
+ositories/${repositoryI
+d}/dashboard`);
+[WebServer]   90 |     
+    if (!res.ok) {
+[WebServer] > 91 |     
+        console.error("
+getDashboardOverview 
+failed with status:", 
+res.status);
+[WebServer]      |     
+                ^
+[WebServer]   92 |     
+        return null;
+[WebServer]   93 |     
+    }
+[WebServer]   94 |     
+    return await 
+res.json() as Dashboard
+OverviewResponse; (src/
+lib/api/repositories.ts
+:91:21)
+  Γ£ô  20 [chromium] ΓÇ║ e2e\tests\overview-page.spec.ts:9:9 ΓÇ║ Overview dashboard ΓÇ║ renders dashboard data for a monitored repository (2.4s)
+  Γ£ô  22 [chromium] ΓÇ║ e2e\tests\overview-page.spec.ts:141:9 ΓÇ║ Overview dashboard ΓÇ║ shows dashboard and component empty states (2.3s)
+  Γ£ô  24 [chromium] ΓÇ║ e2e\tests\overview-page.spec.ts:194:9 ΓÇ║ Overview dashboard ΓÇ║ shows the repository summary unconfigured state (2.2s)
+  Γ£ô  25 [chromium] ΓÇ║ e2e\tests\overview-page.spec.ts:218:9 ΓÇ║ Overview dashboard ΓÇ║ shows repository summary loading and error states (2.2s)
+[WebServer] [browser] 
+getRepositoryHealth 
+failed with status: 
+404 
+[WebServer]     at 
+getRepositoryHealth (sr
+c/lib/api/health.ts:22:
+21)
+[WebServer]   20 |     
+    const res = await f
+etchClient(`/api/v1/rep
+ositories/${repositoryI
+d}/health`);
+[WebServer]   21 |     
+    if (!res.ok) {
+[WebServer] > 22 |     
+        console.error("
+getRepositoryHealth 
+failed with status:", 
+res.status);
+[WebServer]      |     
+                ^
+[WebServer]   23 |     
+        return null;
+[WebServer]   24 |     
+    }
+[WebServer]   25 |     
+    return (await 
+res.json()) as Reposito
+ryHealthSnapshot; (src/
+lib/api/health.ts:22:21
+)
+[WebServer] [browser] 
+getRepositoryHealth 
+failed with status: 
+404 
+[WebServer]     at 
+getRepositoryHealth (sr
+c/lib/api/health.ts:22:
+21)
+[WebServer]   20 |     
+    const res = await f
+etchClient(`/api/v1/rep
+ositories/${repositoryI
+d}/health`);
+[WebServer]   21 |     
+    if (!res.ok) {
+[WebServer] > 22 |     
+        console.error("
+getRepositoryHealth 
+failed with status:", 
+res.status);
+[WebServer]      |     
+                ^
+[WebServer]   23 |     
+        return null;
+[WebServer]   24 |     
+    }
+[WebServer]   25 |     
+    return (await 
+res.json()) as Reposito
+ryHealthSnapshot; (src/
+lib/api/health.ts:22:21
+)
+  Γ£ô  21 [chromium] ΓÇ║ e2e\tests\overview-page.spec.ts:131:9 ΓÇ║ Overview dashboard ΓÇ║ shows empty states when no repository is connected (3.6s)
+  Γ£ô  28 [chromium] ΓÇ║ e2e\tests\repositories-page.spec.ts:9:9 ΓÇ║ Repositories Page Flow ΓÇ║ shows empty state and links to settings when no connections exist (1.6s)
+  Γ£ô  29 [chromium] ΓÇ║ e2e\tests\repositories-page.spec.ts:37:9 ΓÇ║ Repositories Page Flow ΓÇ║ shows connections, adds a repository, and toggles monitoring (1.7s)
+  Γ£ô  26 [chromium] ΓÇ║ e2e\tests\repositories-health.spec.ts:33:9 ΓÇ║ Repositories Health Visualization Flow ΓÇ║ list displays health loading, populated, and not yet checked states (3.3s)
+[WebServer] [browser] 
+getFinding failed with 
+status: 422 
+[WebServer]     at 
+getFinding (src/lib/api
+/findings.ts:52:21)
+[WebServer]   50 |     
+    const res = await f
+etchClient(`/api/v1/fin
+dings/${id}`);
+[WebServer]   51 |     
+    if (!res.ok) {
+[WebServer] > 52 |     
+        console.error("
+getFinding failed with 
+status:", res.status);
+[WebServer]      |     
+                ^
+[WebServer]   53 |     
+        return null;
+[WebServer]   54 |     
+    }
+[WebServer]   55 |     
+    return (await 
+res.json()) as 
+FindingResponse; (src/l
+ib/api/findings.ts:52:2
+1)
+[WebServer] [browser] 
+getFinding failed with 
+status: 422 
+[WebServer]     at 
+getFinding (src/lib/api
+/findings.ts:52:21)
+[WebServer]   50 |     
+    const res = await f
+etchClient(`/api/v1/fin
+dings/${id}`);
+[WebServer]   51 |     
+    if (!res.ok) {
+[WebServer] > 52 |     
+        console.error("
+getFinding failed with 
+status:", res.status);
+[WebServer]      |     
+                ^
+[WebServer]   53 |     
+        return null;
+[WebServer]   54 |     
+    }
+[WebServer]   55 |     
+    return (await 
+res.json()) as 
+FindingResponse; (src/l
+ib/api/findings.ts:52:2
+1)
+  Γ£ô  27 [chromium] ΓÇ║ e2e\tests\repositories-health.spec.ts:56:9 ΓÇ║ Repositories Health Visualization Flow ΓÇ║ health detail view and manual trigger refreshes data without page reload (7.5s)
+[WebServer] [browser] 
+getRepositoryHealth 
+failed with status: 
+422 
+[WebServer]     at 
+getRepositoryHealth (sr
+c/lib/api/health.ts:22:
+21)
+[WebServer]     at 
+async loadData (src/app
+/(app)/overview/reposit
+ories/[id]/page.tsx:72:
+59)
+[WebServer]   20 |     
+    const res = await f
+etchClient(`/api/v1/rep
+ositories/${repositoryI
+d}/health`);
+[WebServer]   21 |     
+    if (!res.ok) {
+[WebServer] > 22 |     
+        console.error("
+getRepositoryHealth 
+failed with status:", 
+res.status);
+[WebServer]      |     
+                ^
+[WebServer]   23 |     
+        return null;
+[WebServer]   24 |     
+    }
+[WebServer]   25 |     
+    return (await 
+res.json()) as Reposito
+ryHealthSnapshot; (src/
+lib/api/health.ts:22:21
+)
+[WebServer] [browser] 
+getRepositoryHealth 
+failed with status: 
+422 
+[WebServer]     at 
+getRepositoryHealth (sr
+c/lib/api/health.ts:22:
+21)
+[WebServer]     at 
+async loadData (src/app
+/(app)/overview/reposit
+ories/[id]/page.tsx:72:
+59)
+[WebServer]   20 |     
+    const res = await f
+etchClient(`/api/v1/rep
+ositories/${repositoryI
+d}/health`);
+[WebServer]   21 |     
+    if (!res.ok) {
+[WebServer] > 22 |     
+        console.error("
+getRepositoryHealth 
+failed with status:", 
+res.status);
+[WebServer]      |     
+                ^
+[WebServer]   23 |     
+        return null;
+[WebServer]   24 |     
+    }
+[WebServer]   25 |     
+    return (await 
+res.json()) as Reposito
+ryHealthSnapshot; (src/
+lib/api/health.ts:22:21
+)
+[WebServer] [browser] g
+etRepositoryHealthHisto
+ry failed with status: 
+422 
+[WebServer]     at getR
+epositoryHealthHistory 
+(src/lib/api/health.ts:
+40:21)
+[WebServer]     at 
+async loadData (src/app
+/(app)/overview/reposit
+ories/[id]/page.tsx:72:
+59)
+[WebServer]   38 |     
+    const res = await f
+etchClient(`/api/v1/rep
+ositories/${repositoryI
+d}/health/history${quer
+yString}`);
+[WebServer]   39 |     
+    if (!res.ok) {
+[WebServer] > 40 |     
+        console.error("
+getRepositoryHealthHist
+ory failed with 
+status:", res.status);
+[WebServer]      |     
+                ^
+[WebServer]   41 |     
+        return null;
+[WebServer]   42 |     
+    }
+[WebServer]   43 |     
+    return (await 
+res.json()) as HealthSn
+apshotListResponse; (sr
+c/lib/api/health.ts:40:
+21)
+[WebServer] [browser] g
+etRepositoryHealthHisto
+ry failed with status: 
+422 
+[WebServer]     at getR
+epositoryHealthHistory 
+(src/lib/api/health.ts:
+40:21)
+[WebServer]     at 
+async loadData (src/app
+/(app)/overview/reposit
+ories/[id]/page.tsx:72:
+59)
+[WebServer]   38 |     
+    const res = await f
+etchClient(`/api/v1/rep
+ositories/${repositoryI
+d}/health/history${quer
+yString}`);
+[WebServer]   39 |     
+    if (!res.ok) {
+[WebServer] > 40 |     
+        console.error("
+getRepositoryHealthHist
+ory failed with 
+status:", res.status);
+[WebServer]      |     
+                ^
+[WebServer]   41 |     
+        return null;
+[WebServer]   42 |     
+    }
+[WebServer]   43 |     
+    return (await 
+res.json()) as HealthSn
+apshotListResponse; (sr
+c/lib/api/health.ts:40:
+21)
+  Γ£ô  19 [chromium] ΓÇ║ e2e\tests\notifications.spec.ts:9:9 ΓÇ║ Notifications e2e testing ΓÇ║ bell rendering, dropdown, pagination, filtering, mark-read, mark-all-read and unknown reference (20.9s)
+
+
+  1) [chromium] ΓÇ║ e2e\tests\activity-page.spec.ts:9:9 ΓÇ║ Activity page ΓÇ║ renders mixed-source activity and handles source filtering, pagination, and bot-interaction expansion 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: expect(locator).not.toBeVisible() failed
+
+    Locator:  getByText('Deployment completed')
+    Expected: not visible
+    Received: visible
+
+
+      124 |
+      125 |         // Deployment completed should be hidden since we filtered
+    > 126 |         await expect(page.getByText('Deployment completed')).not.toBeVisible();
+          |                                                                  ^
+      127 |         await expect(page.getByText('Bot interaction: ci_status')).toBeVisible();
+      128 |     });
+      129 | });
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\activity-page.spec.ts:126:66
+
+    Error Context: test-results\tests-activity-page-Activi-7a313-d-bot-interaction-expansion-chromium\error-context.md
+
+  2) [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/overview", waiting until "load"
+
+
+       6 |     test('unauthenticated user is redirected to /login when accessing protected route', async ({ page }) => {
+       7 |         // Attempt to navigate to a protected app route
+    >  8 |         await page.goto('/overview');
+         |                    ^
+       9 |
+      10 |         // We expect the app to redirect us because no cookie is set
+      11 |         await expect(page).toHaveURL(/.*\/login/);
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\auth-protected-routes.spec.ts:8:20
+
+    Error Context: test-results\tests-auth-protected-route-1763b-n-accessing-protected-route-chromium\error-context.md
+
+  3) [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: apiRequestContext.post: Test timeout of 30000ms exceeded.
+
+       at helpers\auth.ts:33
+
+      31 |  */
+      32 | export async function logout(page: Page) {
+    > 33 |     const response = await page.request.post('http://localhost:8000/api/v1/auth/logout');
+         |                                         ^
+      34 |     expect(response.status()).toBe(200);
+      35 |
+      36 |     await page.context().addInitScript(() => {
+        at logout (C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\helpers\auth.ts:33:41)
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\auth-protected-routes.spec.ts:33:21
+
+    Error Context: test-results\tests-auth-protected-route-5e6c6-matic-logout-revokes-access-chromium\error-context.md
+
+  4) [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/login", waiting until "load"
+
+
+      42 |     test('UI login form flow works correctly', async ({ page }) => {
+      43 |         // This test actually walks the real UI as per requirements
+    > 44 |         await page.goto('/login');
+         |                    ^
+      45 |
+      46 |         // Submit the dev login form (assumes there is a submit button)
+      47 |         // Based on standard dev-login conventions from Prompts 1-6
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\auth-protected-routes.spec.ts:44:20
+
+    Error Context: test-results\tests-auth-protected-route-3a6a7-n-form-flow-works-correctly-chromium\error-context.md
+
+  5) [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:47:9 ΓÇ║ Finding AI analysis ΓÇ║ shows the unconfigured state and links to Settings 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Unsafe dependency' })
+
+
+      36 |
+      37 |     await page.goto('/overview/findings');
+    > 38 |     await page.getByRole('button', { name: 'Unsafe dependency' }).click();
+         |                                                                   ^
+      39 |     await expect(page.getByRole('dialog')).toBeVisible();
+      40 | }
+      41 |
+        at openFinding (C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\finding-ai-analysis.spec.ts:38:67)
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\finding-ai-analysis.spec.ts:48:9
+
+    Error Context: test-results\tests-finding-ai-analysis--f4fe0-state-and-links-to-Settings-chromium\error-context.md
+
+  6) [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:54:9 ΓÇ║ Finding AI analysis ΓÇ║ shows a real loading state while analysis is being generated 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Unsafe dependency' })
+
+
+      36 |
+      37 |     await page.goto('/overview/findings');
+    > 38 |     await page.getByRole('button', { name: 'Unsafe dependency' }).click();
+         |                                                                   ^
+      39 |     await expect(page.getByRole('dialog')).toBeVisible();
+      40 | }
+      41 |
+        at openFinding (C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\finding-ai-analysis.spec.ts:38:67)
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\finding-ai-analysis.spec.ts:55:9
+
+    Error Context: test-results\tests-finding-ai-analysis--d182d-analysis-is-being-generated-chromium\error-context.md
+
+  7) [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:72:9 ΓÇ║ Finding AI analysis ΓÇ║ renders every field from a successful analysis 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.goto: Test timeout of 30000ms exceeded.
+    Call log:
+      - navigating to "http://localhost:3000/overview/findings", waiting until "load"
+
+
+      35 |     });
+      36 |
+    > 37 |     await page.goto('/overview/findings');
+         |                ^
+      38 |     await page.getByRole('button', { name: 'Unsafe dependency' }).click();
+      39 |     await expect(page.getByRole('dialog')).toBeVisible();
+      40 | }
+        at openFinding (C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\finding-ai-analysis.spec.ts:37:16)
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\finding-ai-analysis.spec.ts:73:9
+
+    Error Context: test-results\tests-finding-ai-analysis--ef474--from-a-successful-analysis-chromium\error-context.md
+
+  7 failed
+    [chromium] ΓÇ║ e2e\tests\activity-page.spec.ts:9:9 ΓÇ║ Activity page ΓÇ║ renders mixed-source activity and handles source filtering, pagination, and bot-interaction expansion 
+    [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route 
+    [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access 
+    [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly 
+    [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:47:9 ΓÇ║ Finding AI analysis ΓÇ║ shows the unconfigured state and links to Settings 
+    [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:54:9 ΓÇ║ Finding AI analysis ΓÇ║ shows a real loading state while analysis is being generated 
+    [chromium] ΓÇ║ e2e\tests\finding-ai-analysis.spec.ts:72:9 ΓÇ║ Finding AI analysis ΓÇ║ renders every field from a successful analysis 
+  22 passed (1.4m)

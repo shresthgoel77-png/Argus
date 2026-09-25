@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth/use-auth";
+import { isClerkEnabled } from "@/lib/auth/config";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -13,6 +14,11 @@ export default function LoginPage() {
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     useEffect(() => {
+        if (isClerkEnabled()) {
+            router.replace("/sign-in");
+            return;
+        }
+
         if (!isLoading && isAuthenticated) {
             router.replace("/overview");
         }
@@ -24,7 +30,7 @@ export default function LoginPage() {
         router.replace("/overview");
     }
 
-    if (isLoading || isAuthenticated) {
+    if (isClerkEnabled() || isLoading || isAuthenticated) {
         return (
             <main className="flex min-h-screen items-center justify-center p-6">
                 <span className="text-sm text-muted-foreground">Loading...</span>

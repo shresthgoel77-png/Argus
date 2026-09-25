@@ -1,0 +1,12 @@
+﻿
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\app\(app)\overview\settings\notification-preferences-settings.tsx
+  12:5  warning  'NotificationPreferences' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\lib\api\repositories.ts
+  101:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\HP\Desktop\.vscode\Argus  og\frontend\src\middleware.ts
+  36:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 3 problems (2 errors, 1 warning)
+

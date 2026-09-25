@@ -1,0 +1,144 @@
+﻿node.exe : [WebServer] 
+INFO:     Started server 
+process [37480]
+At line:1 char:1
++ & "C:\users\hp\.vscode/no
+de.exe" "C:\users\hp\.vscod
+e/node_modules/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: ([We  
+  bServer] INF...process   
+  [37480]:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+[WebServer] INFO:     
+Waiting for application 
+startup.
+
+
+[WebServer] 2026-09-26 
+02:55:39 - app.main - INFO 
+- Application starting 
+up...
+[WebServer] INFO:     
+Application startup 
+complete.
+[WebServer] INFO:     
+Uvicorn running on 
+http://127.0.0.1:8000 
+(Press CTRL+C to quit)
+[WebServer] ΓÜá The 
+"middleware" file 
+convention is deprecated. 
+Please use "proxy" instead.
+[WebServer] 
+[WebServer]   To migrate 
+automatically, run:
+[WebServer]   npx 
+@next/codemod@canary 
+middleware-to-proxy .
+[WebServer] 
+[WebServer]   Learn more: h
+ttps://nextjs.org/docs/mess
+ages/middleware-to-proxy
+
+
+[WebServer] (node:13976) [M
+ODULE_TYPELESS_PACKAGE_JSON
+] Warning: Module type of f
+ile:///C:/Users/HP/Desktop/
+.vscode/Argus%20%20og/front
+end/tailwind.config.ts?id=1
+790371543451 is not 
+specified and it doesn't 
+parse as CommonJS.
+[WebServer] Reparsing as 
+ES module because module 
+syntax was detected. This 
+incurs a performance 
+overhead.
+[WebServer] To eliminate 
+this warning, add "type": 
+"module" to \\?\C:\Users\HP
+\Desktop\.vscode\Argus  
+og\frontend\package.json.
+[WebServer] (Use `node 
+--trace-warnings ...` to 
+show where the warning was 
+created)
+
+Running 4 tests using 4 workers
+
+[1/4] [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access
+[2/4] [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly
+[3/4] [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:14:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic login allows access to protected routes
+[4/4] [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route
+[WebServer] [browser] 
+getRepositories failed 
+with status: 401 
+[WebServer]     at 
+getRepositories (src/lib/ap
+i/repositories.ts:57:21)
+[WebServer]     at async 
+loadOverview (src/app/(app)
+/overview/page.tsx:40:38)
+[WebServer]   55 |         
+const res = await fetchClie
+nt("/api/v1/repositories");
+[WebServer]   56 |         
+if (!res.ok) {
+[WebServer] > 57 |         
+    console.error("getRepos
+itories failed with 
+status:", res.status);
+[WebServer]      |         
+            ^
+[WebServer]   58 |         
+    return null;
+[WebServer]   59 |         
+}
+[WebServer]   60 |         
+return await res.json() as 
+Repository[]; (src/lib/api/
+repositories.ts:57:21)
+
+
+[WebServer] [browser] 
+getRepositories failed 
+with status: 401 
+[WebServer]     at 
+getRepositories (src/lib/ap
+i/repositories.ts:57:21)
+[WebServer]     at async 
+loadOverview (src/app/(app)
+/overview/page.tsx:40:38)
+[WebServer]   55 |         
+const res = await fetchClie
+nt("/api/v1/repositories");
+[WebServer]   56 |         
+if (!res.ok) {
+[WebServer] > 57 |         
+    console.error("getRepos
+itories failed with 
+status:", res.status);
+[WebServer]      |         
+            ^
+[WebServer]   58 |         
+    return null;
+[WebServer]   59 |         
+}
+[WebServer]   60 |         
+return await res.json() as 
+Repository[]; (src/lib/api/
+repositories.ts:57:21)
+  4 passed (14.0s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m

@@ -1,0 +1,89 @@
+﻿node.exe : [WebServer] 
+INFO:     Started 
+server process [24064]
+At line:1 char:1
++ & "C:\users\hp\.vscod
+e/node.exe" "C:\users\h
+p\.vscode/node_modules/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([WebServer] I   
+ NF...process [2406    
+4]:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[WebServer] INFO:     
+Waiting for 
+application startup.
+[WebServer] 2026-09-26 
+02:41:02 - app.main - 
+INFO - Application 
+starting up...
+[WebServer] INFO:     
+Application startup 
+complete.
+[WebServer] INFO:     
+Uvicorn running on 
+http://127.0.0.1:8000 
+(Press CTRL+C to quit)
+[WebServer] ΓÜá The 
+"middleware" file 
+convention is 
+deprecated. Please use 
+"proxy" instead.
+[WebServer] 
+[WebServer]   To 
+migrate automatically, 
+run:
+[WebServer]   npx 
+@next/codemod@canary 
+middleware-to-proxy .
+[WebServer] 
+[WebServer]   Learn 
+more: https://nextjs.or
+g/docs/messages/middlew
+are-to-proxy
+[WebServer] 
+(node:34572) [MODULE_TY
+PELESS_PACKAGE_JSON] 
+Warning: Module type 
+of file:///C:/Users/HP/
+Desktop/.vscode/Argus%2
+0%20og/frontend/tailwin
+d.config.ts?id=17903706
+71054 is not specified 
+and it doesn't parse 
+as CommonJS.
+[WebServer] Reparsing 
+as ES module because 
+module syntax was 
+detected. This incurs 
+a performance overhead.
+[WebServer] To 
+eliminate this 
+warning, add "type": 
+"module" to \\?\C:\User
+s\HP\Desktop\.vscode\Ar
+gus  og\frontend\packag
+e.json.
+[WebServer] (Use `node 
+--trace-warnings ...` 
+to show where the 
+warning was created)
+
+Running 4 tests using 4 workers
+
+  Γ£ô  2 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:14:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic login allows access to protected routes (13.7s)
+  Γ£ô  3 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route (15.5s)
+  Γ£ô  4 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly (16.9s)
+  Γ£ô  1 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access (17.6s)
+
+  4 passed (44.0s)

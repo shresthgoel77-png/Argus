@@ -1,0 +1,71 @@
+﻿node.exe : [33m(!) Your 
+Vite config uses features 
+that are unsupported by 
+`configLoader: 'native'`, 
+which is planned to become 
+the default in a future 
+major version of Vite:
+At line:1 char:1
++ & "C:\users\hp\.vscode/no
+de.exe" "C:\users\hp\.vscod
+e/node_modules/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: ([3  
+  3m(!) Your V...ersion    
+ of Vite::String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  - ESM syntax in a file 
+loaded as CommonJS 
+(vitest.config.ts:1:1). 
+Use a `.mjs` extension or 
+set `"type": "module"` in 
+the closest package.json
+Set `VITE_CONFIG_NATIVE_IGN
+ORE_WARNING=true` to 
+suppress this warning.[39m
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.2 [39m[90mC:/Users/HP/Desktop/.vscode/Argus  og/frontend[39m
+
+ [31mΓ¥»[39m src/__tests__/auth/auth-context.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31mΓ¥»[39m src/__tests__/auth/protected-shell.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39
+m[1m[41m Failed Suites 2 
+[49m[22m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»[39m
+
+[41m[1m FAIL [22m[49m s
+rc/__tests__/auth/auth-cont
+ext.test.tsx[2m [ src/__te
+sts__/auth/auth-context.tes
+t.tsx ][22m
+[41m[1m FAIL [22m[49m s
+rc/__tests__/auth/protected
+-shell.test.tsx[2m [ src/_
+_tests__/auth/protected-she
+ll.test.tsx ][22m
+[31m[1mError[22m: 
+Cannot find package 
+'@testing-library/dom' 
+imported from C:\Users\HP\D
+esktop\.vscode\Argus  og\fr
+ontend\node_modules\@testin
+g-library\jest-dom\dist\mat
+chers-b01dabb1.mjs[39m
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[1/2]ΓÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [2mno tests[22m
+[2m   Start at [22m 02:43:16
+[2m   Duration [22m 50.34s[2m (environment 100%)[22m
+

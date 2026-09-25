@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth/use-auth";
+import { getAuthLoginPath } from "@/lib/auth/config";
 
 export function ProtectedShell({ children }: { children: ReactNode }) {
     const router = useRouter();
@@ -13,7 +14,7 @@ export function ProtectedShell({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
-            router.replace("/login");
+            router.replace(getAuthLoginPath());
         }
     }, [isAuthenticated, isLoading, router]);
 

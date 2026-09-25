@@ -1,0 +1,73 @@
+﻿node.exe : 
+At line:1 char:1
++ & "C:\users\hp\.vscod
+e/node.exe" "C:\users\h
+p\.vscode/node_modules/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (:String) [],    
+ RemoteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»[39m[1m[41m 
+Startup Error [49m[22
+m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»[39m
+Error [ERR_MODULE_NOT_F
+OUND]: Cannot find 
+package 'vite' 
+imported from C:\Users\
+HP\Desktop\.vscode\Argu
+s  og\frontend\node_mod
+ules\vitest\dist\chunks
+\index.C-uw7tH9.js
+    at Object.getPackag
+eJSONURL (node:internal
+/modules/package_json_r
+eader:301:9)
+    at packageResolve (
+node:internal/modules/e
+sm/resolve:768:81)
+    at moduleResolve (n
+ode:internal/modules/es
+m/resolve:859:18)
+    at defaultResolve (
+node:internal/modules/e
+sm/resolve:992:11)
+    at 
+#cachedDefaultResolve (
+node:internal/modules/e
+sm/loader:691:20)
+    at #resolveAndMaybe
+BlockOnLoaderThread (no
+de:internal/modules/esm
+/loader:708:38)
+    at ModuleLoader.res
+olveSync (node:internal
+/modules/esm/loader:740
+:52)
+    at #resolve (node:i
+nternal/modules/esm/loa
+der:673:17)
+    at ModuleLoader.get
+OrCreateModuleJob (node
+:internal/modules/esm/l
+oader:593:35)
+    at 
+ModuleJob.syncLink (nod
+e:internal/modules/esm/
+module_job:163:33) {
+  code: 
+'ERR_MODULE_NOT_FOUND'
+}
+
+
+

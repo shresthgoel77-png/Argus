@@ -1,0 +1,42 @@
+﻿node.exe : [33m(!) Your 
+Vite config uses features 
+that are unsupported by 
+`configLoader: 'native'`, 
+which is planned to become 
+the default in a future 
+major version of Vite:
+At line:1 char:1
++ & "C:\users\hp\.vscode/no
+de.exe" "C:\users\hp\.vscod
+e/node_modules/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: ([3  
+  3m(!) Your V...ersion    
+ of Vite::String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  - ESM syntax in a file 
+loaded as CommonJS 
+(vitest.config.ts:1:1). 
+Use a `.mjs` extension or 
+set `"type": "module"` in 
+the closest package.json
+Set `VITE_CONFIG_NATIVE_IGN
+ORE_WARNING=true` to 
+suppress this warning.[39m
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.2 [39m[90mC:/Users/HP/Desktop/.vscode/Argus  og/frontend[39m
+
+ [32mΓ£ô[39m src/__tests__/auth/auth-context.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/auth/protected-shell.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 02:55:15
+[2m   Duration [22m 2.43s[2m (environment 66%, setup 19%, transform 6%, import 6%, tests 3%, worker 1%)[22m
+

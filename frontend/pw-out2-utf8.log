@@ -1,0 +1,125 @@
+﻿node.exe : [WebServer] 
+INFO:     Started 
+server process [27640]
+At line:1 char:1
++ & "C:\users\hp\.vscod
+e/node.exe" "C:\users\h
+p\.vscode/node_modules/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([WebServer] I   
+ NF...process [2764    
+0]:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[WebServer] INFO:     
+Waiting for 
+application startup.
+[WebServer] 2026-09-26 
+02:25:15 - app.main - 
+INFO - Application 
+starting up...
+[WebServer] INFO:     
+Application startup 
+complete.
+[WebServer] INFO:     
+Uvicorn running on 
+http://127.0.0.1:8000 
+(Press CTRL+C to quit)
+
+Running 4 tests using 4 workers
+
+  Γ£ô  2 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:14:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic login allows access to protected routes (3.0s)
+  Γ£ÿ  4 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route (5.4s)
+  Γ£ÿ  1 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly (5.4s)
+  Γ£ÿ  3 [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access (6.4s)
+
+
+  1) [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route 
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /.*\/login/
+    Received string:  "http://localhost:3000/overview"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        13 ├ù locator resolved to <html>ΓÇª</html>
+           - unexpected value "http://localhost:3000/overview"
+
+
+       9 |
+      10 |         // We expect the app to redirect us because no cookie is set
+    > 11 |         await expect(page).toHaveURL(/.*\/login/);
+         |                            ^
+      12 |     });
+      13 |
+      14 |     test('programmatic login allows access to protected routes', async ({ page }) => {
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\auth-protected-routes.spec.ts:11:28
+
+    Error Context: test-results\tests-auth-protected-route-1763b-n-accessing-protected-route-chromium\error-context.md
+
+  2) [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access 
+
+    Error: expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /.*\/login/
+    Received string:  "http://localhost:3000/overview"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toHaveURL" with timeout 5000ms
+        13 ├ù locator resolved to <html>ΓÇª</html>
+           - unexpected value "http://localhost:3000/overview"
+
+
+      37 |
+      38 |         // Thus we expect a redirect to login
+    > 39 |         await expect(page).toHaveURL(/.*\/login/);
+         |                            ^
+      40 |     });
+      41 |
+      42 |     test('UI login form flow works correctly', async ({ page }) => {
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\auth-protected-routes.spec.ts:39:28
+
+    Error Context: test-results\tests-auth-protected-route-5e6c6-matic-logout-revokes-access-chromium\error-context.md
+
+  3) [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('button:has-text("Continue as dev user")')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('button:has-text("Continue as dev user")') with timeout 5000ms
+      - waiting for locator('button:has-text("Continue as dev user")')
+
+
+      47 |         // Based on standard dev-login conventions from Prompts 1-6
+      48 |         const submitButton = page.locator('button:has-text("Continue as dev user")');
+    > 49 |         await expect(submitButton).toBeVisible();
+         |                                    ^
+      50 |         await submitButton.click();
+      51 |
+      52 |         // Wait for the redirect to overview
+        at C:\Users\HP\Desktop\.vscode\Argus  og\frontend\e2e\tests\auth-protected-routes.spec.ts:49:36
+
+    Error Context: test-results\tests-auth-protected-route-3a6a7-n-form-flow-works-correctly-chromium\error-context.md
+
+  3 failed
+    [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:6:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ unauthenticated user is redirected to /login when accessing protected route 
+    [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:25:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ programmatic logout revokes access 
+    [chromium] ΓÇ║ e2e\tests\auth-protected-routes.spec.ts:42:9 ΓÇ║ Authentication and Protected Routes ΓÇ║ UI login form flow works correctly 
+  1 passed (20.5s)

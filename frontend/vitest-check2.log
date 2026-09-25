@@ -1,0 +1,227 @@
+﻿node.exe : [33m(!) 
+Your Vite config uses 
+features that are 
+unsupported by 
+`configLoader: 
+'native'`, which is 
+planned to become the 
+default in a future 
+major version of Vite:
+At line:1 char:1
++ & "C:\users\hp\.vscod
+e/node.exe" "C:\users\h
+p\.vscode/node_modules/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([33m(!) Your   
+  V...ersion of Vit    
+e::String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  - ESM syntax in a 
+file loaded as 
+CommonJS (vitest.config
+.ts:1:1). Use a `.mjs` 
+extension or set 
+`"type": "module"` in 
+the closest 
+package.json
+Set `VITE_CONFIG_NATIVE
+_IGNORE_WARNING=true` 
+to suppress this 
+warning.[39m
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.2 [39m[90mC:/Users/HP/Desktop/.vscode/Argus  og/frontend[39m
+
+ [31mΓ¥»[39m src/__tests__/auth/protected-shell.test.tsx [2m([22m[2m0 test[22m[2m)[22m
+ [31mΓ¥»[39m src/__tests__/auth/auth-context.test.tsx [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 91[2mms[22m[39m
+   [31mΓ¥»[39m AuthProvider selection [2m(2)[22m
+[31m     [31m├ù[31m renders ClerkAuthProvider when isClerkEnabled is true[39m[32m 62[2mms[22m[39m
+     [32mΓ£ô[39m renders DevAuthProvider when isClerkEnabled is false[32m 24[2mms[22m[39m
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[39m[1m[41m Failed 
+Suites 1 [49m[22m[31
+mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+[39m
+
+[41m[1m FAIL 
+[22m[49m src/__tests_
+_/auth/protected-shell.
+test.tsx[2m [ src/__te
+sts__/auth/protected-sh
+ell.test.tsx ][22m
+[31m[1mError[22m: 
+Failed to resolve 
+import "../../lib/auth/
+protected-shell" from "
+src/__tests__/auth/prot
+ected-shell.test.tsx". 
+Does the file 
+exist?[39m
+  Plugin: [35mvite:imp
+ort-analysis[39m
+  File: [36mC:/Users/H
+P/Desktop/.vscode/Argus
+  og/frontend/src/__tes
+ts__/auth/protected-she
+ll.test.tsx[39m:4:0
+[33m  4  |  const 
+__vi_import_0__ = 
+await import("react");
+  5  |  const 
+__vi_import_1__ = 
+await import("@testing-
+library/react");
+  6  |  const 
+__vi_import_2__ = 
+await import("../../lib
+/auth/protected-shell")
+;
+     |                 
+                      ^
+  7  |  const 
+__vi_import_3__ = 
+await import("../../lib
+/auth/use-auth");
+  8  |  const 
+__vi_import_4__ = 
+await import("../../lib
+/auth/config");[39m
+[90m [2mΓ¥»[22m Tran
+sformPluginContext._for
+matLog ../../Argus%20%2
+0og/frontend/node_modul
+es/vite/dist/node/chunk
+s/node.js:[2m8736:39[
+22m[39m
+[90m [2mΓ¥»[22m Tran
+sformPluginContext.erro
+r ../../Argus%20%20og/f
+rontend/node_modules/vi
+te/dist/node/chunks/nod
+e.js:[2m8733:14[22m[
+39m
+[90m [2mΓ¥»[22m 
+normalizeUrl ../../Argu
+s%20%20og/frontend/node
+_modules/vite/dist/node
+/chunks/node.js:[2m264
+23:18[22m[39m
+[90m [2mΓ¥»[22m ../.
+./Argus%20%20og/fronten
+d/node_modules/vite/dis
+t/node/chunks/node.js:
+[2m26493:30[22m[39m
+[90m [2mΓ¥»[22m Tran
+sformPluginContext.tran
+sform ../../Argus%20%20
+og/frontend/node_module
+s/vite/dist/node/chunks
+/node.js:[2m26459:4[2
+2m[39m
+[90m [2mΓ¥»[22m Envi
+ronmentPluginContainer.
+transform ../../Argus%2
+0%20og/frontend/node_mo
+dules/vite/dist/node/ch
+unks/node.js:[2m8515:1
+4[22m[39m
+[90m [2mΓ¥»[22m 
+loadAndTransform ../../
+Argus%20%20og/frontend/
+node_modules/vite/dist/
+node/chunks/node.js:[2
+m19998:26[22m[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/2]ΓÄ»[2
+2m[39m
+
+
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»[39m[1m[41m 
+Failed Tests 1 [49m[2
+2m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»[39m
+
+[41m[1m FAIL 
+[22m[49m src/__tests_
+_/auth/auth-context.tes
+t.tsx[2m > 
+[22mAuthProvider 
+selection[2m > 
+[22mrenders 
+ClerkAuthProvider when 
+isClerkEnabled is true
+[31m[1mTestingLibrary
+ElementError[22m: 
+Unable to find an 
+element by: [data-testi
+d="clerk-provider"]
+
+Ignored nodes: 
+comments, script, style
+[36m<body>[31m
+  [36m<div />[31m
+[36m</body>[31m[39m
+[90m [2mΓ¥»[22m 
+Object.getElementError 
+node_modules/@testing-l
+ibrary/dom/dist/config.
+js:[2m37:19[22m[39m
+[90m [2mΓ¥»[22m node
+_modules/@testing-libra
+ry/dom/dist/query-helpe
+rs.js:[2m76:38[22m[3
+9m
+[90m [2mΓ¥»[22m node
+_modules/@testing-libra
+ry/dom/dist/query-helpe
+rs.js:[2m52:17[22m[3
+9m
+[90m [2mΓ¥»[22m node
+_modules/@testing-libra
+ry/dom/dist/query-helpe
+rs.js:[2m95:19[22m[3
+9m
+[36m [2mΓ¥»[22m src/
+__tests__/auth/auth-con
+text.test.tsx:[2m42:23
+[22m[39m
+    [90m 40|[39m     
+    );
+    [90m 41|[39m
+    [90m 42|[39m     
+    expect(screen.getBy
+TestId("clerk-provider"
+)).toBeInTheDocumentΓÇª
+    [90m   |[39m     
+                  
+[31m^[39m
+    [90m 43|[39m     
+});
+    [90m 44|[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ
+»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»Γ
+Ä»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/2]ΓÄ»[2
+2m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (2)[39m
+[2m   Start at [22m 02:45:03
+[2m   Duration [22m 23.29s[2m (setup 91%, environment 6%, import 2%, transform 1%)[22m
+

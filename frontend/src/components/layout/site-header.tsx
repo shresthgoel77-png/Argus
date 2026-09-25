@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
 import { MobileNav, type SiteNavItem } from "@/components/layout/mobile-nav";
+import { getAuthLoginPath } from "@/lib/auth/config";
 
 const navItems: SiteNavItem[] = [
   { label: "Platform", href: "#platform" },
@@ -35,8 +38,8 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link href="/login" className={buttonVariants({ variant: "ghost" })}>Sign in</Link>
-          <Link href="/login" className={buttonVariants()}>Get started</Link>
+          <Link href={getAuthLoginPath()} className={buttonVariants({ variant: "ghost" })}>Sign in</Link>
+          <Link href={getAuthLoginPath()} className={buttonVariants()}>Get started</Link>
         </div>
         <MobileNav items={navItems} />
       </div>

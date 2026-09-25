@@ -1,0 +1,70 @@
+Scenario 1: production + valid Clerk config
+Result: False - OSError: [WinError 10106] The requested service provider could not be loaded or initialized
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\manual_simulation.py", line 22, in simulate
+    from app.core.config import Settings
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\core\config.py", line 3, in <module>
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\__init__.py", line 2, in <module>
+    from .main import BaseSettings, CliApp, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\main.py", line 3, in <module>
+    import asyncio
+  File "C:\Python314\Lib\asyncio\__init__.py", line 45, in <module>
+    from .windows_events import *
+  File "C:\Python314\Lib\asyncio\windows_events.py", line 8, in <module>
+    import _overlapped
+OSError: [WinError 10106] The requested service provider could not be loaded or initialized
+
+ERROR: Scenario 1 failed!
+
+Scenario 2: production + missing Clerk config
+Result: False - NameError: name 'base_events' is not defined
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\manual_simulation.py", line 22, in simulate
+    from app.core.config import Settings
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\core\config.py", line 3, in <module>
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\__init__.py", line 2, in <module>
+    from .main import BaseSettings, CliApp, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\main.py", line 3, in <module>
+    import asyncio
+  File "C:\Python314\Lib\asyncio\__init__.py", line 26, in <module>
+    __all__ = (base_events.__all__ +
+               ^^^^^^^^^^^
+NameError: name 'base_events' is not defined
+
+
+Scenario 3: production + development provider
+Result: False - NameError: name 'base_events' is not defined
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\manual_simulation.py", line 22, in simulate
+    from app.core.config import Settings
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\core\config.py", line 3, in <module>
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\__init__.py", line 2, in <module>
+    from .main import BaseSettings, CliApp, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\main.py", line 3, in <module>
+    import asyncio
+  File "C:\Python314\Lib\asyncio\__init__.py", line 26, in <module>
+    __all__ = (base_events.__all__ +
+               ^^^^^^^^^^^
+NameError: name 'base_events' is not defined
+
+
+Scenario 4: test + development provider
+Result: False - NameError: name 'base_events' is not defined
+Traceback (most recent call last):
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\manual_simulation.py", line 22, in simulate
+    from app.core.config import Settings
+  File "C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\core\config.py", line 3, in <module>
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\__init__.py", line 2, in <module>
+    from .main import BaseSettings, CliApp, SettingsConfigDict
+  File "C:\Users\HP\AppData\Roaming\Python\Python314\site-packages\pydantic_settings\main.py", line 3, in <module>
+    import asyncio
+  File "C:\Python314\Lib\asyncio\__init__.py", line 26, in <module>
+    __all__ = (base_events.__all__ +
+               ^^^^^^^^^^^
+NameError: name 'base_events' is not defined
+
+ERROR: Scenario 4 failed!

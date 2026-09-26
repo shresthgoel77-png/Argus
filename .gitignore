@@ -13,3 +13,4 @@ htmlcov
 coverage
 out
 /*.txt
+.pytest_cache/

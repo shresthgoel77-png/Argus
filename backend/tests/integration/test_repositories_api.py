@@ -44,8 +44,8 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
     assert res_login.status_code == 200
 
     # Get the user that was just created/logged in by dev-login
-    # dev-login typically creates a test user with a known email or just gets the first user
-    user = db_session.query(User).first()
+    user_id = res_login.json()["id"]
+    user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
     
     # 2. Setup connection
     connection = GitHubConnection(
@@ -115,9 +115,10 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
     Adding a repository via a connection owned by another user is rejected with 404.
     Toggling monitoring on another user's repository is rejected with 404.
     """
-    client.post("/api/v1/auth/dev-login")
+    res_login = client.post("/api/v1/auth/dev-login")
     # Current logged in dev user
-    my_user = db_session.query(User).first()
+    user_id = res_login.json()["id"]
+    my_user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
     
     # Create another user
     other_user = User(email="other@example.com", auth_provider="github", external_auth_id="gh_999")
@@ -171,8 +172,9 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
 
 
 def test_repository_refresh_happy_path(client, db_session, monkeypatch):
-    client.post("/api/v1/auth/dev-login")
-    user = db_session.query(User).first()
+    res_login = client.post("/api/v1/auth/dev-login")
+    user_id = res_login.json()["id"]
+    user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
 
     connection = GitHubConnection(
         user_id=user.id,
@@ -214,8 +216,9 @@ def test_repository_refresh_happy_path(client, db_session, monkeypatch):
 
 
 def test_repository_refresh_disabled(client, db_session):
-    client.post("/api/v1/auth/dev-login")
-    user = db_session.query(User).first()
+    res_login = client.post("/api/v1/auth/dev-login")
+    user_id = res_login.json()["id"]
+    user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
 
     connection = GitHubConnection(
         user_id=user.id,
@@ -241,8 +244,9 @@ def test_repository_refresh_disabled(client, db_session):
 
 
 def test_repository_refresh_ownership_protection(client, db_session):
-    client.post("/api/v1/auth/dev-login")
-    
+    res_login = client.post("/api/v1/auth/dev-login")
+    user_id = res_login.json()["id"]
+    my_user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
     other_user = User(email="other@example.com", auth_provider="github", external_auth_id="gh_999")
     db_session.add(other_user)
     db_session.commit()

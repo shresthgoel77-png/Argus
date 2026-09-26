@@ -1,0 +1,76 @@
+﻿
+tests/integration/api/v
+1/test_findings_ai_anal
+ysis.py::test_trigger_a
+nalysis_failed_provider
+ PASSED [  2%]
+tests/integration/api/v
+1/test_repositories_ai_
+summary.py::test_trigge
+r_repo_analysis_failed_
+provider PASSED [  5%]
+tests/integration/servi
+ces/test_github_event_s
+ervice.py::test_mark_fa
+iled_strips_secrets 
+PASSED [ 11%]
+tests/integration/servi
+ces/test_github_event_s
+ervice.py::test_process
+_webhook_event_reaction
+_failure_marks_failed 
+PASSED [ 12%]
+tests/services/test_ai_
+analysis_service.py::te
+st_provider_failure_per
+sists_sanitized_failed_
+analysis[provider_error
+0-ai_provider_invalid_a
+pi_key-The configured 
+AI provider rejected 
+the API key.] PASSED [ 
+30%]
+tests/services/test_ai_
+analysis_service.py::te
+st_provider_failure_per
+sists_sanitized_failed_
+analysis[provider_error
+1-ai_provider_rate_limi
+ted-The AI provider is 
+rate limited.] PASSED 
+[ 30%]
+tests/services/test_ai_
+analysis_service.py::te
+st_provider_failure_per
+sists_sanitized_failed_
+analysis[provider_error
+2-ai_provider_unavailab
+le-The AI provider is 
+unavailable.] PASSED [ 
+30%]
+tests/services/test_ai_
+analysis_service.py::te
+st_provider_failure_per
+sists_sanitized_failed_
+analysis[provider_error
+3-ai_provider_invalid_r
+esponse-The AI 
+provider returned an 
+invalid response.] 
+PASSED [ 30%]
+tests/unit/test_schedul
+ed_monitoring_service.p
+y::test_global_monitori
+ng_cycle_isolates_failu
+res FAILED [ 97%]
+FAILED tests/unit/test_
+scheduled_monitoring_se
+rvice.py::test_global_m
+onitoring_cycle_isolate
+s_failures
+================= 1 
+failed, 488 passed, 22 
+warnings in 8.82s 
+==================
+
+

@@ -1,0 +1,296 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\HP\Desktop\.vscode\Argus  og\backend
+configfile: pytest.ini
+plugins: anyio-4.15.1, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 6 items
+
+tests/integration/test_repositories_api.py::test_repositories_endpoints_unauthenticated PASSED [ 16%]
+tests/integration/test_repositories_api.py::test_repositories_happy_path FAILED [ 33%]
+tests/integration/test_repositories_api.py::test_repositories_ownership_protection FAILED [ 50%]
+tests/integration/test_repositories_api.py::test_repository_refresh_happy_path FAILED [ 66%]
+tests/integration/test_repositories_api.py::test_repository_refresh_disabled FAILED [ 83%]
+tests/integration/test_repositories_api.py::test_repository_refresh_ownership_protection FAILED [100%]
+
+================================== FAILURES ===================================
+________________________ test_repositories_happy_path _________________________
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'hex'
+
+The above exception was the direct cause of the following exception:
+tests\integration\test_repositories_api.py:48: in test_repositories_happy_path
+    user = db_session.query(User).filter(User.id == user_id).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1823: in _execute_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   sqlalchemy.exc.StatementError: (builtins.AttributeError) 'str' object has no attribute 'hex'
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.auth_provider AS users_auth_provider, users.external_auth_id AS users_external_auth_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+E   FROM users 
+E   WHERE users.id = ?
+E    LIMIT ? OFFSET ?]
+E   [parameters: [{}]]
+___________________ test_repositories_ownership_protection ____________________
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'hex'
+
+The above exception was the direct cause of the following exception:
+tests\integration\test_repositories_api.py:121: in test_repositories_ownership_protection
+    my_user = db_session.query(User).filter(User.id == user_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1823: in _execute_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   sqlalchemy.exc.StatementError: (builtins.AttributeError) 'str' object has no attribute 'hex'
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.auth_provider AS users_auth_provider, users.external_auth_id AS users_external_auth_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+E   FROM users 
+E   WHERE users.id = ?
+E    LIMIT ? OFFSET ?]
+E   [parameters: [{}]]
+_____________________ test_repository_refresh_happy_path ______________________
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'hex'
+
+The above exception was the direct cause of the following exception:
+tests\integration\test_repositories_api.py:177: in test_repository_refresh_happy_path
+    user = db_session.query(User).filter(User.id == user_id).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1823: in _execute_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   sqlalchemy.exc.StatementError: (builtins.AttributeError) 'str' object has no attribute 'hex'
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.auth_provider AS users_auth_provider, users.external_auth_id AS users_external_auth_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+E   FROM users 
+E   WHERE users.id = ?
+E    LIMIT ? OFFSET ?]
+E   [parameters: [{}]]
+______________________ test_repository_refresh_disabled _______________________
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'hex'
+
+The above exception was the direct cause of the following exception:
+tests\integration\test_repositories_api.py:221: in test_repository_refresh_disabled
+    user = db_session.query(User).filter(User.id == user_id).first()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1823: in _execute_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   sqlalchemy.exc.StatementError: (builtins.AttributeError) 'str' object has no attribute 'hex'
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.auth_provider AS users_auth_provider, users.external_auth_id AS users_external_auth_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+E   FROM users 
+E   WHERE users.id = ?
+E    LIMIT ? OFFSET ?]
+E   [parameters: [{}]]
+________________ test_repository_refresh_ownership_protection _________________
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   AttributeError: 'str' object has no attribute 'hex'
+
+The above exception was the direct cause of the following exception:
+tests\integration\test_repositories_api.py:249: in test_repository_refresh_ownership_protection
+    my_user = db_session.query(User).filter(User.id == user_id).first()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2766: in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+venv\Lib\site-packages\sqlalchemy\orm\query.py:2864: in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2373: in execute
+    return self._execute_internal(
+venv\Lib\site-packages\sqlalchemy\orm\session.py:2271: in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+venv\Lib\site-packages\sqlalchemy\orm\context.py:306: in orm_execute_statement
+    result = conn.execute(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1421: in execute
+    return meth(
+venv\Lib\site-packages\sqlalchemy\sql\elements.py:526: in _execute_on_connection
+    return connection._execute_clauseelement(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1643: in _execute_clauseelement
+    ret = self._execute_context(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1823: in _execute_context
+    self._handle_dbapi_exception(
+venv\Lib\site-packages\sqlalchemy\engine\base.py:2365: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+venv\Lib\site-packages\sqlalchemy\engine\base.py:1817: in _execute_context
+    context = constructor(
+venv\Lib\site-packages\sqlalchemy\engine\default.py:1496: in _init_compiled
+    flattened_processors[key](compiled_params[key])
+venv\Lib\site-packages\sqlalchemy\sql\sqltypes.py:3738: in process
+    value = value.hex
+            ^^^^^^^^^
+E   sqlalchemy.exc.StatementError: (builtins.AttributeError) 'str' object has no attribute 'hex'
+E   [SQL: SELECT users.id AS users_id, users.email AS users_email, users.display_name AS users_display_name, users.auth_provider AS users_auth_provider, users.external_auth_id AS users_external_auth_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+E   FROM users 
+E   WHERE users.id = ?
+E    LIMIT ? OFFSET ?]
+E   [parameters: [{}]]
+============================== warnings summary ===============================
+venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+app\schemas\notification.py:24
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\schemas\notification.py:24: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class Notification(NotificationBase):
+
+app\main.py:21
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\app\main.py:21: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv\Lib\site-packages\fastapi\applications.py:4681
+  C:\Users\HP\Desktop\.vscode\Argus  og\backend\venv\Lib\site-packages\fastapi\applications.py:4681: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)  # ty: ignore[deprecated]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/integration/test_repositories_api.py::test_repositories_happy_path
+FAILED tests/integration/test_repositories_api.py::test_repositories_ownership_protection
+FAILED tests/integration/test_repositories_api.py::test_repository_refresh_happy_path
+FAILED tests/integration/test_repositories_api.py::test_repository_refresh_disabled
+FAILED tests/integration/test_repositories_api.py::test_repository_refresh_ownership_protection
+=================== 5 failed, 1 passed, 5 warnings in 2.54s ===================

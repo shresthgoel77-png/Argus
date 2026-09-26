@@ -245,11 +245,9 @@ async def test_global_monitoring_cycle_isolates_failures(db_session, enabled_rep
     # Create another repo that will fail
     conn = GitHubConnection(
         user_id=test_user.id,
-        github_account_id=999,
-        account_name="test2",
+        account_login="test2",
         account_type="User",
         installation_id=999,
-        access_token="token2",
     )
     db_session.add(conn)
     db_session.commit()

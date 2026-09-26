@@ -26,6 +26,8 @@ _BASE = dict(
 _PROD_EXTRAS = dict(
     session_secret_key="prod_secret_override",
     scheduler_shared_secret="sched_secret",
+    cors_origins=["https://app.example.com"],
+    clerk_authorized_parties=["https://app.example.com"],
 )
 
 

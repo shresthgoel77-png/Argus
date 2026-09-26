@@ -1,5 +1,5 @@
 from typing import Literal, Any, List, Union
-from pydantic import field_validator, model_validator, SecretStr
+from pydantic import Field, field_validator, model_validator, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     test_database_url: str | None = None
     log_level: str = "INFO"
     cors_origins: Union[List[str], str] = ["http://localhost:3000"]
+    api_rate_limit_requests: int = Field(default=120, gt=0)
+    api_rate_limit_window_seconds: int = Field(default=60, gt=0)
 
     github_app_id: str
     github_app_slug: str
@@ -140,6 +142,22 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "SESSION_SECRET_KEY must be overridden "
                     "in production environment"
+                )
+            if "cors_origins" not in self.model_fields_set:
+                raise ValueError(
+                    "CORS_ORIGINS must be explicitly configured in production"
+                )
+            if not self.cors_origins or "*" in self.cors_origins:
+                raise ValueError(
+                    "CORS_ORIGINS must contain explicit origins in production"
+                )
+            if not self.clerk_authorized_parties:
+                raise ValueError(
+                    "CLERK_AUTHORIZED_PARTIES must be explicitly configured in production"
+                )
+            if "*" in self.clerk_authorized_parties:
+                raise ValueError(
+                    "CLERK_AUTHORIZED_PARTIES must contain explicit origins in production"
                 )
 
         return self

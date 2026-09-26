@@ -120,8 +120,8 @@ async def test_monitoring_check_failure_does_not_block_remaining_checks(
 
     assert result.status == "partial_failure"
     assert result.checks["stale_issues"].status == "failed"
-    assert (
-        result.checks["stale_issues"].error_message == "stale issue failure"
+    assert result.checks["stale_issues"].error_message == (
+        "The check could not be completed."
     )
     assert all(
         result.checks[name].status == "success"

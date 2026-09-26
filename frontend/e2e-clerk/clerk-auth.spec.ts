@@ -8,7 +8,7 @@ async function signIn(page: Page) {
     await page.goto("/sign-in");
     await page.getByRole("textbox", { name: /email address/i }).fill(accountEmail);
     await page.getByRole("button", { name: /continue/i }).click();
-    await page.getByLabel(/password/i).fill(accountPassword);
+    await page.getByLabel(/password/i).first().fill(accountPassword);
     await page.getByRole("button", { name: /continue/i }).click();
     await expect(page).not.toHaveURL(/\/sign-in/);
 }
@@ -28,7 +28,7 @@ test("signs up through Clerk and provisions a stable internal user", async ({ pa
 
     await page.goto("/sign-up");
     await page.getByRole("textbox", { name: /email address/i }).fill(signupEmail);
-    await page.getByLabel(/password/i).fill(accountPassword);
+    await page.getByLabel(/password/i).first().fill(accountPassword);
     await page.getByRole("button", { name: /continue/i }).click();
     const verificationCode = page.getByLabel(/verification code/i);
     const needsVerification = await verificationCode

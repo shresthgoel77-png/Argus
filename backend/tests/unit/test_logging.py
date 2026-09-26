@@ -65,6 +65,29 @@ def test_json_formatter_preserves_safe_correlation_context():
     assert "repository_content" not in parsed
 
 
+def test_json_formatter_redacts_exception_messages_and_tracebacks():
+    formatter = JSONFormatter()
+    try:
+        raise ValueError("/internal/path credential-fragment")
+    except ValueError:
+        record = logging.LogRecord(
+            "api",
+            logging.ERROR,
+            "/internal/path/module.py",
+            42,
+            "Unhandled server error",
+            (),
+            __import__("sys").exc_info(),
+        )
+
+    output = formatter.format(record)
+    parsed = json.loads(output)
+    assert parsed["exception_type"] == "ValueError"
+    assert "exc_info" not in parsed
+    assert "/internal/path" not in output
+    assert "credential-fragment" not in output
+
+
 def test_get_logger():
     logger = get_logger("my_custom_logger")
     assert isinstance(logger, logging.Logger)

@@ -103,3 +103,15 @@ async def test_tampered_signature_is_rejected(signing_keys, request_factory):
         await adapter.resolve_identity(request_factory(f"Bearer {tampered_token}"))
         is None
     )
+
+
+@pytest.mark.asyncio
+async def test_mismatched_authorized_party_is_rejected(signing_keys, request_factory):
+    private_key, public_key = signing_keys
+    adapter = ClerkAuthAdapter(
+        jwt_key=public_key,
+        authorized_parties=["https://app.example.com"],
+    )
+    token = make_token(private_key, azp="https://attacker.example")
+
+    assert await adapter.resolve_identity(request_factory(f"Bearer {token}")) is None

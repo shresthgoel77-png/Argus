@@ -26,6 +26,8 @@ _BASE_SIMULATION_ENV = dict(
     ai_credential_encryption_key="MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
     session_secret_key="prod_secret_override",
     scheduler_shared_secret="sched_secret",
+    cors_origins=["https://app.example.com"],
+    clerk_authorized_parties=["https://app.example.com"],
 )
 
 @pytest.mark.asyncio

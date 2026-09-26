@@ -75,6 +75,12 @@ async def test_get_findings_list(authorized_client, test_finding):
     assert data["items"][0]["id"] == str(test_finding.id)
     assert "fingerprint" not in data["items"][0]
 
+
+@pytest.mark.asyncio
+async def test_get_findings_rejects_unbounded_page_size(authorized_client):
+    response = await authorized_client.get("/api/v1/findings?limit=1000000")
+    assert response.status_code == 422
+
 @pytest.mark.asyncio
 async def test_get_findings_list_filters(authorized_client, test_finding):
     response = await authorized_client.get(f"/api/v1/findings?status_=open&category=security&repository_id={test_finding.repository_id}")

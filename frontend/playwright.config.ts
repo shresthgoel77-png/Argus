@@ -29,6 +29,9 @@ export default defineConfig({
             url: 'http://localhost:3000',
             reuseExistingServer: true,
             timeout: 120000,
+            env: {
+                NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ""
+            }
         }
     ],
 });

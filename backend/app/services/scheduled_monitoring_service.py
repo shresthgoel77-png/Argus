@@ -84,9 +84,9 @@ async def run_monitoring_checks_for_repository(
                 raise RuntimeError(
                     error_message or "Check reported failure"
                 )
-        except Exception as exc:
+        except Exception:
             result.checks[name] = CheckResult(
-                status="failed", error_message=str(exc)
+                status="failed", error_message="The check could not be completed."
             )
             result.status = "partial_failure"
             logger.error(

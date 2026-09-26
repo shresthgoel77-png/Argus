@@ -110,7 +110,7 @@ def get_repository_findings(
     severity: str | None = None,
     priority: str | None = None,
     status_: str | None = None,
-    limit: int = 50,
+    limit: int = Query(default=50, ge=1, le=100),
     cursor: str | None = None,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -256,8 +256,8 @@ def get_latest_repository_ai_summary(
 @router.get("/{repository_id}/ai-summary/history", response_model=AIAnalysisHistoryResponse)
 def get_repository_ai_summary_history(
     repository_id: uuid.UUID,
-    limit: int = 50,
-    offset: int = 0,
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0, le=100000),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -265,9 +265,6 @@ def get_repository_ai_summary_history(
     Returns a paginated list of all prior AI analyses for the repository, newest first.
     """
     get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
-
-    limit = min(max(limit, 1), 200)
-    offset = max(offset, 0)
 
     total, items = list_repo_analyses(db, repository_id, limit, offset)
 

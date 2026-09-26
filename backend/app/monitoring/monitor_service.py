@@ -67,7 +67,7 @@ async def run_analyzer(
                 findings_drafts = await res
             else:
                 findings_drafts = res
-    except Exception as e:
+    except Exception:
         logger.error(
             "Analyzer failed with exception",
             exc_info=True,
@@ -77,7 +77,9 @@ async def run_analyzer(
                 "correlation_id": correlation_id
             }
         )
-        return MonitorRunResult(status="failed", error_message=str(e))
+        return MonitorRunResult(
+            status="failed", error_message="The analyzer could not be completed."
+        )
 
     if analyzer.full_state_sync:
         sync_result = finding_service.sync_findings_for_run(

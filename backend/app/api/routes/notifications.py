@@ -26,7 +26,9 @@ class MarkAllReadResponse(BaseModel):
 def get_notifications(
     unread_only: bool = Query(False, description="Filter for unread notifications only"),
     before: Optional[datetime] = Query(None, description="Cursor for pagination (creation time)"),
-    limit: int = Query(25, lte=100, description="Number of notifications to return"),
+    limit: int = Query(
+        25, ge=1, le=100, description="Number of notifications to return"
+    ),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> List[Notification]:

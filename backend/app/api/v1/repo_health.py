@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
@@ -52,8 +52,8 @@ def get_repository_health(
 @router.get("/health/history", response_model=HealthSnapshotListResponse)
 def get_repository_health_history(
     repository_id: uuid.UUID,
-    limit: int = 50,
-    offset: int = 0,
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0, le=100000),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

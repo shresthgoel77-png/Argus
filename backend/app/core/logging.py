@@ -25,9 +25,9 @@ class JSONFormatter(logging.Formatter):
             if value is not None:
                 log_record[field] = value
         
-        # Add basic exception traceback if available
+        # Exception messages and tracebacks can contain request or repository data.
         if record.exc_info:
-            log_record["exc_info"] = self.formatException(record.exc_info)
+            log_record["exception_type"] = record.exc_info[0].__name__
         
         return json.dumps(log_record)
 

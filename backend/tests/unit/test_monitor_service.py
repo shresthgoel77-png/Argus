@@ -88,7 +88,7 @@ async def test_run_analyzer_exception_containment(db_session, test_user_reposito
     
     result = await run_analyzer(db_session, "dummy_error", test_user_repository)
     assert result.status == "failed"
-    assert "Something went wrong" in result.error_message
+    assert result.error_message == "The analyzer could not be completed."
 
 @pytest.mark.asyncio
 async def test_run_analyzer_success_persists_findings(db_session, test_user_repository):

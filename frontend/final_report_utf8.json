@@ -1,0 +1,390 @@
+﻿{
+  "config": {
+    "argv": [
+      "C:\\users\\hp\\.vscode\\node.exe",
+      "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config=playwright.clerk.config.ts",
+      "--reporter=json"
+    ],
+    "configFile": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\playwright.clerk.config.ts",
+    "rootDir": "C:/Users/HP/Desktop/.vscode/Argus  og/frontend/e2e-clerk",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/HP/Desktop/.vscode/Argus  og/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/HP/Desktop/.vscode/Argus  og/frontend/e2e-clerk",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "clerk-auth.spec.ts",
+      "file": "clerk-auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "denies protected routes without a Clerk session",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2701,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-26T15:49:52.732Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "5ccd67481dadb8768e9f-07aeae711028d1b5c7f4",
+          "file": "clerk-auth.spec.ts",
+          "line": 20,
+          "column": 5
+        },
+        {
+          "title": "signs up through Clerk and provisions a stable internal user",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 4247,
+                  "error": {
+                    "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" required=\"\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-required=\"true\" data-feedback=\"info\" aria-disabled=\"false\" data-variant=\"default\" autocomplete=\"new-password\" placeholder=\"Create a password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password cl-required ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByRole('textbox', { name: 'Password' })\n    2) <button data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByRole('button', { name: 'Show password' })\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n",
+                    "stack": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" required=\"\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-required=\"true\" data-feedback=\"info\" aria-disabled=\"false\" data-variant=\"default\" autocomplete=\"new-password\" placeholder=\"Create a password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password cl-required ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByRole('textbox', { name: 'Password' })\n    2) <button data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByRole('button', { name: 'Show password' })\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:31:40",
+                    "location": {
+                      "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                      "column": 40,
+                      "line": 31
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m\"/sign-up\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"textbox\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/email address/i\u001b[39m })\u001b[33m.\u001b[39mfill(signupEmail)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(accountPassword)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/continue/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 33 |\u001b[39m     \u001b[36mconst\u001b[39m verificationCode \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/verification code/i\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m     \u001b[36mconst\u001b[39m needsVerification \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m verificationCode\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                        "column": 40,
+                        "line": 31
+                      },
+                      "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" required=\"\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-required=\"true\" data-feedback=\"info\" aria-disabled=\"false\" data-variant=\"default\" autocomplete=\"new-password\" placeholder=\"Create a password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password cl-required ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByRole('textbox', { name: 'Password' })\n    2) <button data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByRole('button', { name: 'Show password' })\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n\n  29 |     await page.goto(\"/sign-up\");\n  30 |     await page.getByRole(\"textbox\", { name: /email address/i }).fill(signupEmail);\n> 31 |     await page.getByLabel(/password/i).fill(accountPassword);\n     |                                        ^\n  32 |     await page.getByRole(\"button\", { name: /continue/i }).click();\n  33 |     const verificationCode = page.getByLabel(/verification code/i);\n  34 |     const needsVerification = await verificationCode\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:31:40"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-26T15:49:55.557Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-signs-up-throug-9b3d0-ions-a-stable-internal-user\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-signs-up-throug-9b3d0-ions-a-stable-internal-user\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                    "column": 40,
+                    "line": 31
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "5ccd67481dadb8768e9f-7d131b0bd7132d2983e2",
+          "file": "clerk-auth.spec.ts",
+          "line": 25,
+          "column": 5
+        },
+        {
+          "title": "signs in with Clerk and persists the session across reloads",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5141,
+                  "error": {
+                    "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n",
+                    "stack": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n    at signIn (C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:11:40)\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:60:5",
+                    "location": {
+                      "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                      "column": 40,
+                      "line": 11
+                    },
+                    "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"textbox\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/email address/i\u001b[39m })\u001b[33m.\u001b[39mfill(accountEmail)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/continue/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(accountPassword)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/continue/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/sign-in/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                        "column": 40,
+                        "line": 11
+                      },
+                      "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n\n   9 |     await page.getByRole(\"textbox\", { name: /email address/i }).fill(accountEmail);\n  10 |     await page.getByRole(\"button\", { name: /continue/i }).click();\n> 11 |     await page.getByLabel(/password/i).fill(accountPassword);\n     |                                        ^\n  12 |     await page.getByRole(\"button\", { name: /continue/i }).click();\n  13 |     await expect(page).not.toHaveURL(/\\/sign-in/);\n  14 | }\n    at signIn (C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:11:40)\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:60:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-26T15:50:01.197Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-signs-in-with-C-6ed4b--the-session-across-reloads\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-signs-in-with-C-6ed4b--the-session-across-reloads\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                    "column": 40,
+                    "line": 11
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "5ccd67481dadb8768e9f-6c64f90000e677e08bf1",
+          "file": "clerk-auth.spec.ts",
+          "line": 59,
+          "column": 5
+        },
+        {
+          "title": "rejects an expired Clerk session token",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3865,
+                  "error": {
+                    "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n",
+                    "stack": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n    at signIn (C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:11:40)\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:78:5",
+                    "location": {
+                      "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                      "column": 40,
+                      "line": 11
+                    },
+                    "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"textbox\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/email address/i\u001b[39m })\u001b[33m.\u001b[39mfill(accountEmail)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/continue/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(accountPassword)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/continue/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/sign-in/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                        "column": 40,
+                        "line": 11
+                      },
+                      "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n\n   9 |     await page.getByRole(\"textbox\", { name: /email address/i }).fill(accountEmail);\n  10 |     await page.getByRole(\"button\", { name: /continue/i }).click();\n> 11 |     await page.getByLabel(/password/i).fill(accountPassword);\n     |                                        ^\n  12 |     await page.getByRole(\"button\", { name: /continue/i }).click();\n  13 |     await expect(page).not.toHaveURL(/\\/sign-in/);\n  14 | }\n    at signIn (C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:11:40)\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:78:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-26T15:50:07.694Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-rejects-an-expired-Clerk-session-token\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-rejects-an-expired-Clerk-session-token\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                    "column": 40,
+                    "line": 11
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "5ccd67481dadb8768e9f-c0656d3c4dcc6396c976",
+          "file": "clerk-auth.spec.ts",
+          "line": 76,
+          "column": 5
+        },
+        {
+          "title": "sign-out invalidates the Clerk session in the frontend and backend",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 180000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 4328,
+                  "error": {
+                    "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n",
+                    "stack": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n    at signIn (C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:11:40)\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:103:5",
+                    "location": {
+                      "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                      "column": 40,
+                      "line": 11
+                    },
+                    "snippet": "\u001b[0m \u001b[90m  9 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"textbox\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/email address/i\u001b[39m })\u001b[33m.\u001b[39mfill(accountEmail)\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/continue/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/password/i\u001b[39m)\u001b[33m.\u001b[39mfill(accountPassword)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 12 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/continue/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/sign-in/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m }\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                        "column": 40,
+                        "line": 11
+                      },
+                      "message": "Error: locator.fill: Error: strict mode violation: getByLabel(/password/i) resolved to 2 elements:\n    1) <input value=\"\" disabled tabindex=\"-1\" name=\"password\" type=\"password\" id=\"password-field\" aria-invalid=\"false\" aria-disabled=\"true\" data-feedback=\"info\" aria-required=\"false\" data-variant=\"default\" placeholder=\"Enter your password\" class=\"cl-formFieldInput cl-input cl-formFieldInput__password cl-input__password ≡ƒöÆ∩╕Å cl-internal-lu6wva\"/> aka getByPlaceholder('Enter your password')\n    2) <button tabindex=\"-1\" data-variant=\"ghost\" data-color=\"primary\" aria-label=\"Show password\" class=\"cl-formFieldInputShowPasswordButton cl-button ≡ƒöÆ∩╕Å cl-internal-uegrlp\">ΓÇª</button> aka getByLabel('Show password')\n\nCall log:\n\u001b[2m  - waiting for getByLabel(/password/i)\u001b[22m\n\n\n   9 |     await page.getByRole(\"textbox\", { name: /email address/i }).fill(accountEmail);\n  10 |     await page.getByRole(\"button\", { name: /continue/i }).click();\n> 11 |     await page.getByLabel(/password/i).fill(accountPassword);\n     |                                        ^\n  12 |     await page.getByRole(\"button\", { name: /continue/i }).click();\n  13 |     await expect(page).not.toHaveURL(/\\/sign-in/);\n  14 | }\n    at signIn (C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:11:40)\n    at C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts:103:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-26T15:50:12.935Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-sign-out-invali-cbd2f-in-the-frontend-and-backend\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\test-results\\clerk-auth-sign-out-invali-cbd2f-in-the-frontend-and-backend\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\HP\\Desktop\\.vscode\\Argus  og\\frontend\\e2e-clerk\\clerk-auth.spec.ts",
+                    "column": 40,
+                    "line": 11
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "5ccd67481dadb8768e9f-e8477481fdf6f1d43dce",
+          "file": "clerk-auth.spec.ts",
+          "line": 102,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-26T15:49:45.587Z",
+    "duration": 33479.731999999996,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 4,
+    "flaky": 0
+  }
+}

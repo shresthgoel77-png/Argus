@@ -1,8 +1,11 @@
+import pytest
 from unittest.mock import AsyncMock, patch
 
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 
+from app.api.v1.internal import require_scheduler_secret
 from app.core.config import settings
 from app.main import app
 from app.services.scheduled_monitoring_service import GlobalRunSummary
@@ -37,6 +40,19 @@ def test_scheduler_secret_is_required_and_does_not_run_cycle(monkeypatch, caplog
     assert "test-secret" not in caplog.text
 
     cycle.assert_not_awaited()
+
+
+def test_scheduler_secret_rejects_non_ascii_input(monkeypatch):
+    monkeypatch.setattr(
+        settings,
+        "scheduler_shared_secret",
+        SecretStr("test-secret"),
+    )
+
+    with pytest.raises(HTTPException) as error:
+        require_scheduler_secret(chr(233))
+
+    assert error.value.status_code == 401
 
 
 def test_scheduler_secret_runs_cycle_and_returns_safe_summary(monkeypatch, caplog):  # noqa: E501

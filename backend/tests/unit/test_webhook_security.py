@@ -54,3 +54,9 @@ def test_verify_signature_malformed_header(mock_settings):
     # Different prefix
     signature_header_sha1 = f"sha1={digest}"
     assert verify_signature(payload, signature_header_sha1) is False
+
+
+def test_verify_signature_rejects_non_ascii_digest(mock_settings):
+    payload = b'{"action":"opened"}'
+
+    assert verify_signature(payload, f"sha256={chr(233)}") is False

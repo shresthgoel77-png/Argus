@@ -20,6 +20,11 @@ def verify_signature(payload_body: bytes, signature_header: str | None) -> bool:
         return False
         
     header_digest = signature_header[7:]  # Strip the 'sha256=' prefix
+    if (
+        len(header_digest) != hashlib.sha256().digest_size * 2
+        or not header_digest.isascii()
+    ):
+        return False
     
     secret_bytes = settings.github_app_webhook_secret.get_secret_value().encode('utf-8')
     

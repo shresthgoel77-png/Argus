@@ -34,8 +34,8 @@ def require_scheduler_secret(
     )
     supplied_value = scheduler_secret or ""
     if not configured_value or not secrets.compare_digest(
-        supplied_value,
-        configured_value,
+        supplied_value.encode("utf-8"),
+        configured_value.encode("utf-8"),
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

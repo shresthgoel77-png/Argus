@@ -16,8 +16,6 @@ for (const name of requiredEnvironment) {
 
 const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 const clerkSecretKey = process.env.CLERK_SECRET_KEY!;
-const clerkEmail = process.env.CLERK_E2E_EMAIL!;
-const clerkPassword = process.env.CLERK_E2E_PASSWORD!;
 const databaseUrl = process.env.CLERK_E2E_DATABASE_URL!;
 
 const backendEnvironment: Record<string, string> = {

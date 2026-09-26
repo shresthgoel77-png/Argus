@@ -1,8 +1,13 @@
+import asyncio
 import uuid
+from unittest.mock import MagicMock
+
+from fastapi import Request
 
 from app.auth.context import AuthContext
 from app.models.user import User
 from app.services import clerk_identity_service
+from app.auth import dependencies
 
 
 def clerk_context(suffix: str) -> AuthContext:
@@ -69,3 +74,32 @@ def test_race_on_first_clerk_identity_uses_unique_constraint(
     assert db_session.query(User).filter(
         User.external_auth_id == context.external_id
     ).count() == 1
+
+
+def test_current_user_uses_clerk_identity_mapper(db_session, monkeypatch):
+    context = clerk_context(uuid.uuid4().hex)
+
+    class ClerkProvider:
+        async def resolve_identity(self, request):
+            return context
+
+    def reject_generic_mapping(*args):
+        raise AssertionError("Clerk identity used the generic user mapper")
+
+    monkeypatch.setattr(dependencies, "get_auth_provider", ClerkProvider)
+    monkeypatch.setattr(
+        dependencies,
+        "get_or_create_user_from_context",
+        reject_generic_mapping,
+    )
+
+    user = asyncio.run(
+        dependencies.get_current_user(
+            request=MagicMock(spec=Request),
+            db=db_session,
+        )
+    )
+
+    assert user.email == context.email
+    assert user.external_auth_id == context.external_id
+    assert user.auth_provider == "clerk"

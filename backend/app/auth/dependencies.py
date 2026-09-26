@@ -4,6 +4,9 @@ from app.models.user import User
 from app.db.session import get_db
 from app.auth.factory import get_auth_provider
 from app.core.exceptions import NotAuthenticatedError
+from app.services.clerk_identity_service import (
+    get_or_create_clerk_user,
+)
 from app.services.user_service import get_or_create_user_from_context
 
 async def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
@@ -18,5 +21,8 @@ async def get_current_user(request: Request, db: Session = Depends(get_db)) -> U
     if not auth_context:
         raise NotAuthenticatedError()
         
-    user = get_or_create_user_from_context(db, auth_context)
+    if auth_context.provider == "clerk":
+        user = get_or_create_clerk_user(db, auth_context)
+    else:
+        user = get_or_create_user_from_context(db, auth_context)
     return user

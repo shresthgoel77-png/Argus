@@ -11,7 +11,6 @@ try {
             const key = parts[0].trim();
             const val = parts.slice(1).join("=").trim().replace(/"/g, '');
             process.env[key] = val;
-            if (key === 'CLERK_SECRET_KEY') console.log("Playwright SK loaded:", val.substring(0, 15) + "...");
         }
     }
 } catch (e) { }

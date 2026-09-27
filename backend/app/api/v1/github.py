@@ -1,5 +1,6 @@
-
-from fastapi import APIRouter, Depends, Query, HTTPException, status
+from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from app.models.user import User
 from app.auth.dependencies import get_current_user
@@ -30,6 +31,7 @@ async def start_installation(user: User = Depends(get_current_user)):
 
 @router.get("/install/callback", response_model=GitHubConnectionRead)
 async def installation_callback(
+    request: Request,
     installation_id: str | None = None,
     setup_action: str | None = None,
     state: str | None = None,
@@ -37,7 +39,12 @@ async def installation_callback(
     db: Session = Depends(get_db)
 ):
     """
-    Handles the GitHub App installation callback forwarding endpoint. 
+    Handles the GitHub App installation callback.
+
+    Browser-driven GitHub redirects expect the popup completion HTML because
+    the frontend listens for the window.opener.postMessage event. Direct app
+    fetches still expect the JSON connection payload used by the client callback
+    page. The two modes are intentionally preserved.
     """
     if not installation_id or not installation_id.isdigit():
         raise HTTPException(
@@ -51,13 +58,13 @@ async def installation_callback(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported or missing setup_action"
         )
-        
+
     if not state:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Missing state"
         )
-        
+
     try:
         payload = verify_install_state(state)
     except ValueError as e:
@@ -65,13 +72,13 @@ async def installation_callback(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
-        
+
     if payload.get("user_id") != str(user.id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="State token belongs to a different user"
         )
-        
+
     client = GitHubAppClient(installation_id=inst_id_int)
     connection = await upsert_connection_from_installation(
         db=db,
@@ -79,7 +86,54 @@ async def installation_callback(
         installation_id=inst_id_int,
         client=client
     )
-    
+
+    accept_header = request.headers.get("accept", "")
+    if "text/html" in accept_header.lower():
+        return HTMLResponse(
+            """
+            <html>
+              <body>
+                <script>
+                  if (window.opener) {
+                    window.opener.postMessage({ type: 'github_install_success' }, window.location.origin);
+                  }
+                  window.close();
+                </script>
+              </body>
+            </html>
+            """
+        )
+
+    return connection
+
+class GitHubSyncRequest(BaseModel):
+    installation_id: str
+
+@router.post("/sync", response_model=GitHubConnectionRead)
+async def sync_installation(
+    body: GitHubSyncRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Syncs an existing GitHub App installation that was installed from outside the typical browser flow
+    (e.g., from the GitHub Marketplace), which does not return a state token.
+    """
+    if not body.installation_id or not body.installation_id.isdigit():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Missing or malformed installation_id"
+        )
+    inst_id_int = int(body.installation_id)
+
+    client = GitHubAppClient(installation_id=inst_id_int)
+    connection = await upsert_connection_from_installation(
+        db=db,
+        user_id=user.id,
+        installation_id=inst_id_int,
+        client=client
+    )
+
     return connection
 
 @router.get("/connections", response_model=list[GitHubConnectionRead])

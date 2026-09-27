@@ -110,6 +110,90 @@ async def test_add_repository_rejects_unauthorized(db_session, mock_client):
         await add_repository(db_session, connection, 999, mock_client)
 
 
+@pytest.mark.asyncio
+async def test_add_repository_reassociates_existing_repo_for_same_user(db_session, mock_client):
+    user_id = uuid.uuid4()
+    old_connection = GitHubConnection(
+        user_id=user_id,
+        installation_id=123,
+        account_login="testuser",
+        account_type="User",
+        status="active",
+    )
+    new_connection = GitHubConnection(
+        user_id=user_id,
+        installation_id=456,
+        account_login="testuser",
+        account_type="User",
+        status="active",
+    )
+    db_session.add_all([old_connection, new_connection])
+    db_session.commit()
+
+    existing_repo = Repository(
+        connection_id=old_connection.id,
+        github_repo_id=101,
+        full_name="testuser/repo1",
+        private=False,
+        default_branch="main",
+        monitoring_enabled=True,
+    )
+    db_session.add(existing_repo)
+    db_session.commit()
+
+    mock_client.list_installation_repositories.return_value = [
+        {"id": 101, "full_name": "testuser/repo1", "private": False, "default_branch": "main"},
+    ]
+
+    reassigned = await add_repository(db_session, new_connection, 101, mock_client)
+
+    assert reassigned.id == existing_repo.id
+    assert reassigned.connection_id == new_connection.id
+    assert db_session.query(Repository).filter(Repository.github_repo_id == 101).count() == 1
+
+
+@pytest.mark.asyncio
+async def test_add_repository_refuses_to_reassign_other_users_repo(db_session, mock_client):
+    user1_id = uuid.uuid4()
+    user2_id = uuid.uuid4()
+    old_connection = GitHubConnection(
+        user_id=user2_id,
+        installation_id=123,
+        account_login="otheruser",
+        account_type="User",
+        status="active",
+    )
+    new_connection = GitHubConnection(
+        user_id=user1_id,
+        installation_id=456,
+        account_login="testuser",
+        account_type="User",
+        status="active",
+    )
+    db_session.add_all([old_connection, new_connection])
+    db_session.commit()
+
+    existing_repo = Repository(
+        connection_id=old_connection.id,
+        github_repo_id=101,
+        full_name="otheruser/repo1",
+        private=False,
+        default_branch="main",
+        monitoring_enabled=True,
+    )
+    db_session.add(existing_repo)
+    db_session.commit()
+
+    mock_client.list_installation_repositories.return_value = [
+        {"id": 101, "full_name": "otheruser/repo1", "private": False, "default_branch": "main"},
+    ]
+
+    with pytest.raises(NotFoundError):
+        await add_repository(db_session, new_connection, 101, mock_client)
+
+    assert db_session.query(Repository).filter(Repository.github_repo_id == 101).one().connection_id == old_connection.id
+
+
 def test_set_monitoring_enabled_ownership(db_session):
     user1_id = uuid.uuid4()
     user2_id = uuid.uuid4()

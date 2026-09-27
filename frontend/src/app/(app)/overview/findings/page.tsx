@@ -45,7 +45,9 @@ function FindingRow({ finding, repositoryName, onClick }: { finding: FindingResp
 }
 
 function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: readonly string[]; onChange: (value: string) => void }) {
-    return <label className="flex min-w-40 flex-1 flex-col gap-1.5 text-sm font-medium text-foreground">{label}<select value={value} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-md border bg-card px-3 text-sm font-normal shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"><option value="">All {label.toLowerCase()}s</option>{options.map((option) => <option key={option} value={option}>{displayValue(option)}</option>)}</select></label>;
+    const pluralMap: Record<string, string> = { Category: "categories", Severity: "severities", Priority: "priorities", Status: "statuses" };
+    const pluralLabel = pluralMap[label] || `${label.toLowerCase()}s`;
+    return <label className="flex min-w-40 flex-1 flex-col gap-1.5 text-sm font-medium text-foreground">{label}<select value={value} onChange={(event) => onChange(event.target.value)} className="h-10 rounded-md border bg-card px-3 text-sm font-normal shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"><option value="">All {pluralLabel}</option>{options.map((option) => <option key={option} value={option}>{displayValue(option)}</option>)}</select></label>;
 }
 
 export default function FindingsPage() {

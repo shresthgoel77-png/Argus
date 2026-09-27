@@ -38,7 +38,7 @@ def test_valid_key_returns_without_exception():
     GeminiProvider(make_client(response=response)).validate_api_key(SECRET_KEY)
 
 
-@pytest.mark.parametrize("status", [401, 403])
+@pytest.mark.parametrize("status", [400, 401, 403])
 def test_invalid_key_maps_to_invalid_api_key(status):
     provider = GeminiProvider(
         make_client(response=httpx.Response(status, text="secret details"))

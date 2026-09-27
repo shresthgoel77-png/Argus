@@ -51,19 +51,20 @@ export function AIConnectionSettings() {
 
     useEffect(() => {
         let isActive = true;
-        getAIConnectionStatus()
-            .then((nextStatus) => {
+        async function loadStatus() {
+            try {
+                const nextStatus = await getAIConnectionStatus();
                 if (isActive) setStatus(nextStatus);
-            })
-            .catch((error: unknown) => {
+            } catch (error) {
                 if (isActive) {
                     setStatus(null);
                     setErrorMessage(getErrorMessage(error, "The AI connection status could not be loaded."));
                 }
-            })
-            .finally(() => {
+            } finally {
                 if (isActive) setIsLoading(false);
-            });
+            }
+        }
+        void loadStatus();
 
         return () => {
             isActive = false;

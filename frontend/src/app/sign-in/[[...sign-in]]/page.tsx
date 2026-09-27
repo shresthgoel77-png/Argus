@@ -9,7 +9,7 @@ export default function SignInPage() {
 
     return (
         <main className="flex min-h-screen items-center justify-center p-6 bg-muted/30">
-            <SignIn />
+            <SignIn fallbackRedirectUrl="/dashboard" forceRedirectUrl="/dashboard" />
         </main>
     );
 }

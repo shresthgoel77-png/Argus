@@ -37,21 +37,22 @@ export function NotificationPreferencesSettings() {
 
     useEffect(() => {
         let isActive = true;
-        getNotificationPreferences()
-            .then((prefs) => {
+        async function loadPreferences() {
+            try {
+                const prefs = await getNotificationPreferences();
                 if (isActive) {
                     setEmailEnabled(prefs.email_enabled);
                     setMinSeverityEmail(prefs.min_severity_email);
                 }
-            })
-            .catch((error: unknown) => {
+            } catch (error) {
                 if (isActive) {
                     setErrorMessage(getErrorMessage(error, "Failed to load notification preferences."));
                 }
-            })
-            .finally(() => {
+            } finally {
                 if (isActive) setIsLoading(false);
-            });
+            }
+        }
+        void loadPreferences();
 
         return () => {
             isActive = false;

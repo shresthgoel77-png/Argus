@@ -79,7 +79,7 @@ export function AppSidebar() {
                 ))}
 
                 {/* Bottom-pinned items */}
-                <div className="mt-auto pb-2">
+                <div className="mt-auto pb-10">
                     <Separator className="mb-3" />
                     {bottomNavItems.map((item) => (
                         <NavLink key={item.href} item={item} pathname={pathname} />

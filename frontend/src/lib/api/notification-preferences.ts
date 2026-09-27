@@ -6,10 +6,12 @@ export interface NotificationPreferences {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function fetchClient(endpoint: string, options: RequestInit = {}) {
+    const clerkToken = typeof window !== "undefined" && (window as any).Clerk?.session ? await (window as any).Clerk.session.getToken() : null;
     const mergedOptions: RequestInit = {
         ...options,
         headers: {
             "Content-Type": "application/json",
+            ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
             ...options.headers,
         },
         credentials: "include",
@@ -26,23 +28,33 @@ export class NotificationPreferencesApiError extends Error {
 }
 
 export async function getNotificationPreferences(): Promise<NotificationPreferences> {
-    const res = await fetchClient("/api/v1/notifications/preferences");
-    if (!res.ok) {
-        throw new NotificationPreferencesApiError("Failed to fetch notification preferences", res.status);
+    try {
+        const res = await fetchClient("/api/v1/notifications/preferences");
+        if (!res.ok) {
+            throw new NotificationPreferencesApiError("Failed to fetch notification preferences", res.status);
+        }
+        return await res.json() as NotificationPreferences;
+    } catch (error) {
+        if (error instanceof NotificationPreferencesApiError) throw error;
+        throw new NotificationPreferencesApiError("Failed to fetch notification preferences");
     }
-    return res.json() as Promise<NotificationPreferences>;
 }
 
 export async function updateNotificationPreferences(
     data: NotificationPreferences
 ): Promise<NotificationPreferences> {
-    const res = await fetchClient("/api/v1/notifications/preferences", {
-        method: "PATCH",
-        body: JSON.stringify(data),
-    });
+    try {
+        const res = await fetchClient("/api/v1/notifications/preferences", {
+            method: "PUT",
+            body: JSON.stringify(data),
+        });
 
-    if (!res.ok) {
-        throw new NotificationPreferencesApiError("Failed to update notification preferences", res.status);
+        if (!res.ok) {
+            throw new NotificationPreferencesApiError("Failed to update notification preferences", res.status);
+        }
+        return await res.json() as NotificationPreferences;
+    } catch (error) {
+        if (error instanceof NotificationPreferencesApiError) throw error;
+        throw new NotificationPreferencesApiError("Failed to update notification preferences");
     }
-    return res.json() as Promise<NotificationPreferences>;
 }

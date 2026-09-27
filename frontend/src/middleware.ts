@@ -28,8 +28,11 @@ export default async function middleware(request: NextRequest) {
     ]);
 
     const handler = clerkMiddleware(async (auth, req) => {
+        const authObj = await auth();
         if (!isPublicRoute(req)) {
             await auth.protect();
+        } else if (req.nextUrl.pathname === "/" && authObj.userId) {
+            return NextResponse.redirect(new URL("/dashboard", req.url));
         }
     });
 

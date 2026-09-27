@@ -66,6 +66,8 @@ frontendEnvironment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = clerkPublishableKey;
 frontendEnvironment.NEXT_PUBLIC_CLERK_SIGN_IN_URL = "/sign-in";
 frontendEnvironment.NEXT_PUBLIC_CLERK_SIGN_UP_URL = "/sign-up";
 frontendEnvironment.NEXT_PUBLIC_API_URL = "http://localhost:8005";
+frontendEnvironment.NEXT_DIST_DIR = ".next-clerk-e2e";
+process.env.NEXT_PUBLIC_API_URL = "http://localhost:8005";
 
 export default defineConfig({
     testDir: "./e2e-clerk",

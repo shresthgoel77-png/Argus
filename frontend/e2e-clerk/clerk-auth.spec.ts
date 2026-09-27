@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const apiUrl = "http://localhost:8000/api/v1";
+const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1`;
 const accountEmail = process.env.CLERK_E2E_EMAIL!;
 const accountPassword = process.env.CLERK_E2E_PASSWORD!;
 
@@ -20,6 +20,8 @@ async function getCurrentUser(page: Page) {
 test("denies protected routes without a Clerk session", async ({ page }) => {
     await page.goto("/overview");
     await expect(page).toHaveURL(/\/sign-in/);
+    expect(new URL(apiUrl).port).toBe("8005");
+    expect((await getCurrentUser(page)).status()).toBe(401);
 });
 
 test("signs up through Clerk and provisions a stable internal user", async ({ page }) => {

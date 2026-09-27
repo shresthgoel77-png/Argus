@@ -16,8 +16,12 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.core.config import settings
 
-# Override environment for tests
+# Override environment for tests.
+# The test harness intentionally uses the development auth adapter so it can
+# exercise the explicit dev-login flow and other authenticated routes without
+# weakening the production Clerk configuration.
 settings.app_env = "test"
+settings.auth_provider = "development"
 if not settings.test_database_url:
     raise ValueError("TEST_DATABASE_URL environment variable must be provided for integration tests.")
 settings.database_url = settings.test_database_url

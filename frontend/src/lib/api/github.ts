@@ -3,13 +3,16 @@ import { GitHubConnection } from "../types/github";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function fetchClient(endpoint: string, options: RequestInit = {}) {
+    const clerkToken = typeof window !== "undefined" && (window as any).Clerk?.session ? await (window as any).Clerk.session.getToken() : null;
     const mergedOptions: RequestInit = {
         ...options,
         headers: {
             "Content-Type": "application/json",
+            ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
             ...options.headers,
         },
         credentials: "include",
+        cache: "no-store",
     };
 
     return fetch(`${API_URL}${endpoint}`, mergedOptions);
@@ -49,6 +52,23 @@ export async function completeInstall(params: {
         return await res.json() as GitHubConnection;
     } catch (error) {
         console.error("Network error during completeInstall:", error);
+        return null;
+    }
+}
+
+export async function syncInstallation(installation_id: string): Promise<GitHubConnection | null> {
+    try {
+        const res = await fetchClient(`/api/v1/github/sync`, {
+            method: "POST",
+            body: JSON.stringify({ installation_id }),
+        });
+        if (!res.ok) {
+            console.error("syncInstallation failed with status:", res.status);
+            return null;
+        }
+        return await res.json() as GitHubConnection;
+    } catch (error) {
+        console.error("Network error during syncInstallation:", error);
         return null;
     }
 }

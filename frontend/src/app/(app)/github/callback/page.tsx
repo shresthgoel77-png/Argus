@@ -23,13 +23,25 @@ export default function GitHubCallbackPage() {
                 return;
             }
 
-            const result = await completeInstall({ installation_id, setup_action, state });
+            let result;
+            try {
+                result = await completeInstall({ installation_id, setup_action, state });
+            } catch (error) {
+                console.error("GitHub installation callback failed", error);
+                setStatus("error");
+                return;
+            }
 
             if (result) {
                 setStatus("success");
                 // Short delay to show success state before redirecting
                 setTimeout(() => {
-                    router.push("/overview/settings");
+                    if (window.opener) {
+                        window.opener.postMessage({ type: "github_install_success" }, window.location.origin);
+                        window.close();
+                    } else {
+                        router.push("/overview/repositories");
+                    }
                 }, 1500);
             } else {
                 setStatus("error");

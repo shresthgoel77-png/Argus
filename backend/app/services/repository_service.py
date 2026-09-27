@@ -20,10 +20,13 @@ async def list_available_repositories(
     """
     github_repos = await client.list_installation_repositories()
 
-    # Get already saved repositories for this connection
+    # Reused repositories are unique by github_repo_id, so any saved entry for the
+    # same user should count as already-added, even if it is attached to a prior
+    # connection tied to a re-install/reconnect.
     saved_repos = (
         db.query(Repository.github_repo_id)
-        .filter(Repository.connection_id == connection.id)
+        .join(GitHubConnection)
+        .filter(GitHubConnection.user_id == connection.user_id)
         .all()
     )
     saved_repo_ids = {r[0] for r in saved_repos}
@@ -50,21 +53,51 @@ async def add_repository(
     Adds a repository to the connection. Validates that the repository is actually
     accessible to the installation. Idempotent: returns existing if already added.
     """
-    # Check if it already exists
     existing_repo = (
         db.query(Repository)
-        .filter(
-            Repository.connection_id == connection.id,
-            Repository.github_repo_id == github_repo_id,
-        )
+        .filter(Repository.github_repo_id == github_repo_id)
         .first()
     )
+
     if existing_repo:
+        if existing_repo.connection_id == connection.id:
+            logger.info(
+                "Repository already added to this connection, returning existing.",
+                extra={
+                    "github_repo_id": github_repo_id,
+                    "connection_id": str(connection.id),
+                },
+            )
+            return existing_repo
+
+        existing_connection = (
+            db.query(GitHubConnection)
+            .filter(GitHubConnection.id == existing_repo.connection_id)
+            .first()
+        )
+        if existing_connection is None or existing_connection.user_id != connection.user_id:
+            logger.warning(
+                "Repository already exists but belongs to a different user or connection.",
+                extra={
+                    "github_repo_id": github_repo_id,
+                    "new_connection_id": str(connection.id),
+                    "existing_connection_id": str(existing_repo.connection_id),
+                    "existing_user_id": str(existing_connection.user_id) if existing_connection else None,
+                    "current_user_id": str(connection.user_id),
+                },
+            )
+            raise NotFoundError("Repository not found or not owned by user.")
+
+        existing_repo.connection_id = connection.id
+        db.commit()
+        db.refresh(existing_repo)
         logger.info(
-            "Repository already added, returning existing.",
+            "Repository reassigned to the current valid GitHub connection.",
             extra={
-                "github_repo_id": github_repo_id,
-                "connection_id": str(connection.id),
+                "repository_id": str(existing_repo.id),
+                "github_repo_id": existing_repo.github_repo_id,
+                "old_connection_id": str(existing_connection.id),
+                "new_connection_id": str(connection.id),
             },
         )
         return existing_repo

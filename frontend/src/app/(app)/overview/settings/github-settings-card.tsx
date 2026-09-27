@@ -6,27 +6,60 @@ import { getConnections, startInstall } from "@/lib/api/github";
 import { GitHubConnection } from "@/lib/types/github";
 import { Loader2, Plus } from "lucide-react";
 import { EmptyState } from "@/components/rm/empty-state";
+import { useRouter } from "next/navigation";
 
 export function GitHubSettingsCard() {
     const [connections, setConnections] = useState<GitHubConnection[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isInstalling, setIsInstalling] = useState(false);
+    const [installError, setInstallError] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
+        let mounted = true;
         async function fetchConnections() {
             const data = await getConnections();
-            setConnections(data || []);
+            if (!mounted) return;
+            setConnections(data ?? []);
             setIsLoading(false);
         }
-        fetchConnections();
-    }, []);
+        void fetchConnections();
+        window.addEventListener("focus", fetchConnections);
+
+        const handleMessage = (event: MessageEvent) => {
+            if (event.origin !== window.location.origin) return;
+            if (event.data?.type === "github_install_success") {
+                router.push("/overview/repositories");
+            }
+        };
+        window.addEventListener("message", handleMessage);
+
+        return () => {
+            mounted = false;
+            window.removeEventListener("focus", fetchConnections);
+            window.removeEventListener("message", handleMessage);
+        };
+    }, [router]);
 
     const handleConnectClick = async () => {
-        setIsInstalling(true);
-        const result = await startInstall();
-        if (result && result.install_url) {
-            window.location.href = result.install_url;
-        } else {
+        setInstallError(null);
+        const installWindow = window.open("about:blank", "_blank");
+        if (!installWindow) {
+            setInstallError("Your browser blocked the GitHub tab. Allow pop-ups and try again.");
+            return;
+        }
+
+        try {
+            setIsInstalling(true);
+            const result = await startInstall();
+            if (!result?.install_url) {
+                throw new Error("GitHub installation URL was not returned.");
+            }
+            installWindow.location.href = result.install_url;
+        } catch {
+            installWindow.close();
+            setInstallError("Unable to start the GitHub connection. Please try again.");
+        } finally {
             setIsInstalling(false);
         }
     };
@@ -86,6 +119,11 @@ export function GitHubSettingsCard() {
                             </button>
                         }
                     />
+                )}
+                {installError && (
+                    <p role="alert" className="mt-3 text-sm text-destructive">
+                        {installError}
+                    </p>
                 )}
             </CardContent>
         </Card>

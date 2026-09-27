@@ -51,6 +51,15 @@ class ClerkAuthAdapter(AuthProvider):
         email = state.payload.get("email")
         if not isinstance(external_id, str) or not external_id:
             return None
+            
+        if not email:
+            try:
+                user_obj = self._clerk.users.get(user_id=external_id)
+                if user_obj and user_obj.email_addresses:
+                    email = user_obj.email_addresses[0].email_address
+            except Exception:
+                pass
+
         if not isinstance(email, str) or not email:
             return None
 

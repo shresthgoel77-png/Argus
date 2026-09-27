@@ -48,7 +48,7 @@ test.describe('Notification Preferences Settings Flow', () => {
                         min_severity_email: 'critical'
                     }),
                 });
-            } else if (route.request().method() === 'PATCH') {
+            } else if (route.request().method() === 'PUT') {
                 await route.fulfill({
                     status: 200,
                     contentType: 'application/json',
@@ -113,7 +113,7 @@ test.describe('Notification Preferences Settings Flow', () => {
                     }),
                 });
                 isGet = false;
-            } else if (route.request().method() === 'PATCH') {
+            } else if (route.request().method() === 'PUT') {
                 await route.fulfill({
                     status: 400,
                     contentType: 'application/json',

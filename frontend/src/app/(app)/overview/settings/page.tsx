@@ -3,6 +3,8 @@ import { SectionHeading } from "@/components/rm/section-heading";
 import { GitHubSettingsCard } from "./github-settings-card";
 import { AIConnectionSettings } from "./ai-connection-settings";
 import { NotificationPreferencesSettings } from "./notification-preferences-settings";
+import { GitHubCallbackProcessor } from "./github-callback-processor";
+import { Suspense } from "react";
 
 const settingsSections = [
     {
@@ -20,6 +22,9 @@ export default function SettingsPage() {
                 title="Settings"
                 description="Configure integrations and preferences for your RepoMedic workspace."
             />
+            <Suspense fallback={null}>
+                <GitHubCallbackProcessor />
+            </Suspense>
             <div className="grid gap-4 lg:grid-cols-3">
                 <GitHubSettingsCard />
                 <AIConnectionSettings />

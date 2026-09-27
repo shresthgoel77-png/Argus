@@ -70,7 +70,7 @@ class GeminiClient:
 
         if 200 <= response.status_code < 300:
             return
-        if response.status_code in (401, 403):
+        if response.status_code in (400, 401, 403):
             raise InvalidAPIKeyError("Gemini API key is invalid")
         if response.status_code == 429:
             raise AIProviderRateLimitedError("Gemini API rate limit exceeded")

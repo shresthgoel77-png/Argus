@@ -23,6 +23,9 @@ export default defineConfig({
             url: 'http://localhost:8000/api/v1/health',
             reuseExistingServer: true,
             timeout: 120000,
+            env: {
+                AUTH_PROVIDER: "development"
+            }
         },
         {
             command: 'npm run dev',

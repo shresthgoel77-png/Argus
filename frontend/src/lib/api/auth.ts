@@ -8,10 +8,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
  * Centralizing this here simplifies endpoint calls.
  */
 async function fetchClient(endpoint: string, options: RequestInit = {}) {
+    const clerkToken = typeof window !== "undefined" && (window as any).Clerk?.session ? await (window as any).Clerk.session.getToken() : null;
     const mergedOptions: RequestInit = {
         ...options,
         headers: {
             "Content-Type": "application/json",
+            ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
             ...options.headers,
         },
         // Crucial for cookie-based auth

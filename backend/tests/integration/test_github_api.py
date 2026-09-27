@@ -108,3 +108,28 @@ def test_github_endpoints_unauthenticated(client):
     assert client.get("/api/v1/github/install/start").status_code == 401
     assert client.get("/api/v1/github/install/callback?installation_id=1&setup_action=install&state=foo").status_code == 401
     assert client.get("/api/v1/github/connections").status_code == 401
+    assert client.post("/api/v1/github/sync", json={"installation_id": "999"}).status_code == 401
+
+def test_github_sync_flow(client, monkeypatch):
+    """
+    Test the GitHub app sync endpoint for existing installations.
+    """
+    client.post("/api/v1/auth/dev-login")
+    
+    class MockClient:
+        def __init__(self, *args, **kwargs):
+            pass
+        async def get_installation(self, installation_id):
+            return {"account": {"login": "octocat_synced", "type": "User"}}
+            
+    monkeypatch.setattr("app.api.v1.github.GitHubAppClient", MockClient)
+    
+    res = client.post("/api/v1/github/sync", json={"installation_id": "999999"})
+    assert res.status_code == 200
+    connection = res.json()
+    assert connection["account_login"] == "octocat_synced"
+    assert connection["installation_id"] == 999999
+    
+    # Missing payload test
+    res_missing = client.post("/api/v1/github/sync", json={})
+    assert res_missing.status_code == 422

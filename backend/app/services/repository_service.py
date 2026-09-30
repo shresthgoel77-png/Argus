@@ -144,6 +144,27 @@ async def add_repository(
     return new_repo
 
 
+async def sync_installation_repositories(
+    db: Session, connection: GitHubConnection, client: GitHubAppClient
+) -> list[Repository]:
+    """
+    Persists every repository GitHub exposes for this installation, reusing add_repository
+    so github_repo_id uniqueness and user ownership rules stay unchanged.
+    """
+    github_repos = await client.list_installation_repositories()
+    synced: list[Repository] = []
+    for repo in github_repos:
+        synced.append(
+            await add_repository(
+                db=db,
+                connection=connection,
+                github_repo_id=repo["id"],
+                client=client,
+            )
+        )
+    return synced
+
+
 def list_repositories_for_user(db: Session, user_id: uuid.UUID) -> list[Repository]:
     """
     Lists all saved repositories that belong to the user's connections.

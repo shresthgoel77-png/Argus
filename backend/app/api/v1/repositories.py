@@ -66,13 +66,13 @@ async def create_repository(
     connection = get_connection_or_404(
         db=db, user_id=user.id, connection_id=repo_in.connection_id
     )
-    client = GitHubAppClient(installation_id=connection.installation_id)
-    return await add_repository(
-        db=db,
-        connection=connection,
-        github_repo_id=repo_in.github_repo_id,
-        client=client
-    )
+    async with GitHubAppClient(installation_id=connection.installation_id) as client:
+        return await add_repository(
+            db=db,
+            connection=connection,
+            github_repo_id=repo_in.github_repo_id,
+            client=client,
+        )
 
 @router.get("", response_model=list[RepositoryRead])
 def get_user_repositories(

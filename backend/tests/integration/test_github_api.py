@@ -36,9 +36,26 @@ def test_github_install_flow(client, monkeypatch):
     class MockClient:
         def __init__(self, *args, **kwargs):
             pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            return False
+
         async def get_installation(self, installation_id):
             return {"account": {"login": "octocat", "type": "User"}}
-            
+
+        async def list_installation_repositories(self):
+            return [
+                {
+                    "id": 5001,
+                    "full_name": "octocat/hello-world",
+                    "private": False,
+                    "default_branch": "main",
+                },
+            ]
+
     monkeypatch.setattr("app.api.v1.github.GitHubAppClient", MockClient)
     
     # 4. Successful callback
@@ -62,6 +79,16 @@ def test_github_install_flow(client, monkeypatch):
     connections_list = res_connections.json()
     assert len(connections_list) >= 1
     assert any(c["installation_id"] == 12345 for c in connections_list)
+
+    # 6. Installation sync persists authorized repositories for the user
+    res_repos = client.get("/api/v1/repositories")
+    assert res_repos.status_code == 200
+    repos = res_repos.json()
+    assert any(r["full_name"] == "octocat/hello-world" for r in repos)
+
+    # Idempotent re-callback does not duplicate repository rows
+    res_repos2 = client.get("/api/v1/repositories")
+    assert len(res_repos2.json()) == len(repos)
 
 def test_github_install_callback_rejections(client):
     """
@@ -101,14 +128,47 @@ def test_github_install_callback_rejections(client):
     assert res_wrong_user.status_code == 400
     assert "different user" in res_wrong_user.json()["detail"].lower()
 
-def test_github_endpoints_unauthenticated(client):
+def test_github_endpoints_unauthenticated(client, monkeypatch):
     """
-    Test that github endpoints return 401 without auth
+    The callback is allowed to validate a signed installation state without a
+    Clerk bearer token; other GitHub endpoints remain protected.
     """
     assert client.get("/api/v1/github/install/start").status_code == 401
-    assert client.get("/api/v1/github/install/callback?installation_id=1&setup_action=install&state=foo").status_code == 401
     assert client.get("/api/v1/github/connections").status_code == 401
     assert client.post("/api/v1/github/sync", json={"installation_id": "999"}).status_code == 401
+
+    # Valid signed installation state should be accepted without a bearer token,
+    # because it cryptographically binds the callback to the initiating RepoMedic user.
+    class MockClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            return False
+
+        async def get_installation(self, installation_id):
+            return {"account": {"login": "octocat", "type": "User"}}
+
+        async def list_installation_repositories(self):
+            return [{"id": 9001, "full_name": "octocat/redirected-repo", "private": False, "default_branch": "main"}]
+
+    monkeypatch.setattr("app.api.v1.github.GitHubAppClient", MockClient)
+
+    user = client.post("/api/v1/auth/dev-login")
+    assert user.status_code == 200
+    install_res = client.get("/api/v1/github/install/start")
+    assert install_res.status_code == 200
+    state = install_res.json()["install_url"].split("?state=")[1]
+
+    res_callback = client.get(f"/api/v1/github/install/callback?installation_id=12345&setup_action=install&state={state}")
+    assert res_callback.status_code == 200
+    assert res_callback.json()["installation_id"] == 12345
+
+    # Missing/invalid state still fails before any repository persistence.
+    assert client.get("/api/v1/github/install/callback?installation_id=1&setup_action=install&state=foo").status_code == 400
 
 def test_github_sync_flow(client, monkeypatch):
     """
@@ -119,17 +179,38 @@ def test_github_sync_flow(client, monkeypatch):
     class MockClient:
         def __init__(self, *args, **kwargs):
             pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            return False
+
         async def get_installation(self, installation_id):
             return {"account": {"login": "octocat_synced", "type": "User"}}
-            
+
+        async def list_installation_repositories(self):
+            return [
+                {
+                    "id": 6001,
+                    "full_name": "octocat_synced/app",
+                    "private": True,
+                    "default_branch": "main",
+                },
+            ]
+
     monkeypatch.setattr("app.api.v1.github.GitHubAppClient", MockClient)
-    
+
     res = client.post("/api/v1/github/sync", json={"installation_id": "999999"})
     assert res.status_code == 200
     connection = res.json()
     assert connection["account_login"] == "octocat_synced"
     assert connection["installation_id"] == 999999
-    
+
+    res_repos = client.get("/api/v1/repositories")
+    assert res_repos.status_code == 200
+    assert any(r["full_name"] == "octocat_synced/app" for r in res_repos.json())
+
     # Missing payload test
     res_missing = client.post("/api/v1/github/sync", json={})
     assert res_missing.status_code == 422

@@ -59,18 +59,11 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
 
     # 3. List available repos
     class MockClient:
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc_val, exc_tb):
-            return False
-
         async def list_installation_repositories(self):
             return [
                 {"id": 1001, "full_name": "test_org/repo1", "private": True, "default_branch": "main"},
                 {"id": 1002, "full_name": "test_org/repo2", "private": False, "default_branch": "master"}
             ]
-
     def mock_init(*args, **kwargs):
         return MockClient()
         
@@ -148,15 +141,8 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
     
     # Try to add repository using other user's connection
     class MockClient:
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc_val, exc_tb):
-            return False
-
         async def list_installation_repositories(self):
             return [{"id": 2001, "full_name": "other_org/repo1", "private": True, "default_branch": "main"}]
-
     def mock_init(*args, **kwargs):
         return MockClient()
         

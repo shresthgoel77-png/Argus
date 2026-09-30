@@ -6,7 +6,6 @@ from app.models.user import User
 from app.auth.dependencies import get_current_user
 from app.db.session import get_db
 from app.core.config import settings
-from app.core.exceptions import NotAuthenticatedError
 from app.integrations.github.install_state import generate_install_state, verify_install_state
 from app.integrations.github.client import GitHubAppClient
 from app.services.github_connection_service import (
@@ -15,10 +14,7 @@ from app.services.github_connection_service import (
     get_connection_or_404
 )
 from app.schemas.github_connection import GitHubConnectionRead
-from app.services.repository_service import (
-    list_available_repositories,
-    sync_installation_repositories,
-)
+from app.services.repository_service import list_available_repositories
 from app.schemas.repository import AvailableRepository
 import uuid
 
@@ -39,16 +35,11 @@ async def installation_callback(
     installation_id: str | None = None,
     setup_action: str | None = None,
     state: str | None = None,
+    user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Handles the GitHub App installation callback.
-
-    Browser-driven GitHub redirects do not include a Clerk bearer token, so the
-    initiating RepoMedic user must be recovered from the signed installation
-    state that was issued by start_installation(). This remains cryptographically
-    bound to the correct user while avoiding a token requirement on the GitHub
-    redirect itself.
 
     Browser-driven GitHub redirects expect the popup completion HTML because
     the frontend listens for the window.opener.postMessage event. Direct app
@@ -82,47 +73,19 @@ async def installation_callback(
             detail=str(e)
         )
 
-    user_id_raw = payload.get("user_id")
-    if not isinstance(user_id_raw, str):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Installation state is missing a valid user_id"
-        )
-
-    try:
-        user_id = uuid.UUID(user_id_raw)
-    except (TypeError, ValueError):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Installation state contains an invalid user_id"
-        )
-
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
+    if payload.get("user_id") != str(user.id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="State token belongs to a different user"
         )
 
-    try:
-        current_user = await get_current_user(request, db)
-    except NotAuthenticatedError:
-        current_user = None
-
-    if current_user is not None and current_user.id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="State token belongs to a different user"
-        )
-
-    async with GitHubAppClient(installation_id=inst_id_int) as client:
-        connection = await upsert_connection_from_installation(
-            db=db,
-            user_id=user.id,
-            installation_id=inst_id_int,
-            client=client,
-        )
-        await sync_installation_repositories(db=db, connection=connection, client=client)
+    client = GitHubAppClient(installation_id=inst_id_int)
+    connection = await upsert_connection_from_installation(
+        db=db,
+        user_id=user.id,
+        installation_id=inst_id_int,
+        client=client
+    )
 
     accept_header = request.headers.get("accept", "")
     if "text/html" in accept_header.lower():
@@ -163,14 +126,13 @@ async def sync_installation(
         )
     inst_id_int = int(body.installation_id)
 
-    async with GitHubAppClient(installation_id=inst_id_int) as client:
-        connection = await upsert_connection_from_installation(
-            db=db,
-            user_id=user.id,
-            installation_id=inst_id_int,
-            client=client,
-        )
-        await sync_installation_repositories(db=db, connection=connection, client=client)
+    client = GitHubAppClient(installation_id=inst_id_int)
+    connection = await upsert_connection_from_installation(
+        db=db,
+        user_id=user.id,
+        installation_id=inst_id_int,
+        client=client
+    )
 
     return connection
 
@@ -196,5 +158,6 @@ async def get_available_repositories(
     Ownership is verified.
     """
     connection = get_connection_or_404(db=db, user_id=user.id, connection_id=connection_id)
-    async with GitHubAppClient(installation_id=connection.installation_id) as client:
-        return await list_available_repositories(db=db, connection=connection, client=client)
+    client = GitHubAppClient(installation_id=connection.installation_id)
+    # List the repos against GitHub API
+    return await list_available_repositories(db=db, connection=connection, client=client)

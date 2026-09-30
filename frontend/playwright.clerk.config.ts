@@ -1,23 +1,19 @@
 import { defineConfig, devices } from "@playwright/test";
-import { parse as parseEnv } from "dotenv";
 import fs from "fs";
 import path from "path";
 
-function loadEnvFile(envPath: string) {
-    try {
-        const parsed = parseEnv(fs.readFileSync(envPath, "utf8"));
-        for (const [key, value] of Object.entries(parsed)) {
-            if (!(key in process.env) || process.env[key] === "") {
-                process.env[key] = value;
-            }
+try {
+    const envPath = path.resolve(__dirname, ".env");
+    const envContent = fs.readFileSync(envPath, "utf8");
+    for (const line of envContent.split("\n")) {
+        if (line.includes("=")) {
+            const parts = line.split("=");
+            const key = parts[0].trim();
+            const val = parts.slice(1).join("=").trim().replace(/"/g, '');
+            process.env[key] = val;
         }
-    } catch {
-        // Optional env files are ignored when absent.
     }
-}
-
-loadEnvFile(path.resolve(__dirname, ".env"));
-loadEnvFile(path.resolve(__dirname, "../backend/.env"));
+} catch (e) { }
 
 const requiredEnvironment = [
     "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
@@ -25,9 +21,6 @@ const requiredEnvironment = [
     "CLERK_E2E_EMAIL",
     "CLERK_E2E_PASSWORD",
     "CLERK_E2E_DATABASE_URL",
-    "GITHUB_APP_ID",
-    "GITHUB_APP_SLUG",
-    "GITHUB_APP_PRIVATE_KEY",
 ] as const;
 
 for (const name of requiredEnvironment) {
@@ -49,10 +42,9 @@ const backendEnvironment: Record<string, string> = {
     DATABASE_URL: databaseUrl,
     CLERK_SECRET_KEY: clerkSecretKey,
     CLERK_AUTHORIZED_PARTIES: "http://localhost:3005",
-    CORS_ORIGINS: "http://localhost:3005",
-    GITHUB_APP_ID: process.env.GITHUB_APP_ID!,
-    GITHUB_APP_SLUG: process.env.GITHUB_APP_SLUG!,
-    GITHUB_APP_PRIVATE_KEY: process.env.GITHUB_APP_PRIVATE_KEY!,
+    GITHUB_APP_ID: process.env.GITHUB_APP_ID || "12345",
+    GITHUB_APP_SLUG: process.env.GITHUB_APP_SLUG || "clerk-e2e-test",
+    GITHUB_APP_PRIVATE_KEY: process.env.GITHUB_APP_PRIVATE_KEY || "test-pem",
     GITHUB_APP_WEBHOOK_SECRET: process.env.GITHUB_APP_WEBHOOK_SECRET || "test-secret",
     AI_CREDENTIAL_ENCRYPTION_KEY:
         process.env.AI_CREDENTIAL_ENCRYPTION_KEY ||
@@ -66,23 +58,10 @@ delete backendEnvironment.CLERK_E2E_DATABASE_URL;
 const frontendEnvironment = Object.fromEntries(
     Object.entries(process.env).filter(([, value]) => value !== undefined),
 ) as Record<string, string>;
-for (const name of [
-    "CLERK_SECRET_KEY",
-    "CLERK_JWT_KEY",
-    "CLERK_E2E_EMAIL",
-    "CLERK_E2E_PASSWORD",
-    "CLERK_E2E_DATABASE_URL",
-    "GITHUB_E2E_STORAGE_STATE",
-    "DATABASE_URL",
-    "TEST_DATABASE_URL",
-    "GITHUB_APP_PRIVATE_KEY",
-    "GITHUB_APP_WEBHOOK_SECRET",
-    "AI_CREDENTIAL_ENCRYPTION_KEY",
-    "SESSION_SECRET_KEY",
-    "SCHEDULER_SHARED_SECRET",
-]) {
-    delete frontendEnvironment[name];
-}
+delete frontendEnvironment.CLERK_SECRET_KEY;
+delete frontendEnvironment.CLERK_E2E_EMAIL;
+delete frontendEnvironment.CLERK_E2E_PASSWORD;
+delete frontendEnvironment.CLERK_E2E_DATABASE_URL;
 frontendEnvironment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = clerkPublishableKey;
 frontendEnvironment.NEXT_PUBLIC_CLERK_SIGN_IN_URL = "/sign-in";
 frontendEnvironment.NEXT_PUBLIC_CLERK_SIGN_UP_URL = "/sign-up";
@@ -97,6 +76,11 @@ export default defineConfig({
     workers: 1,
     reporter: "list",
     timeout: 180_000,
+    use: {
+        ...devices["Desktop Chrome"],
+        baseURL: "http://localhost:3005",
+        trace: "retain-on-failure",
+    },
     webServer: [
         {
             command: ".\\venv\\Scripts\\python.exe -m alembic upgrade head && .\\venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8005",
@@ -112,25 +96,6 @@ export default defineConfig({
             reuseExistingServer: false,
             timeout: 120_000,
             env: frontendEnvironment,
-        },
-    ],
-    projects: [
-        {
-            name: "clerk-setup",
-            testMatch: /global\.setup\.ts/,
-        },
-        {
-            name: "clerk-e2e",
-            testIgnore: /global\.setup\.ts/,
-            dependencies: ["clerk-setup"],
-            use: {
-                ...devices["Desktop Chrome"],
-                baseURL: "http://localhost:3005",
-                storageState: process.env.GITHUB_E2E_STORAGE_STATE
-                    ? path.resolve(process.env.GITHUB_E2E_STORAGE_STATE)
-                    : undefined,
-                trace: "retain-on-failure",
-            },
         },
     ],
 });

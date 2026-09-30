@@ -91,10 +91,6 @@ jobs:
       CLERK_SECRET_KEY: ${{ secrets.CLERK_TEST_SECRET_KEY }}
       CLERK_E2E_EMAIL: ${{ secrets.CLERK_E2E_EMAIL }}
       CLERK_E2E_PASSWORD: ${{ secrets.CLERK_E2E_PASSWORD }}
-      GITHUB_APP_ID: ${{ secrets.GITHUB_APP_ID }}
-      GITHUB_APP_SLUG: ${{ secrets.GITHUB_APP_SLUG }}
-      GITHUB_APP_PRIVATE_KEY: ${{ secrets.GITHUB_APP_PRIVATE_KEY }}
-      GITHUB_E2E_STORAGE_STATE: ${{ runner.temp }}/github-e2e-storage-state.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -113,16 +109,6 @@ jobs:
       - name: Install Playwright browser
         working-directory: frontend
         run: npx playwright install --with-deps chromium
-      - name: Prepare GitHub browser session
-        env:
-          GITHUB_E2E_STORAGE_STATE_JSON: ${{ secrets.GITHUB_E2E_STORAGE_STATE_JSON }}
-          GITHUB_E2E_STORAGE_STATE: ${{ runner.temp }}/github-e2e-storage-state.json
-        run: |
-          if [ -z "$GITHUB_E2E_STORAGE_STATE_JSON" ]; then
-            echo "GITHUB_E2E_STORAGE_STATE_JSON secret is required for the real GitHub App flow." >&2
-            exit 1
-          fi
-          printf '%s' "$GITHUB_E2E_STORAGE_STATE_JSON" > "$GITHUB_E2E_STORAGE_STATE"
       - name: Run isolated Clerk E2E suite
         working-directory: frontend
         run: npm run test:e2e:clerk

@@ -6,15 +6,13 @@ const isClerkEnabled =
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.length > 0;
 
 export default async function middleware(request: NextRequest) {
-    // When Clerk is NOT configured, the middleware is a complete no-op.
-    // This preserves the dev-adapter flow with zero interference.
     if (!isClerkEnabled) {
-        return NextResponse.next();
+        throw new Error(
+            "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required; authentication cannot be bypassed.",
+        );
     }
 
-    // Dynamically import Clerk only when it is actually enabled.
-    // This prevents the Clerk SDK from initialising (and throwing)
-    // when no publishable key is present in the environment.
+    // Dynamically import Clerk after validating its required configuration.
     const { clerkMiddleware, createRouteMatcher } = await import(
         "@clerk/nextjs/server"
     );

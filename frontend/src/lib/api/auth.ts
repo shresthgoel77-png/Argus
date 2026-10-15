@@ -1,4 +1,5 @@
 import { AuthUser } from "../auth/types";
+import { getClerkAuthorizationHeaders } from "../auth/clerk-token";
 
 // Get the base API URL from environment, fallback to localhost for development
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -8,13 +9,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
  * Centralizing this here simplifies endpoint calls.
  */
 async function fetchClient(endpoint: string, options: RequestInit = {}) {
-    const clerkToken = typeof window !== "undefined" && (window as any).Clerk?.session ? await (window as any).Clerk.session.getToken() : null;
+    const clerkHeaders = await getClerkAuthorizationHeaders();
     const mergedOptions: RequestInit = {
         ...options,
         headers: {
             "Content-Type": "application/json",
-            ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
             ...options.headers,
+            ...clerkHeaders,
         },
         // Crucial for cookie-based auth
         credentials: "include",
@@ -39,23 +40,6 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
         return await res.json() as AuthUser;
     } catch (error) {
         console.error("Network error getting current user:", error);
-        return null;
-    }
-}
-
-/**
- * For development purposes ONLY. Logs in a test user and establishes a session cookie.
- */
-export async function devLogin(): Promise<AuthUser | null> {
-    try {
-        const res = await fetchClient("/api/v1/auth/dev-login", { method: "POST" });
-        if (!res.ok) {
-            console.error("devLogin failed with status:", res.status);
-            return null;
-        }
-        return await res.json() as AuthUser;
-    } catch (error) {
-        console.error("Network error during devLogin:", error);
         return null;
     }
 }

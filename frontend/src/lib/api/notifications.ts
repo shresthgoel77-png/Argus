@@ -1,11 +1,13 @@
 import type { Notification, UnreadCountResponse } from "../types/notifications";
+import { getClerkAuthorizationHeaders } from "../auth/clerk-token";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function request(endpoint: string, options: RequestInit = {}) {
+    const clerkHeaders = await getClerkAuthorizationHeaders();
     return fetch(`${API_URL}${endpoint}`, {
         ...options,
-        headers: { "Content-Type": "application/json", ...options.headers },
+        headers: { "Content-Type": "application/json", ...options.headers, ...clerkHeaders },
         credentials: "include",
     });
 }

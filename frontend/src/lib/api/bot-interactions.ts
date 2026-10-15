@@ -1,4 +1,5 @@
 import type { BotInteractionListResponse } from "../types/bot-interactions";
+import { getClerkAuthorizationHeaders } from "../auth/clerk-token";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -14,7 +15,10 @@ export async function listRepositoryBotInteractions(
         const response = await fetch(
             `${API_URL}/api/v1/repositories/${repositoryId}/bot-interactions${queryString}`,
             {
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    ...await getClerkAuthorizationHeaders(),
+                },
                 credentials: "include",
             },
         );

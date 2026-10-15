@@ -1,9 +1,9 @@
 /**
  * Auth provider detection — single source of truth for the frontend.
  *
- * When NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is set to a non-empty string,
- * Clerk is the active auth provider.  Otherwise the development adapter
- * is used, matching the backend's own environment-gated selection.
+ * Clerk is the only supported authentication provider. This helper reports
+ * whether the required frontend configuration is present; it never selects
+ * an alternate provider.
  */
 
 export function isClerkEnabled(): boolean {
@@ -13,10 +13,8 @@ export function isClerkEnabled(): boolean {
 }
 
 /**
- * Returns the login path appropriate for the active auth provider.
- * Clerk → /sign-in (hosted Clerk UI)
- * Dev   → /login   (local dev-adapter card)
+ * Returns the Clerk sign-in route.
  */
 export function getAuthLoginPath(): string {
-    return isClerkEnabled() ? "/sign-in" : "/login";
+    return "/sign-in";
 }

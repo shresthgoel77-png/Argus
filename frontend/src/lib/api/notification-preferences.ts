@@ -1,3 +1,5 @@
+import { getClerkAuthorizationHeaders } from "../auth/clerk-token";
+
 export interface NotificationPreferences {
     email_enabled: boolean;
     min_severity_email: "critical" | "high" | "medium" | "low" | "info";
@@ -6,13 +8,13 @@ export interface NotificationPreferences {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function fetchClient(endpoint: string, options: RequestInit = {}) {
-    const clerkToken = typeof window !== "undefined" && (window as any).Clerk?.session ? await (window as any).Clerk.session.getToken() : null;
+    const clerkHeaders = await getClerkAuthorizationHeaders();
     const mergedOptions: RequestInit = {
         ...options,
         headers: {
             "Content-Type": "application/json",
-            ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
             ...options.headers,
+            ...clerkHeaders,
         },
         credentials: "include",
     };

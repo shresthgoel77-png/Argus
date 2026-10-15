@@ -5,14 +5,14 @@
  *
  * This is the ONLY file in the frontend that imports Clerk hooks/components.
  * It maps Clerk's session state into the application's internal AuthContextType
- * so that every downstream component uses the same `useAuth()` interface
- * regardless of whether Clerk or the dev adapter is active.
+ * so every downstream component uses the same `useAuth()` interface.
  */
 
-import React, { useMemo, type ReactNode } from "react";
-import { ClerkProvider, useUser, useClerk } from "@clerk/nextjs";
+import React, { useEffect, useMemo, type ReactNode } from "react";
+import { ClerkProvider, useUser, useClerk, useAuth as useClerkAuth } from "@clerk/nextjs";
 import { AuthContext, type AuthContextType } from "./auth-context";
 import type { AuthUser } from "./types";
+import { clearClerkTokenGetter, setClerkTokenGetter } from "./clerk-token";
 
 // ---------------------------------------------------------------------------
 // Bridge: subscribes to Clerk hooks and exposes AuthContextType
@@ -21,6 +21,12 @@ import type { AuthUser } from "./types";
 function ClerkAuthBridge({ children }: { children: ReactNode }) {
     const { user, isLoaded } = useUser();
     const clerk = useClerk();
+    const { getToken } = useClerkAuth();
+
+    useEffect(() => {
+        setClerkTokenGetter(getToken);
+        return () => clearClerkTokenGetter(getToken);
+    }, [getToken]);
 
     const authUser: AuthUser | null = useMemo(() => {
         if (!user) return null;
@@ -51,6 +57,8 @@ function ClerkAuthBridge({ children }: { children: ReactNode }) {
         [authUser, isLoaded, clerk],
     );
 
+    if (!isLoaded) return null;
+
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
@@ -59,7 +67,12 @@ function ClerkAuthBridge({ children }: { children: ReactNode }) {
 // ---------------------------------------------------------------------------
 
 export function ClerkAuthProvider({ children }: { children: ReactNode }) {
-    const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!;
+    const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+    if (!publishableKey) {
+        throw new Error(
+            "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required to use RepoMedic.",
+        );
+    }
 
     return (
         <ClerkProvider publishableKey={publishableKey}>

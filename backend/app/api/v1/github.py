@@ -79,13 +79,13 @@ async def installation_callback(
             detail="State token belongs to a different user"
         )
 
-    client = GitHubAppClient(installation_id=inst_id_int)
-    connection = await upsert_connection_from_installation(
-        db=db,
-        user_id=user.id,
-        installation_id=inst_id_int,
-        client=client
-    )
+    async with GitHubAppClient(installation_id=inst_id_int) as client:
+        connection = await upsert_connection_from_installation(
+            db=db,
+            user_id=user.id,
+            installation_id=inst_id_int,
+            client=client
+        )
 
     accept_header = request.headers.get("accept", "")
     if "text/html" in accept_header.lower():
@@ -126,13 +126,13 @@ async def sync_installation(
         )
     inst_id_int = int(body.installation_id)
 
-    client = GitHubAppClient(installation_id=inst_id_int)
-    connection = await upsert_connection_from_installation(
-        db=db,
-        user_id=user.id,
-        installation_id=inst_id_int,
-        client=client
-    )
+    async with GitHubAppClient(installation_id=inst_id_int) as client:
+        connection = await upsert_connection_from_installation(
+            db=db,
+            user_id=user.id,
+            installation_id=inst_id_int,
+            client=client
+        )
 
     return connection
 
@@ -158,6 +158,10 @@ async def get_available_repositories(
     Ownership is verified.
     """
     connection = get_connection_or_404(db=db, user_id=user.id, connection_id=connection_id)
-    client = GitHubAppClient(installation_id=connection.installation_id)
-    # List the repos against GitHub API
-    return await list_available_repositories(db=db, connection=connection, client=client)
+    async with GitHubAppClient(installation_id=connection.installation_id) as client:
+        # List the repos against GitHub API
+        return await list_available_repositories(
+            db=db,
+            connection=connection,
+            client=client
+        )

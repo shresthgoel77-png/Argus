@@ -6,16 +6,14 @@ def get_auth_provider() -> AuthProvider:
     """
     Environment-gated auth provider selection.
 
-    Development adapter uses a narrow ALLOW-LIST (only "development"
-    and "test" environments) — any other environment, including
-    production or unrecognised values, is structurally blocked.
+    Clerk is the only application provider. The development adapter is
+    available solely to the isolated backend test harness.
     """
     if settings.auth_provider == "development":
-        # Narrow allow-list: NOT a deny-list on "production"
-        if settings.app_env not in ("development", "test"):
+        if settings.app_env != "test":
             raise ValueError(
                 "DevelopmentAuthProvider must never be instantiated "
-                "in production."
+                "outside the test environment."
             )
         from app.auth.development.adapter import DevelopmentAuthProvider
         return DevelopmentAuthProvider()

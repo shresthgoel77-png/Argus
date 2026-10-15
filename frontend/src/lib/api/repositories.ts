@@ -1,16 +1,17 @@
 import { AvailableRepository, Repository } from "../types/github";
 import type { DashboardOverviewResponse } from "../types/overview";
+import { getClerkAuthorizationHeaders } from "../auth/clerk-token";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function fetchClient(endpoint: string, options: RequestInit = {}) {
-    const clerkToken = typeof window !== "undefined" && (window as any).Clerk?.session ? await (window as any).Clerk.session.getToken() : null;
+    const clerkHeaders = await getClerkAuthorizationHeaders();
     const mergedOptions: RequestInit = {
         ...options,
         headers: {
             "Content-Type": "application/json",
-            ...(clerkToken ? { Authorization: `Bearer ${clerkToken}` } : {}),
             ...options.headers,
+            ...clerkHeaders,
         },
         credentials: "include",
         cache: "no-store",

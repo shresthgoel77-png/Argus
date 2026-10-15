@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
-    auth_provider: Literal["development", "clerk"] = "development"
+    auth_provider: Literal["clerk"] = "clerk"
     session_secret_key: str = "dev_secret_key_change_me_in_production"
     database_url: str
     test_database_url: str | None = None

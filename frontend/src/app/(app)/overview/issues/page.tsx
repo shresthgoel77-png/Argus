@@ -1,6 +1,4 @@
-import { CircleDot } from "lucide-react";
-
-import { EmptyState } from "@/components/rm/empty-state";
+import { RepositoryWorkItems } from "@/components/repositories/repository-work-items";
 import { SectionHeading } from "@/components/rm/section-heading";
 
 export default function IssuesPage() {
@@ -11,11 +9,7 @@ export default function IssuesPage() {
                 title="Issues"
                 description="Keep track of repository issues that may affect engineering health."
             />
-            <EmptyState
-                icon={<CircleDot className="size-6" aria-hidden="true" />}
-                title="No issues to show"
-                description="Issue activity will appear here after a repository is connected."
-            />
+            <RepositoryWorkItems kind="issues" />
         </div>
     );
 }

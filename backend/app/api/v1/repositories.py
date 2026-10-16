@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, Depends, Query, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.db.session import get_db
@@ -11,6 +11,7 @@ from app.schemas.repository import (
     RepositoryRead,
     RepositoryCreate,
     RepositoryUpdate,
+    GitHubWorkItem,
 )
 from app.services.github_connection_service import get_connection_or_404
 from app.services.repository_service import (
@@ -23,6 +24,7 @@ from app.services.scheduled_monitoring_service import (
     run_monitoring_checks_for_repository,
     RepositoryCheckResult
 )
+from app.services.scheduled_monitoring_service import run_initial_assessment_in_background
 from app.integrations.github.client import GitHubAppClient
 from app.schemas.finding import FindingListResponse, FindingResponse
 from app.services.finding_service import list_findings
@@ -50,6 +52,7 @@ from app.schemas.dashboard_overview import DashboardOverviewResponse
 from app.services.health_service import get_latest_snapshot
 from app.services.needs_attention_service import get_needs_attention
 from app.services.finding_service import get_all_open_findings_for_repository
+from app.services.health_score_service import FINDING_CATEGORY_TO_HEALTH_CATEGORY
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
 
@@ -89,6 +92,7 @@ def get_user_repositories(
 def update_repository(
     repository_id: uuid.UUID,
     repo_in: RepositoryUpdate,
+    background_tasks: BackgroundTasks,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -96,12 +100,25 @@ def update_repository(
     Toggles monitoring enabled status for a repository.
     Verifies ownership before updating.
     """
-    return set_monitoring_enabled(
+    before = get_repository_or_404(
+        db=db, user_id=user.id, repository_id=repository_id
+    )
+    should_start_assessment = repo_in.monitoring_enabled and (
+        not before.monitoring_enabled
+        or before.monitoring_status
+        in {"disabled", "not_started", "failed", "partial_failure"}
+    )
+    repository = set_monitoring_enabled(
         db=db,
         user_id=user.id,
         repository_id=repository_id,
         enabled=repo_in.monitoring_enabled
     )
+    if should_start_assessment:
+        background_tasks.add_task(
+            run_initial_assessment_in_background, str(repository.id)
+        )
+    return repository
 
 @router.get("/{repository_id}/findings", response_model=FindingListResponse)
 def get_repository_findings(
@@ -109,7 +126,8 @@ def get_repository_findings(
     category: str | None = None,
     severity: str | None = None,
     priority: str | None = None,
-    status_: str | None = None,
+    status_: str | None = Query(default=None, alias="status"),
+    legacy_status: str | None = Query(default=None, alias="status_", include_in_schema=False),
     limit: int = Query(default=50, ge=1, le=100),
     cursor: str | None = None,
     user: User = Depends(get_current_user),
@@ -130,7 +148,7 @@ def get_repository_findings(
             category=category,
             severity=severity,
             priority=priority,
-            status=status_,
+            status=status_ if status_ is not None else legacy_status,
             limit=limit,
             cursor=cursor
         )
@@ -161,6 +179,41 @@ async def refresh_repository(
             detail="Monitoring is not enabled for this repository"
         )
     return await run_monitoring_checks_for_repository(db, repository)
+
+
+@router.get("/{repository_id}/issues", response_model=list[GitHubWorkItem])
+async def get_repository_github_issues(
+    repository_id: uuid.UUID,
+    limit: int = Query(default=50, ge=1, le=100),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    repository = get_repository_or_404(
+        db=db, user_id=user.id, repository_id=repository_id
+    )
+    async with GitHubAppClient(
+        installation_id=repository.connection.installation_id
+    ) as client:
+        items = await client.list_repository_issues(repository.full_name)
+    issues = [item for item in items if "pull_request" not in item]
+    return [GitHubWorkItem.model_validate(item) for item in issues[:limit]]
+
+
+@router.get("/{repository_id}/pull-requests", response_model=list[GitHubWorkItem])
+async def get_repository_github_pull_requests(
+    repository_id: uuid.UUID,
+    limit: int = Query(default=50, ge=1, le=100),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    repository = get_repository_or_404(
+        db=db, user_id=user.id, repository_id=repository_id
+    )
+    async with GitHubAppClient(
+        installation_id=repository.connection.installation_id
+    ) as client:
+        items = await client.list_repository_pulls(repository.full_name)
+    return [GitHubWorkItem.model_validate(item) for item in items[:limit]]
 
 
 @router.get("/{repository_id}/activity", response_model=ActivityFeedResponse)
@@ -322,10 +375,16 @@ def get_dashboard_overview(
     """
     Composed dashboard overview endpoint that reads from multiple domains without triggering new AI analysis.
     """
-    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    repository = get_repository_or_404(
+        db=db, user_id=user.id, repository_id=repository_id
+    )
 
     # 1. Health
-    health_snapshot = get_latest_snapshot(db, repository_id)
+    health_snapshot = (
+        get_latest_snapshot(db, repository_id)
+        if repository.monitoring_status == "success"
+        else None
+    )
 
     # 2. Needs Attention (uses open findings inside)
     # The return type of get_needs_attention is NeedsAttentionDTO
@@ -375,10 +434,9 @@ def get_dashboard_overview(
     }
     # Using predefined valid categories from instructions/other parts
     for finding in open_findings:
-        if finding.category in finding_counts:
-            finding_counts[finding.category] += 1
-        else:
-            finding_counts[finding.category] = 1 # Just in case a category differs
+        category = FINDING_CATEGORY_TO_HEALTH_CATEGORY.get(finding.category)
+        if category is not None:
+            finding_counts[category] += 1
 
     # Assemble composed response
     return DashboardOverviewResponse(
@@ -388,5 +446,8 @@ def get_dashboard_overview(
         activity_feed=activity_items,
         ai_summary=latest_ai_summary if latest_ai_summary else AIAnalysisNotExists(),
         trends=trends,
-        finding_category_counts=finding_counts
+        finding_category_counts=finding_counts,
+        monitoring_status=repository.monitoring_status,
+        monitoring_checks=repository.monitoring_checks,
+        last_monitoring_at=repository.last_monitoring_at,
     )

@@ -71,7 +71,7 @@ def reopen_finding(db: Session, finding: Finding) -> Finding:
     db.refresh(finding)
     return finding
 
-def auto_resolve_finding(db: Session, finding: Finding) -> Finding:
+def auto_resolve_finding(db: Session, finding: Finding, *, commit: bool = True) -> Finding:
     """
     Internal-use only transition.
     behaves like resolve_finding(source="auto"), but silently no-ops if 
@@ -86,6 +86,9 @@ def auto_resolve_finding(db: Session, finding: Finding) -> Finding:
     finding.status = "resolved"
     finding.resolved_at = datetime.now(timezone.utc)
     finding.resolution_source = "auto"
-    db.commit()
+    if commit:
+        db.commit()
+    else:
+        db.flush()
     db.refresh(finding)
     return finding

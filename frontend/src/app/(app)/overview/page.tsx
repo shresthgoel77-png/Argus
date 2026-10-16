@@ -33,14 +33,17 @@ export default function AppOverviewPage() {
     React.useEffect(() => {
         let active = true;
 
-        async function loadOverview() {
-            setIsLoading(true);
-            setError(null);
-
+        async function loadRepositories() {
             const nextRepositories = await getRepositories();
             if (!active) return;
 
-            if (!nextRepositories || nextRepositories.length === 0) {
+            if (nextRepositories === null) {
+                setError("Repositories could not be loaded right now.");
+                setIsLoading(false);
+                return;
+            }
+            setRepositories(nextRepositories);
+            if (nextRepositories.length === 0) {
                 setRepositories([]);
                 setSelectedRepositoryId(null);
                 setOverview(null);
@@ -53,23 +56,55 @@ export default function AppOverviewPage() {
                 : nextRepositories;
 
             const firstRepository = orderedRepositories[0];
-            setRepositories(nextRepositories);
             setSelectedRepositoryId(firstRepository.id);
-
-            const nextOverview = await getDashboardOverview(firstRepository.id);
-            if (!active) return;
-            setOverview(nextOverview);
-            setError(nextOverview ? null : "The dashboard could not be loaded right now.");
-            setIsLoading(false);
         }
 
-        void loadOverview();
+        void loadRepositories();
         return () => {
             active = false;
         };
     }, []);
 
-    const selectedRepository = repositories.find((repository) => repository.id === selectedRepositoryId) ?? repositories[0] ?? null;
+    React.useEffect(() => {
+        if (!selectedRepositoryId) return;
+        const repositoryId = selectedRepositoryId;
+        let active = true;
+        async function loadOverview() {
+            setIsLoading(true);
+            setError(null);
+            setOverview(null);
+            const nextOverview = await getDashboardOverview(repositoryId);
+            if (!active) return;
+            setOverview(nextOverview);
+            setError(nextOverview ? null : "The dashboard could not be loaded right now.");
+            setIsLoading(false);
+        }
+        void loadOverview();
+        return () => {
+            active = false;
+        };
+    }, [selectedRepositoryId]);
+
+    const selectedRepository = repositories.find((repository) => repository.id === selectedRepositoryId) ?? null;
+    const monitoringStatus = overview?.monitoring_status ?? selectedRepository?.monitoring_status ?? "unknown";
+
+    const repositorySelector = repositories.length > 0 ? (
+        <label className="flex items-center gap-3 text-sm">
+            <span className="font-medium">Repository</span>
+            <select
+                aria-label="Select repository"
+                className="h-10 max-w-full rounded-md border bg-background px-3"
+                value={selectedRepositoryId ?? ""}
+                onChange={(event) => setSelectedRepositoryId(event.target.value)}
+            >
+                {repositories.map((repository) => (
+                    <option key={repository.id} value={repository.id}>
+                        {repository.full_name}{repository.monitoring_enabled ? "" : " (monitoring disabled)"}
+                    </option>
+                ))}
+            </select>
+        </label>
+    ) : null;
 
     if (isLoading) {
         return (
@@ -88,6 +123,15 @@ export default function AppOverviewPage() {
         );
     }
 
+    if (error && !selectedRepository && repositories.length === 0) {
+        return (
+            <div className="space-y-6">
+                <SectionHeading eyebrow="Workspace" title="Overview" description="A health check across your connected repositories and engineering activity." />
+                <EmptyState icon={<ShieldAlert className="size-6" aria-hidden="true" />} title="Repositories are unavailable" description={error} />
+            </div>
+        );
+    }
+
     if (!selectedRepository) {
         return (
             <div className="space-y-6">
@@ -96,6 +140,7 @@ export default function AppOverviewPage() {
                     title="Overview"
                     description="A health check across your connected repositories and engineering activity."
                 />
+                {repositorySelector}
                 <EmptyState
                     icon={<HeartPulse className="size-6" aria-hidden="true" />}
                     title="No connected repositories yet"
@@ -113,6 +158,7 @@ export default function AppOverviewPage() {
                     title="Overview"
                     description="A health check across your connected repositories and engineering activity."
                 />
+                {repositorySelector}
                 <EmptyState
                     icon={<ShieldAlert className="size-6" aria-hidden="true" />}
                     title="Overview is temporarily unavailable"
@@ -134,6 +180,29 @@ export default function AppOverviewPage() {
                 title="Overview"
                 description={`Health check for ${selectedRepository.full_name}.`}
             />
+            {repositorySelector}
+            <section className="rounded-lg border bg-card p-4" aria-label="Assessment status">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h2 className="font-semibold">Assessment status: {monitoringStatus.replace(/_/g, " ")}</h2>
+                    <p className="text-sm text-muted-foreground">
+                        {overview.last_monitoring_at
+                            ? `Last checked ${new Date(overview.last_monitoring_at).toLocaleString()}`
+                            : "No assessment has completed yet"}
+                    </p>
+                </div>
+                {monitoringStatus !== "success" && (
+                    <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+                        <p>A complete health score is unavailable until every required check succeeds.</p>
+                        {Object.entries(overview.monitoring_checks ?? {}).map(([name, check]) => (
+                                <p key={name}>
+                                    {name.replace(/_/g, " ")}: {check.status}
+                                    {check.checked_at ? ` · checked ${new Date(check.checked_at).toLocaleString()}` : ""}
+                                    {check.error_message ? ` — ${check.error_message}` : ""}
+                                </p>
+                            ))}
+                    </div>
+                )}
+            </section>
 
             <div className="grid gap-4 xl:grid-cols-2">
                 <section className="space-y-3" aria-labelledby="health-score-heading">

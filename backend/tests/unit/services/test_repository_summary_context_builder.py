@@ -24,6 +24,7 @@ def mock_repository():
     repo.id = uuid.uuid4()
     repo.full_name = "test/test-repo"
     repo.monitoring_enabled = True
+    repo.monitoring_status = "success"
     return repo
 
 
@@ -106,3 +107,26 @@ def test_build_repository_summary_context_repo_not_found(mock_db_session):
 
     with pytest.raises(ValueError, match="Repository .* not found"):
         build_repository_summary_context(mock_db_session, uuid.uuid4())
+
+
+@pytest.mark.parametrize("status", ["queued", "running", "failed", "partial_failure"])
+@patch("app.services.repository_summary_context_builder.get_needs_attention")
+def test_incomplete_assessment_does_not_present_historical_score_as_current(
+    mock_attention, mock_db_session, mock_repository, status
+):
+    mock_repository.monitoring_status = status
+    mock_db_session.query.return_value.filter.return_value.first.return_value = mock_repository
+    snapshot = MagicMock(spec=RepositoryHealthSnapshot)
+    snapshot.overall_score = 100
+    snapshot.category_scores = {"security": 100}
+    mock_attention.return_value = NeedsAttentionDTO(
+        findings=[], health_snapshot=snapshot, reasons=["Initial health score computed."]
+    )
+
+    context = build_repository_summary_context(mock_db_session, mock_repository.id)
+
+    assert f"Assessment Status: {status}" in context.untrusted_content
+    assert "Overall Health Score: N/A" in context.untrusted_content
+    assert "Overall Health Score: 100" not in context.untrusted_content
+    assert "Initial health score computed." not in context.untrusted_content
+    assert "does not establish that the repository is healthy" in context.untrusted_content

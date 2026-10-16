@@ -37,26 +37,22 @@ class SecurityAnalyzer(BaseAnalyzer):
     async def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         """Fetch open Dependabot alerts and create findings for them.
         
-        Note: Re-running this analyzer will currently re-create a finding per 
-        open alert each time. This is an accepted Phase 6 limitation. 
-        Deduplication is Phase 7's job.
-        
         Note on Permissions: This analyzer depends on the 'Dependabot-alerts' 
         permission on the GitHub App to fetch the alerts successfully. 
         If missing, it results in a 403.
         """
         if not context.client:
-            return []
+            raise RuntimeError("Security scan requires a GitHub client")
 
         try:
             alerts = await context.client.list_dependabot_alerts(context.repository.full_name)
         except GitHubAuthError:
-            # 403 on client fetch -> treated as "skipped due to permissions," not a crash
-            return []
+            raise
         
-        # 404 is natively managed within list_dependabot_alerts returning []
         findings: list[FindingDraft] = []
         for alert in alerts:
+            if not isinstance(alert.get("number"), int) or not alert.get("state"):
+                raise ValueError("GitHub returned an incomplete Dependabot alert")
             if alert.get("state") != "open":
                 continue
             
@@ -66,7 +62,9 @@ class SecurityAnalyzer(BaseAnalyzer):
 
             summary = advisory.get("summary", "Unknown Security Advisory")
             dependency_package = alert.get("dependency", {}).get("package", {})
-            package_name = dependency_package.get("name", "unknown")
+            package_name = dependency_package.get("name")
+            if not package_name or not advisory.get("summary") or advisory.get("severity") not in {"critical", "high", "medium", "low"}:
+                raise ValueError("GitHub returned incomplete security advisory evidence")
 
             findings.append(
                 FindingDraft(
@@ -79,6 +77,9 @@ class SecurityAnalyzer(BaseAnalyzer):
                         "github_alert_number": alert.get("number"),
                         "package_name": package_name,
                         "severity": gh_severity,
+                        **({"manifest_path": alert["dependency"]["manifest_path"]}
+                           if alert.get("dependency", {}).get("manifest_path") else {}),
+                        **({"url": alert["html_url"]} if alert.get("html_url") else {}),
                     },
                     fingerprint=f"security:{context.repository.id}:dependabot:{alert.get('number')}",
                 )

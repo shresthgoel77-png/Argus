@@ -95,8 +95,12 @@ async def test_scan_repository_for_stale_issues():
         await analyzer.scan_repository_for_stale_issues(db, repo, client)
         
         client.list_repository_issues.assert_called_once_with("my/repo")
-        issue_analyzer_mdl.finding_service.create_finding.assert_called_once()
-        kwargs = issue_analyzer_mdl.finding_service.create_finding.call_args.kwargs
+        issue_analyzer_mdl.finding_service.sync_findings_for_run.assert_called_once()
+        call = issue_analyzer_mdl.finding_service.sync_findings_for_run.call_args.kwargs
+        assert call["source"] == "repository_scan:issue"
+        assert len(call["drafts"]) == 1
+        draft = call["drafts"][0]
+        kwargs = {"fingerprint": draft.fingerprint, "type_": draft.type_, "severity": draft.severity}
         assert kwargs["fingerprint"] == "stale_issue_1"
         assert kwargs["type_"] == "stale_issue"
         assert kwargs["severity"] == "info"

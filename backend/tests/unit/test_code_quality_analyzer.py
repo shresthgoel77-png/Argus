@@ -70,8 +70,8 @@ async def test_analyzer_github_auth_error(
 ):
     mock_get_branch_protection.side_effect = GitHubAuthError("403 Forbidden")
 
-    findings = await code_quality_analyzer.analyze(mock_context)
-    assert len(findings) == 0
+    with pytest.raises(GitHubAuthError):
+        await code_quality_analyzer.analyze(mock_context)
     mock_get_branch_protection.assert_called_once_with(
         999, "test/repo", "main"
     )

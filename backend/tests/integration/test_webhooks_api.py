@@ -123,6 +123,33 @@ def test_webhook_malformed_json_valid_signature(unauth_client):
     resp = unauth_client.post("/api/v1/webhooks/github", content=body_bytes, headers=headers)
     assert resp.status_code == 400
 
+
+def test_webhook_processing_failure_returns_retryable_server_error(
+    unauth_client, monkeypatch
+):
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(
+        "app.api.v1.webhooks.process_webhook_event",
+        lambda *args, **kwargs: SimpleNamespace(
+            status="failed", error_message="safe failure"
+        ),
+    )
+    payload = {"action": "created", "installation": {"id": 333}}
+    body_bytes = json.dumps(payload).encode("utf-8")
+    response = unauth_client.post(
+        "/api/v1/webhooks/github",
+        content=body_bytes,
+        headers={
+            "x-github-event": "installation",
+            "x-github-delivery": str(uuid4()),
+            "x-hub-signature-256": _sign_payload(body_bytes),
+        },
+    )
+
+    assert response.status_code == 500
+    assert response.json()["detail"] == "Webhook processing failed and can be retried."
+
 def test_webhook_installation_suspend(unauth_client, db_session):
     # Seed user and connection
     user = User(email="suspend@example.com", auth_provider="github", external_auth_id="gh_suspend")

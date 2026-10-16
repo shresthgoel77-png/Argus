@@ -52,50 +52,35 @@ class IssueAnalyzer(BaseAnalyzer):
         return []
 
     async def scan_repository_for_stale_issues(
-        self,
-        db: Session,
-        repository: Repository,
-        client: GitHubAppClient
+        self, db: Session, repository: Repository, client: GitHubAppClient
     ) -> None:
-        issues = await client.list_repository_issues(repository.full_name)
+        items = await client.list_repository_issues(repository.full_name)
         now = datetime.now(timezone.utc)
         threshold = timedelta(days=settings.stale_issue_days)
-
-        for issue in issues:
-            if "pull_request" in issue:
+        drafts = []
+        # Validate the entire response before persisting or resolving anything.
+        for item in items:
+            if isinstance(item, dict) and "pull_request" in item:
                 continue
-
-            updated_at_str = issue.get("updated_at")
-            if not updated_at_str:
-                continue
-
-            updated_at = datetime.fromisoformat(
-                updated_at_str.replace("Z", "+00:00")
-            )
+            if (not isinstance(item, dict) or type(item.get("number")) is not int
+                    or not item.get("updated_at") or not item.get("html_url")):
+                raise ValueError("GitHub returned incomplete issues evidence")
+            updated_at = datetime.fromisoformat(item["updated_at"].replace("Z", "+00:00"))
+            if updated_at.tzinfo is None:
+                raise ValueError("GitHub returned a timestamp without a timezone")
             if now - updated_at > threshold:
-                issue_number = issue.get("number")
-                fingerprint = f"stale_issue_{issue_number}"
-                title = f"Stale Issue #{issue_number}"
-                description = (
-                    f"Issue #{issue_number} has been "
-                    f"stale for over {settings.stale_issue_days} days."
-                )
-
-                evidence = {
-                    "issue_url": issue.get("html_url"),
-                    "issue_number": issue_number,
-                    "updated_at": updated_at.isoformat(),
-                }
-
-                finding_service.create_finding(
-                    db,
-                    repository_id=repository.id,
-                    category=self.category,
-                    type_="stale_issue",
-                    title=title,
-                    description=description,
+                number = item["number"]
+                drafts.append(FindingDraft(
+                    category=self.category, type_="stale_issue",
+                    title=f"Stale Issue #{number}",
+                    description=f"Issue #{number} has been stale for over {settings.stale_issue_days} days.",
                     severity="info",
-                    source=f"repository_scan:{self.key}",
-                    evidence=evidence,
-                    fingerprint=fingerprint,
-                )
+                    evidence={"issue_url": item["html_url"], "issue_number": number,
+                              "updated_at": updated_at.isoformat()},
+                    fingerprint=f"stale_issue_{number}",
+                ))
+        finding_service.sync_findings_for_run(
+            db, repository_id=repository.id, category=self.category,
+            analyzer_key=self.key, drafts=drafts,
+            source=f"repository_scan:{self.key}", finding_type="stale_issue",
+        )

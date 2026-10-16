@@ -91,7 +91,29 @@ export function RepositoryAISummaryPanel({ repositoryId }: { repositoryId: strin
                     </div>
                 ) : analysis ? (
                     <div className="space-y-4 text-sm">
-                        <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">{analysis.summary ?? "No summary was provided."}</p>
+                        {analysis.status === "failed" ? (
+                            <div className="space-y-3" role="alert">
+                                <div className="flex items-start gap-2 text-sm text-destructive">
+                                    <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                                    <p>AI summary failed: {analysis.error_message ?? "The summary could not be completed."}</p>
+                                </div>
+                                <Button onClick={() => void handleGenerate()} loading={isPending}>Try again</Button>
+                            </div>
+                        ) : analysis.status === "pending" ? (
+                            <p role="status" className="text-muted-foreground">AI summary is still in progress.</p>
+                        ) : (
+                            <>
+                                <p className="whitespace-pre-wrap leading-relaxed text-muted-foreground">{analysis.summary || "The completed analysis did not include a summary."}</p>
+                                {!!analysis.key_insights?.length && (
+                                    <div>
+                                        <p className="mb-1 font-medium text-foreground">Key insights</p>
+                                        <ul className="list-disc space-y-1 pl-5 text-muted-foreground">
+                                            {analysis.key_insights.map((insight, index) => <li key={`${insight}-${index}`}>{insight}</li>)}
+                                        </ul>
+                                    </div>
+                                )}
+                            </>
+                        )}
                         {analysis.recommendations && (
                             <div className="rounded-md border bg-muted/30 p-3">
                                 <p className="mb-1 font-medium text-foreground">Recommended actions</p>

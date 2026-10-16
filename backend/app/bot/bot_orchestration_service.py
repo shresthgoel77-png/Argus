@@ -189,7 +189,7 @@ async def handle_mention(
         if ai_conn is None:
             raise RuntimeError("AI connection not found for authorized user")
         provider_cls = get_provider(ai_conn.provider)
-        provider = provider_cls(api_key=api_key)
+        provider = provider_cls(api_key=api_key, model=ai_conn.model)
         result = provider.generate_bot_response(context)
         # api_key goes out of scope here — never stored, never logged
 

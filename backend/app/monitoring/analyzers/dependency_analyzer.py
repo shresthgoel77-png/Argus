@@ -22,7 +22,7 @@ class DependencyAnalyzer(BaseAnalyzer):
     async def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         """Check for missing lockfiles when an npm manifest is present."""
         if not context.client:
-            return []
+            raise RuntimeError("Dependency scan requires a GitHub client")
 
         npm_lockfiles = ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"]
         from app.integrations.github.exceptions import GitHubAuthError
@@ -66,5 +66,4 @@ class DependencyAnalyzer(BaseAnalyzer):
             ]
 
         except GitHubAuthError:
-            # 403 on client fetch -> treated as "skipped due to permissions," not a crash
-            return []
+            raise

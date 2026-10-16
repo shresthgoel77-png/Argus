@@ -19,6 +19,11 @@ from app.integrations.github.webhook_events import RepoRef
 def mock_client():
     client = MagicMock(spec=GitHubAppClient)
     client.list_installation_repositories = AsyncMock()
+    client.get_installation = AsyncMock(return_value={
+        "id": 456, "app_id": 12345,
+        "account": {"id": 42, "login": "testuser", "type": "User"},
+        "permissions": {name: "write" for name in ["issues", "pull_requests", "contents", "actions", "administration", "vulnerability_alerts"]},
+    })
     return client
 
 

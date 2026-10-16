@@ -16,6 +16,7 @@ from app.integrations.github.exceptions import (
     GitHubAuthError,
     GitHubNotFoundError,
     GitHubRateLimitError,
+    GitHubInstallationError,
 )
 
 
@@ -167,7 +168,7 @@ class TestErrorMapping:
         [
             (401, GitHubAuthError),
             (403, GitHubAuthError),
-            (404, GitHubNotFoundError),
+            (404, GitHubInstallationError),
             (429, GitHubRateLimitError),
             (500, GitHubAPIError),
         ],
@@ -206,8 +207,8 @@ class TestGetRepositoryContent:
         mock_resp = _mock_response(404, json_data={"message": "Not Found"})
         async with GitHubAppClient(installation_id=1) as client:
             with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
-                result = await client.get_repository_content("org/repo", "missing.md")
-        assert result is None
+                with pytest.raises(GitHubNotFoundError):
+                    await client.get_repository_content("org/repo", "missing.md")
 
     @pytest.mark.asyncio
     async def test_raises_github_auth_error_on_403(self, _patch_auth):
@@ -242,13 +243,13 @@ class TestListDependabotAlerts:
         assert result == [{"number": 1}, {"number": 2}]
 
     @pytest.mark.asyncio
-    async def test_returns_empty_list_on_404(self, _patch_auth):
-        """Returns empty list if dependabot alerts are disabled or repo missing (404)."""
+    async def test_raises_on_ambiguous_dependabot_404(self, _patch_auth):
+        """A missing repository/permission must not look like a clean scan."""
         mock_resp = _mock_response(404, json_data={"message": "Not Found"})
         async with GitHubAppClient(installation_id=1) as client:
             with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
-                result = await client.list_dependabot_alerts("org/repo")
-        assert result == []
+                with pytest.raises(GitHubNotFoundError):
+                    await client.list_dependabot_alerts("org/repo")
 
     @pytest.mark.asyncio
     async def test_raises_github_auth_error_on_403(self, _patch_auth):
@@ -280,8 +281,8 @@ class TestGetBranchProtection:
         mock_resp = _mock_response(404, json_data={"message": "Not Found"})
         async with GitHubAppClient(installation_id=1) as client:
             with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
-                result = await client.get_branch_protection("org/repo", "main")
-        assert result is None
+                with pytest.raises(GitHubNotFoundError):
+                    await client.get_branch_protection("org/repo", "main")
 
     @pytest.mark.asyncio
     async def test_raises_github_auth_error_on_403(self, _patch_auth):
@@ -349,3 +350,51 @@ class TestPostIssueComment:
             with patch.object(client._http, "request", new_callable=AsyncMock, return_value=mock_resp):
                 with pytest.raises(GitHubAuthError):
                     await client.post_issue_comment("org", "repo", 1, "body")
+
+@pytest.mark.asyncio
+async def test_content_404_requires_accessible_repository(_patch_auth):
+    async with GitHubAppClient(installation_id=1) as client:
+        with patch.object(client, '_request', new_callable=AsyncMock, side_effect=[
+            GitHubNotFoundError('file absent'), _mock_response(200, json_data={'id': 1})]) as request:
+            assert await client.get_repository_content('org/repo', 'package.json') is None
+            request.assert_awaited_with('GET', '/repos/org/repo')
+
+
+@pytest.mark.asyncio
+async def test_branch_protection_absence_requires_unprotected_branch(_patch_auth):
+    async with GitHubAppClient(installation_id=1) as client:
+        with patch.object(client, '_request', new_callable=AsyncMock, side_effect=[
+            GitHubNotFoundError('protection absent'), _mock_response(200, json_data={'protected': False})]):
+            assert await client.get_branch_protection('org/repo', 'main') is None
+        with patch.object(client, '_request', new_callable=AsyncMock, side_effect=[
+            GitHubNotFoundError('protection inaccessible'), _mock_response(200, json_data={'protected': True})]):
+            with pytest.raises(GitHubAPIError, match='could not be verified'):
+                await client.get_branch_protection('org/repo', 'main')
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('method', ['list_dependabot_alerts', 'list_repository_issues', 'list_repository_pulls'])
+async def test_scan_page_limit_rejects_partial_results(_patch_auth, monkeypatch, method):
+    monkeypatch.setattr('app.integrations.github.client._MAX_SCAN_PAGES', 1)
+    response = _mock_response(200, json_data=[{'number': 1}], headers={'link': '<https://api.github.com/next>; rel="next"'})
+    async with GitHubAppClient(installation_id=1) as client:
+        with patch.object(client, '_request', new_callable=AsyncMock, return_value=response):
+            with pytest.raises(GitHubAPIError, match='page limit'):
+                await getattr(client, method)('org/repo')
+
+@pytest.mark.asyncio
+async def test_installation_network_error_becomes_actionable_api_error(_patch_auth):
+    import httpx
+    async with GitHubAppClient(installation_id=1) as client:
+        with patch.object(client, '_auth_headers', new_callable=AsyncMock, side_effect=httpx.ConnectTimeout('timeout')):
+            with pytest.raises(GitHubAPIError, match='installation authentication could not be reached'):
+                await client.list_repository_issues('org/repo')
+
+
+@pytest.mark.asyncio
+async def test_repository_network_error_becomes_actionable_api_error(_patch_auth):
+    import httpx
+    async with GitHubAppClient(installation_id=1) as client:
+        with patch.object(client._http, 'request', new_callable=AsyncMock, side_effect=httpx.ReadTimeout('timeout')):
+            with pytest.raises(GitHubAPIError, match='timeout or connection error'):
+                await client.list_repository_pulls('org/repo')

@@ -46,4 +46,7 @@ export interface DashboardOverviewResponse {
     ai_summary: AIAnalysisResponse;
     trends: DashboardOverviewTrends;
     finding_category_counts: Record<string, number>;
+    monitoring_status?: string | null;
+    monitoring_checks?: Record<string, { status: string; error_message: string | null; checked_at: string | null }> | null;
+    last_monitoring_at?: string | null;
 }

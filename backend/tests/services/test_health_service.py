@@ -11,6 +11,34 @@ from app.services.health_service import (
 class MockSession:
     def __init__(self):
         self.added = []
+        from types import SimpleNamespace
+
+        self.repository = SimpleNamespace(
+            monitoring_checks={
+                name: {"status": "success"}
+                for name in (
+                    "ci_cd",
+                    "stale_issues",
+                    "stale_prs",
+                    "dependency",
+                    "security",
+                    "code_quality",
+                )
+            },
+            connection_id=uuid.uuid4(),
+        )
+
+    def query(self, model):
+        session = self
+
+        class MockQuery:
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return session.repository
+
+        return MockQuery()
 
     def add(self, obj):
         self.added.append(obj)
@@ -71,6 +99,16 @@ def test_compute_and_persist_health_zero_findings(monkeypatch):
     assert snapshot.overall_score == 100
     assert snapshot.reasons == ["Initial health score computed."]
     assert snapshot in db.added
+
+
+def test_incomplete_check_set_never_returns_a_health_score(monkeypatch):
+    db = MockSession()
+    db.repository.monitoring_checks["security"] = {"status": "failed"}
+
+    snapshot = compute_and_persist_health(db, uuid.uuid4())
+
+    assert snapshot is None
+    assert db.added == []
 
 
 def test_compute_and_persist_health_critical_finding(monkeypatch):
@@ -256,6 +294,17 @@ def test_health_drop_notification_thresholds(monkeypatch):
 
                         class R:
                             connection_id = uuid.uuid4()
+                            monitoring_checks = {
+                                name: {"status": "success"}
+                                for name in (
+                                    "ci_cd",
+                                    "stale_issues",
+                                    "stale_prs",
+                                    "dependency",
+                                    "security",
+                                    "code_quality",
+                                )
+                            }
 
                         return R()
                     if model.__name__ == "GitHubConnection":
@@ -337,6 +386,17 @@ def test_health_drop_notification_exception_handling(monkeypatch):
 
                         class R:
                             connection_id = uuid.uuid4()
+                            monitoring_checks = {
+                                name: {"status": "success"}
+                                for name in (
+                                    "ci_cd",
+                                    "stale_issues",
+                                    "stale_prs",
+                                    "dependency",
+                                    "security",
+                                    "code_quality",
+                                )
+                            }
 
                         return R()
                     if model.__name__ == "GitHubConnection":

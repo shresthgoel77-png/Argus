@@ -115,3 +115,34 @@ async def test_mismatched_authorized_party_is_rejected(signing_keys, request_fac
     token = make_token(private_key, azp="https://attacker.example")
 
     assert await adapter.resolve_identity(request_factory(f"Bearer {token}")) is None
+@pytest.mark.asyncio
+@pytest.mark.parametrize('stage', ['verification', 'email_lookup'])
+async def test_slow_clerk_call_does_not_block_other_requests(request_factory, stage):
+    import asyncio
+    import threading
+    from types import SimpleNamespace
+    from unittest.mock import MagicMock
+
+    released = threading.Event()
+    state = SimpleNamespace(is_signed_in=True, payload={'sub': 'user_verified'})
+    if stage == 'verification':
+        state.payload['email'] = 'verified@example.com'
+    user = SimpleNamespace(email_addresses=[SimpleNamespace(email_address='verified@example.com')])
+    client = MagicMock()
+    def blocked(result):
+        def call(*args, **kwargs):
+            if not released.wait(timeout=1):
+                raise TimeoutError('The event loop could not service another request')
+            return result
+        return call
+    client.authenticate_request.return_value = state
+    client.users.get.return_value = user
+    if stage == 'verification':
+        client.authenticate_request.side_effect = blocked(state)
+    else:
+        client.users.get.side_effect = blocked(user)
+    adapter = ClerkAuthAdapter(clerk_client=client)
+    async def other_request():
+        released.set()
+    context, _ = await asyncio.gather(adapter.resolve_identity(request_factory()), other_request())
+    assert context is not None and context.external_id == 'user_verified'

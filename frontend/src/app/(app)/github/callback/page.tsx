@@ -11,6 +11,8 @@ export default function GitHubCallbackPage() {
     const router = useRouter();
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
+    const [errorMessage, setErrorMessage] = useState("There was a problem finalizing your connection. Start again from GitHub settings in RepoMedic.");
+
     useEffect(() => {
         const handleCallback = async () => {
             const installation_id = searchParams.get("installation_id");
@@ -18,7 +20,7 @@ export default function GitHubCallbackPage() {
             const state = searchParams.get("state");
 
             if (!installation_id || !setup_action || !state) {
-                console.error("Missing required URL parameters", { installation_id, setup_action, state });
+                setErrorMessage("The GitHub callback is missing its signed state. Start again from GitHub settings in RepoMedic.");
                 setStatus("error");
                 return;
             }
@@ -27,7 +29,7 @@ export default function GitHubCallbackPage() {
             try {
                 result = await completeInstall({ installation_id, setup_action, state });
             } catch (error) {
-                console.error("GitHub installation callback failed", error);
+                setErrorMessage(error instanceof Error ? error.message : "GitHub connection could not be verified.");
                 setStatus("error");
                 return;
             }
@@ -73,7 +75,7 @@ export default function GitHubCallbackPage() {
                         <div className="flex flex-col items-center text-center">
                             <AlertCircle className="h-10 w-10 text-destructive mb-4" />
                             <p className="text-sm text-muted-foreground mb-4">
-                                There was a problem finalizing your connection. Please ensure you authorized the app correctly.
+                                {errorMessage}
                             </p>
                             <button
                                 onClick={() => router.push("/overview/settings")}

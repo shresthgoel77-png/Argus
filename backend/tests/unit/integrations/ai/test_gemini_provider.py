@@ -11,7 +11,11 @@ from app.integrations.ai.exceptions import (
 from app.bot.context_builder import BotContext
 from app.bot.question_parser import BotIntent
 from app.integrations.ai.gemini_client import GeminiClient
-from app.integrations.ai.gemini_provider import GeminiProvider, BOT_RESPONSE_SCHEMA
+from app.integrations.ai.gemini_provider import (
+    GeminiProvider,
+    BOT_RESPONSE_SCHEMA,
+    REPOSITORY_SUMMARY_SCHEMA,
+)
 from app.services.ai_context_builder import FindingContext
 from app.services.repository_summary_context_builder import RepositorySummaryContext
 
@@ -195,6 +199,22 @@ def test_generate_repository_summary_returns_validated_result():
     assert result.confidence == 0.86
 
 
+def test_repository_summary_uses_configured_model_and_matching_schema():
+    client = StubGenerationClient(
+        make_generation_response(
+            '{"summary":"Summary","key_insights":["Insight"],'
+            '"recommendations":["Action"],"confidence":0.9}'
+        )
+    )
+
+    GeminiProvider(client, model="gemini-2.5-pro").generate_repository_summary(
+        make_repository_summary_context()
+    )
+
+    assert client.calls[0]["model"] == "gemini-2.5-pro"
+    assert client.calls[0]["response_schema"] == REPOSITORY_SUMMARY_SCHEMA
+
+
 @pytest.mark.parametrize(
     "response",
     [
@@ -307,4 +327,3 @@ def test_generate_bot_response_preserves_mapped_transport_errors(error):
 
     with pytest.raises(type(error)):
         provider.generate_bot_response(make_bot_context())
-

@@ -7,6 +7,8 @@ export type AIAnalysis = {
     requested_at: string;
     completed_at: string | null;
     summary: string | null;
+    key_insights: string[] | null;
+    error_message: string | null;
     severity_assessment: string | null;
     confidence: string | number | null;
     recommendations: string[] | string | null;

@@ -52,8 +52,9 @@ def mock_repo_ai_analysis(test_user_repository):
     mock.requested_at = datetime.now(timezone.utc)
     mock.completed_at = datetime.now(timezone.utc)
     mock.summary = "Test summary"
-    mock.confidence = "High"
-    mock.recommendations = "Fix it"
+    mock.confidence = 0.9
+    mock.recommendations = ["Fix it"]
+    mock.key_insights = ["Test insight"]
     mock.error_message = None
     mock.severity_assessment = None
     return mock

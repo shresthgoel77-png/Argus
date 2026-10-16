@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, CheckCircle2, RotateCcw, XCircle, Loader2 } from "lucide-react";
 import { AIAnalysisPanel } from "./ai-analysis-panel";
+import { FindingIssuePreviewPanel } from "@/components/repositories/finding-issue-preview";
 
 const StatusButton = ({
     status,
@@ -158,6 +159,7 @@ export function FindingDetailDialog({ finding, isOpen, onOpenChange, onUpdate }:
                     </div>
 
                     <AIAnalysisPanel findingId={finding.id} />
+                    {["open", "acknowledged"].includes(finding.status) && <FindingIssuePreviewPanel key={finding.id} findingId={finding.id} />}
                 </div>
 
                 <DialogFooter className="gap-2 sm:gap-2">

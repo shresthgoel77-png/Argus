@@ -73,6 +73,22 @@ def record_event(
     Attempts to insert a new GitHubEvent row.
     Returns None if the delivery_id already exists (caught via IntegrityError).
     """
+    existing_event = (
+        db.query(GitHubEvent)
+        .filter(GitHubEvent.delivery_id == normalized_event.delivery_id)
+        .first()
+    )
+    if existing_event is not None:
+        if existing_event.status != "failed":
+            return None
+        existing_event.status = "received"
+        existing_event.error_message = None
+        existing_event.processed_at = None
+        existing_event.repository_id = repository_id
+        db.commit()
+        db.refresh(existing_event)
+        return existing_event
+
     event = GitHubEvent(
         delivery_id=normalized_event.delivery_id,
         event_type=normalized_event.event_type,
@@ -189,13 +205,18 @@ def process_webhook_event(
                 
         elif repository_id is not None and normalized_event.event_type in EVENT_TYPE_TO_ANALYZER:
             analyzer_key = EVENT_TYPE_TO_ANALYZER[normalized_event.event_type]
-            _run_analyzer_sync(
+            analyzer_result = _run_analyzer_sync(
                 MonitorService.run_analyzer,
                 db=db,
                 analyzer_key=analyzer_key,
                 repository=repo,
                 normalized_event=normalized_event
             )
+            if analyzer_result.status != "success":
+                raise RuntimeError(
+                    analyzer_result.error_message
+                    or f"Analyzer ended with status '{analyzer_result.status}'."
+                )
                 
     except Exception as e:
         return mark_failed(db, event, e)

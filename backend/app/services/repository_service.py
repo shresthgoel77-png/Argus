@@ -7,6 +7,7 @@ from app.integrations.github.webhook_events import RepoRef
 from app.schemas.repository import AvailableRepository
 from app.core.exceptions import NotFoundError
 from app.core.logging import get_logger
+from app.services.github_connection_service import validate_installation_metadata
 
 logger = get_logger(__name__)
 
@@ -88,6 +89,19 @@ async def add_repository(
             )
             raise NotFoundError("Repository not found or not owned by user.")
 
+        metadata = await client.get_installation(connection.installation_id)
+        account = validate_installation_metadata(metadata, connection.installation_id)
+        if (account["login"].casefold() != connection.account_login.casefold()
+                or account["type"] != connection.account_type):
+            raise NotFoundError("GitHub installation account does not match the saved connection.")
+        # Validate before changing a saved association, just as for a new repo.
+        # A connection owned by the same local user may belong to another account.
+        github_repos = await client.list_installation_repositories()
+        accessible_repo = next((repo for repo in github_repos if repo["id"] == github_repo_id), None)
+        if (accessible_repo is None
+                or existing_connection.account_login.casefold() != connection.account_login.casefold()
+                or existing_connection.account_type != connection.account_type):
+            raise NotFoundError("Repository is not accessible to the same GitHub account's installation. Existing association preserved.")
         existing_repo.connection_id = connection.id
         db.commit()
         db.refresh(existing_repo)
@@ -128,6 +142,7 @@ async def add_repository(
         private=accessible_repo["private"],
         default_branch=accessible_repo.get("default_branch"),
         monitoring_enabled=False,
+        monitoring_status="disabled",
     )
     db.add(new_repo)
     db.commit()
@@ -179,7 +194,29 @@ def set_monitoring_enabled(
         )
         raise NotFoundError("Repository not found or not owned by user.")
 
+    was_enabled = repository.monitoring_enabled
     repository.monitoring_enabled = enabled
+    if enabled and (
+        not was_enabled
+        or repository.monitoring_status
+        in {"disabled", "not_started", "failed", "partial_failure"}
+    ):
+        repository.monitoring_status = "queued"
+        repository.monitoring_checks = {
+            name: {"status": "pending", "error_message": None}
+            for name in (
+                "stale_issues",
+                "stale_prs",
+                "dependency",
+                "security",
+                "code_quality",
+                "ci_cd",
+                "health",
+            )
+        }
+    elif not enabled:
+        repository.monitoring_status = "disabled"
+        repository.monitoring_checks = {}
     db.commit()
     db.refresh(repository)
 

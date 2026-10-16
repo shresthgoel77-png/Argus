@@ -4,7 +4,14 @@ import time
 from fastapi.testclient import TestClient
 from app.main import app
 from app.db.session import get_db
+from app.auth.dependencies import get_current_user
 from app.integrations.github.install_state import get_serializer
+from app.core.config import settings
+from unittest.mock import AsyncMock
+
+@pytest.fixture(autouse=True)
+def verified_new_account(monkeypatch):
+    monkeypatch.setattr("app.services.github_connection_service.verify_new_installation_account", AsyncMock())
 
 @pytest.fixture
 def client(db_session):
@@ -15,16 +22,18 @@ def client(db_session):
         yield test_client
     app.dependency_overrides.clear()
 
-def test_github_install_flow(client, monkeypatch):
+@pytest.fixture
+def authenticated_client(client, test_user):
+    app.dependency_overrides[get_current_user] = lambda: test_user
+    yield client
+    app.dependency_overrides.pop(get_current_user, None)
+
+def test_github_install_flow(authenticated_client, monkeypatch):
     """
     Test the GitHub app installation token generation and callback handler.
     """
-    # 1. Dev login to get authenticated session
-    res_login = client.post("/api/v1/auth/dev-login")
-    assert res_login.status_code == 200
-
     # 2. Get install start URL
-    res_start = client.get("/api/v1/github/install/start")
+    res_start = authenticated_client.get("/api/v1/github/install/start")
     assert res_start.status_code == 200
     install_url = res_start.json()["install_url"]
     assert "?state=" in install_url
@@ -36,13 +45,19 @@ def test_github_install_flow(client, monkeypatch):
     class MockClient:
         def __init__(self, *args, **kwargs):
             pass
+        async def __aenter__(self):
+            return self
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
         async def get_installation(self, installation_id):
-            return {"account": {"login": "octocat", "type": "User"}}
+            return {"id": installation_id, "app_id": int(settings.github_app_id), "account": {"login": "octocat", "type": "User"}, "permissions": {name: "write" for name in ["issues", "pull_requests", "contents", "actions", "administration", "vulnerability_alerts"]}}
+        async def list_installation_repositories(self):
+            return []
             
     monkeypatch.setattr("app.api.v1.github.GitHubAppClient", MockClient)
     
     # 4. Successful callback
-    res_callback = client.get(
+    res_callback = authenticated_client.get(
         f"/api/v1/github/install/callback?installation_id=12345&setup_action=install&state={state}"
     )
     assert res_callback.status_code == 200
@@ -51,32 +66,30 @@ def test_github_install_flow(client, monkeypatch):
     assert connection["installation_id"] == 12345
 
     # Idempotency check: Calling it again with same params should still succeed
-    res_callback2 = client.get(
+    res_callback2 = authenticated_client.get(
         f"/api/v1/github/install/callback?installation_id=12345&setup_action=install&state={state}"
     )
     assert res_callback2.status_code == 200
 
     # 5. Get connections
-    res_connections = client.get("/api/v1/github/connections")
+    res_connections = authenticated_client.get("/api/v1/github/connections")
     assert res_connections.status_code == 200
     connections_list = res_connections.json()
     assert len(connections_list) >= 1
     assert any(c["installation_id"] == 12345 for c in connections_list)
 
-def test_github_install_callback_rejections(client):
+def test_github_install_callback_rejections(authenticated_client):
     """
     Test failure cases for the callback handler (invalid state, wrong user).
     """
-    client.post("/api/v1/auth/dev-login")
-    
-    res_missing = client.get("/api/v1/github/install/callback")
+    res_missing = authenticated_client.get("/api/v1/github/install/callback")
     assert res_missing.status_code == 400
     
     # Missing only installation_id
-    res_missing_id = client.get("/api/v1/github/install/callback?setup_action=install&state=foo")
+    res_missing_id = authenticated_client.get("/api/v1/github/install/callback?setup_action=install&state=foo")
     assert res_missing_id.status_code == 400 
 
-    res_invalid_state = client.get(
+    res_invalid_state = authenticated_client.get(
         "/api/v1/github/install/callback?installation_id=12345&setup_action=install&state=invalid.state.sig"
     )
     assert res_invalid_state.status_code == 400
@@ -84,7 +97,7 @@ def test_github_install_callback_rejections(client):
 
     from unittest.mock import patch
     with patch("app.api.v1.github.verify_install_state", side_effect=ValueError("Installation state has expired")):
-        res_expired_state = client.get(
+        res_expired_state = authenticated_client.get(
             f"/api/v1/github/install/callback?installation_id=12345&setup_action=install&state=foo"
         )
         assert res_expired_state.status_code == 400
@@ -95,7 +108,7 @@ def test_github_install_callback_rejections(client):
     wrong_payload = {"user_id": wrong_user_id, "issued_at": time.time()}
     wrong_state = serializer.dumps(wrong_payload)
     
-    res_wrong_user = client.get(
+    res_wrong_user = authenticated_client.get(
         f"/api/v1/github/install/callback?installation_id=12345&setup_action=install&state={wrong_state}"
     )
     assert res_wrong_user.status_code == 400
@@ -110,26 +123,30 @@ def test_github_endpoints_unauthenticated(client):
     assert client.get("/api/v1/github/connections").status_code == 401
     assert client.post("/api/v1/github/sync", json={"installation_id": "999"}).status_code == 401
 
-def test_github_sync_flow(client, monkeypatch):
+def test_github_sync_flow(authenticated_client, monkeypatch):
     """
     Test the GitHub app sync endpoint for existing installations.
     """
-    client.post("/api/v1/auth/dev-login")
-    
     class MockClient:
         def __init__(self, *args, **kwargs):
             pass
+        async def __aenter__(self):
+            return self
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
         async def get_installation(self, installation_id):
-            return {"account": {"login": "octocat_synced", "type": "User"}}
+            return {"id": installation_id, "app_id": int(settings.github_app_id), "account": {"login": "octocat_synced", "type": "User"}, "permissions": {name: "write" for name in ["issues", "pull_requests", "contents", "actions", "administration", "vulnerability_alerts"]}}
+        async def list_installation_repositories(self):
+            return []
             
     monkeypatch.setattr("app.api.v1.github.GitHubAppClient", MockClient)
     
-    res = client.post("/api/v1/github/sync", json={"installation_id": "999999"})
+    res = authenticated_client.post("/api/v1/github/sync", json={"installation_id": "999999"})
     assert res.status_code == 200
     connection = res.json()
     assert connection["account_login"] == "octocat_synced"
     assert connection["installation_id"] == 999999
     
     # Missing payload test
-    res_missing = client.post("/api/v1/github/sync", json={})
+    res_missing = authenticated_client.post("/api/v1/github/sync", json={})
     assert res_missing.status_code == 422

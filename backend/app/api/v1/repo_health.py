@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
@@ -39,12 +39,23 @@ def get_repository_health(
     Returns latest snapshot with previous_score.
     Lazily computes first snapshot if none exists.
     """
-    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    repository = get_repository_or_404(
+        db=db, user_id=user.id, repository_id=repository_id
+    )
+    if repository.monitoring_status != "success":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A complete health score is unavailable until all checks succeed.",
+        )
     
     latest = health_service.get_latest_snapshot(db, repository_id)
     if not latest:
         latest = health_service.compute_and_persist_health(db, repository_id)
-        
+    if latest is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A complete health score is unavailable until all checks succeed.",
+        )
     latest = _with_previous_score(db, latest)
     return HealthSnapshotResponse.model_validate(latest)
 
@@ -90,9 +101,21 @@ def create_repository_health_run(
     """
     Synchronously triggers compute_and_persist_health and returns new snapshot.
     """
-    get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    repository = get_repository_or_404(
+        db=db, user_id=user.id, repository_id=repository_id
+    )
+    if repository.monitoring_status != "success":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A complete health score is unavailable until all checks succeed.",
+        )
     
     new_snapshot = health_service.compute_and_persist_health(db, repository_id)
+    if new_snapshot is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A complete health score is unavailable until all checks succeed.",
+        )
     new_snapshot = _with_previous_score(db, new_snapshot)
     
     return HealthSnapshotResponse.model_validate(new_snapshot)

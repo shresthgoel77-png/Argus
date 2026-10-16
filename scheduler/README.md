@@ -27,6 +27,10 @@ This is a minimal, standalone Cloudflare Worker (cron trigger) whose sole job is
 
 **Never store this secret in `wrangler.toml` or in source control.**
 
+Set `BACKEND_URL` to the complete scheduled-monitoring endpoint, including
+`/api/v1/internal/scheduled-monitoring/run`. The Worker rejects a different
+path or missing secret and reports non-2xx backend responses as failed runs.
+
 To configure it for production deployment:
 ```bash
 wrangler secret put SCHEDULER_SHARED_SECRET

@@ -1,39 +1,42 @@
 import { Page, expect } from '@playwright/test';
 
 /**
- * Deterministically logs in by calling the backend's dev-login endpoint directly.
- * By using the page's request context, cookies returned by the backend
- * (such as auth_token) are automatically stored in the browser's context
- * and sent on subsequent requests.
+ * Signs in through Clerk using the dedicated E2E account configured in .env.
  */
 export async function login(page: Page) {
-    // Hit the backend /dev-login direct API
-    const response = await page.request.post('http://localhost:8000/api/v1/auth/dev-login');
+    const email = process.env.CLERK_E2E_EMAIL;
+    const password = process.env.CLERK_E2E_PASSWORD;
+    if (!email || !password) {
+        throw new Error('CLERK_E2E_EMAIL and CLERK_E2E_PASSWORD are required for authenticated E2E tests.');
+    }
 
-    // Ensure we get a successful 200 response
-    expect(response.status()).toBe(200);
-
-    // The dev login will set a cookie in the response. Since we use `page.request`, 
-    // that cookie is natively mapped to the browser context for the same origin.
-    // We can just return the data if needed.
-    const data = await response.json();
-
-    // Inject the localStorage flag so the frontend knows we are authenticated
-    await page.context().addInitScript(() => {
-        window.localStorage.setItem('auth-status', 'authenticated');
-    });
-
-    return data;
+    await page.goto('/sign-in');
+    await page.getByRole('textbox', { name: /email address/i }).fill(email);
+    await page.getByRole('button', { name: /continue/i }).click();
+    await page.getByLabel(/password/i).first().fill(password);
+    const trustPrepared = page.waitForResponse(response =>
+        /prepare_(second_factor|verification)/.test(new URL(response.url()).pathname) && response.status() === 200,
+        { timeout: 30_000 },
+    ).catch(() => null);
+    await page.getByRole('button', { name: /continue/i }).click();
+    // Clerk's reserved test addresses use its documented development OTP.
+    if (email.includes("+clerk_test@")) {
+        await page.waitForURL(/\/overview|\/dashboard|\/sign-in\/client-trust/);
+        if (page.url().includes("/client-trust")) {
+            if (!await trustPrepared) {
+                await page.getByRole("button", { name: /resend/i }).click();
+            }
+            await page.getByRole("textbox", { name: "Enter verification code" }).pressSequentially("424242");
+            // The OTP component submits automatically after the sixth digit.
+        }
+    }
+    await expect(page).not.toHaveURL(/\/sign-in/);
 }
 
 /**
- * Programmatically clears the session by hitting the backend logout endpoint.
+ * Signs out through Clerk's frontend session.
  */
 export async function logout(page: Page) {
-    const response = await page.request.post('http://localhost:8000/api/v1/auth/logout');
-    expect(response.status()).toBe(200);
-
-    await page.context().addInitScript(() => {
-        window.localStorage.removeItem('auth-status');
-    });
+    await page.getByRole('button', { name: /log out/i }).click();
+    await expect(page).toHaveURL(/\/$/);
 }

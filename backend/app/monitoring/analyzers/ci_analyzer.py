@@ -41,6 +41,9 @@ class CIAnalyzer(BaseAnalyzer):
             description=description,
             severity=severity,
             evidence=evidence,
+            fingerprint=(
+                f"ci:{context.repository.id}:workflow_run:{ev.workflow_run_id}"
+            ),
         )
 
         return [finding]

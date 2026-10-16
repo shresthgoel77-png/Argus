@@ -47,6 +47,11 @@ async def github_webhook(request: Request, db: Session = Depends(get_db)):
     if normalized_event.installation_id:
         client = GitHubAppClient(installation_id=normalized_event.installation_id)
         
-    process_webhook_event(db, normalized_event, client)
-    
+    event = process_webhook_event(db, normalized_event, client)
+    if event is not None and event.status == "failed":
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Webhook processing failed and can be retried.",
+        )
+
     return {"status": "ok"}

@@ -17,9 +17,8 @@ from app.main import app
 from app.core.config import settings
 
 # Override environment for tests.
-# The test harness intentionally uses the development auth adapter so it can
-# exercise the explicit dev-login flow and other authenticated routes without
-# weakening the production Clerk configuration.
+# The test harness can use the development adapter only in the isolated test
+# environment; application configuration defaults exclusively to Clerk.
 settings.app_env = "test"
 settings.auth_provider = "development"
 if not settings.test_database_url:
@@ -33,10 +32,13 @@ def client():
 
 @pytest.fixture(scope="session")
 def engine():
-    if "sqlite" in settings.database_url and "test.db" in settings.database_url:
-        import os
-        if os.path.exists("test.db"):
-            os.remove("test.db")
+    # Never delete the application's database based on a substring in a URL.
+    from pathlib import Path
+    from sqlalchemy.engine import make_url
+    url = make_url(settings.database_url)
+    if url.drivername.startswith("sqlite") and url.database != ":memory:":
+        if Path(url.database).resolve() == Path("test.db").resolve():
+            raise ValueError("Integration tests require a separate disposable database, not test.db")
     connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
     test_engine = create_engine(settings.database_url, pool_pre_ping=True, connect_args=connect_args)
     

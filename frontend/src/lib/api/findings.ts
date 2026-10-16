@@ -67,7 +67,7 @@ export async function updateFindingStatus(
     status: FindingStatusUpdateRequest["status"]
 ): Promise<FindingResponse | null> {
     try {
-        const res = await fetchClient(`/api/v1/findings/${id}/status`, {
+        const res = await fetchClient(`/api/v1/findings/${id}`, {
             method: "PATCH",
             body: JSON.stringify({ status }),
         });

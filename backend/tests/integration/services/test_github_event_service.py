@@ -14,6 +14,7 @@ from app.core.config import settings
 from app.services.github_event_service import process_webhook_event
 from app.models.github_connection import GitHubConnection
 from unittest.mock import MagicMock
+from types import SimpleNamespace
 
 @pytest.fixture
 def mock_normalized_event():
@@ -57,6 +58,23 @@ def test_record_event_duplicate_returns_none(db_session: Session, mock_normalize
     # Ensure only one is in the DB
     count = db_session.query(GitHubEvent).filter_by(delivery_id=mock_normalized_event.delivery_id).count()
     assert count == 1
+
+
+def test_failed_delivery_can_be_retried_in_place(
+    db_session: Session, mock_normalized_event: NormalizedWebhookEvent
+):
+    event = record_event(db_session, mock_normalized_event, None)
+    assert event is not None
+    mark_failed(db_session, event, RuntimeError("temporary analyzer failure"))
+
+    retry = record_event(db_session, mock_normalized_event, None)
+
+    assert retry is not None
+    assert retry.id == event.id
+    assert retry.status == "received"
+    assert retry.error_message is None
+    assert retry.processed_at is None
+    assert record_event(db_session, mock_normalized_event, None) is None
 
 def test_status_transitions(db_session: Session, mock_normalized_event: NormalizedWebhookEvent):
     event = record_event(db_session, mock_normalized_event, None)
@@ -296,7 +314,7 @@ def test_process_webhook_event_analyzes_pull_request(db_session, monkeypatch):
         nonlocal fake_run_analyzer_called
         assert analyzer_key == "pull_request"
         fake_run_analyzer_called = True
-        return []
+        return SimpleNamespace(status="success")
 
     monkeypatch.setattr(monitor_service, "run_analyzer", fake_run_analyzer)
 

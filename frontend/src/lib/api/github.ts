@@ -19,9 +19,10 @@ async function fetchClient(endpoint: string, options: RequestInit = {}) {
     return fetch(`${API_URL}${endpoint}`, mergedOptions);
 }
 
-export async function startInstall(): Promise<{ install_url: string } | null> {
+export async function startInstall(connectionId?: string): Promise<{ install_url: string } | null> {
     try {
-        const res = await fetchClient("/api/v1/github/install/start");
+        const query = connectionId ? `?connection_id=${encodeURIComponent(connectionId)}` : "";
+        const res = await fetchClient(`/api/v1/github/install/start${query}`);
         if (!res.ok) {
             console.error("startInstall failed with status:", res.status);
             return null;
@@ -38,23 +39,18 @@ export async function completeInstall(params: {
     setup_action: string;
     state: string;
 }): Promise<GitHubConnection | null> {
-    try {
-        const urlParams = new URLSearchParams({
-            installation_id: params.installation_id,
-            setup_action: params.setup_action,
-            state: params.state,
-        });
+    const urlParams = new URLSearchParams({
+        installation_id: params.installation_id,
+        setup_action: params.setup_action,
+        state: params.state,
+    });
 
-        const res = await fetchClient(`/api/v1/github/install/callback?${urlParams.toString()}`);
-        if (!res.ok) {
-            console.error("completeInstall failed with status:", res.status);
-            return null;
-        }
-        return await res.json() as GitHubConnection;
-    } catch (error) {
-        console.error("Network error during completeInstall:", error);
-        return null;
+    const res = await fetchClient(`/api/v1/github/install/callback?${urlParams.toString()}`);
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { detail?: string; error?: { message?: string } };
+        throw new Error(body.detail || body.error?.message || `GitHub connection failed (HTTP ${res.status}).`);
     }
+    return await res.json() as GitHubConnection;
 }
 
 export async function syncInstallation(installation_id: string): Promise<GitHubConnection | null> {

@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 from clerk_backend_api import Clerk
 from clerk_backend_api.security.types import AuthenticateRequestOptions
 from fastapi import Request
+from starlette.concurrency import run_in_threadpool
 
 from app.auth.context import AuthContext
 from app.auth.interfaces import AuthProvider
@@ -34,8 +35,8 @@ class ClerkAuthAdapter(AuthProvider):
     async def resolve_identity(self, request: Request) -> AuthContext | None:
         """Return the verified Clerk identity, or ``None`` on auth failure."""
         try:
-            state = self._clerk.authenticate_request(
-                request,
+            state = await run_in_threadpool(
+                self._clerk.authenticate_request, request,
                 AuthenticateRequestOptions(
                     jwt_key=self._jwt_key,
                     authorized_parties=self._authorized_parties,
@@ -54,7 +55,7 @@ class ClerkAuthAdapter(AuthProvider):
             
         if not email:
             try:
-                user_obj = self._clerk.users.get(user_id=external_id)
+                user_obj = await run_in_threadpool(self._clerk.users.get, user_id=external_id)
                 if user_obj and user_obj.email_addresses:
                     email = user_obj.email_addresses[0].email_address
             except Exception:

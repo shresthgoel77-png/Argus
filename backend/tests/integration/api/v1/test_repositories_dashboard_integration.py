@@ -18,6 +18,20 @@ async def test_get_dashboard_overview(
 ):
 
     valid_repository = test_user_repository
+    valid_repository.monitoring_enabled = True
+    valid_repository.monitoring_status = "success"
+    valid_repository.monitoring_checks = {
+        name: {"status": "success", "error_message": None}
+        for name in (
+            "ci_cd",
+            "stale_issues",
+            "stale_prs",
+            "dependency",
+            "security",
+            "code_quality",
+            "health",
+        )
+    }
 
     # 1. Setup mock data for health, findings (needs_attention + counts), activity feed is implicit, AI sum
 
@@ -47,7 +61,7 @@ async def test_get_dashboard_overview(
     )
     f2 = Finding(
         repository_id=valid_repository.id,
-        category="ci_cd",
+        category="ci",
         type="fail",
         title="CI fail",
         description="desc",
@@ -86,6 +100,10 @@ async def test_get_dashboard_overview(
     
         # Struct check
         assert data["repository_id"] == str(valid_repository.id)
+        assert data["monitoring_status"] == "success"
+        assert set(data["monitoring_checks"]) == set(valid_repository.monitoring_checks)
+        assert all("checked_at" in check for check in data["monitoring_checks"].values())
+        assert "last_monitoring_at" in data
         
         assert data["health"]["overall_score"] == 85
         assert data["health"]["reasons"] == ["Good security score"]
@@ -109,3 +127,29 @@ async def test_get_dashboard_overview(
         # Explicit verifications
         mock_ai.assert_not_called()
         mock_github.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_incomplete_dashboard_retains_history_without_claiming_current_health(
+    authorized_client, db_session, test_user_repository
+):
+    test_user_repository.monitoring_status = "queued"
+    db_session.add(RepositoryHealthSnapshot(
+        repository_id=test_user_repository.id, overall_score=100,
+        category_scores={"security": 100}, reasons=["Initial health score computed."],
+    ))
+    db_session.commit()
+
+    response = await authorized_client.get(
+        f"/api/v1/repositories/{test_user_repository.id}/dashboard"
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["health"] is None
+    assert data["needs_attention"]["health_snapshot"] is None
+    assert data["needs_attention"]["reasons"] == []
+    assert any(item["summary"] == "Overall score: 100" for item in data["activity_feed"])
+    assert db_session.query(RepositoryHealthSnapshot).filter_by(
+        repository_id=test_user_repository.id
+    ).count() == 1

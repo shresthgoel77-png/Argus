@@ -54,8 +54,9 @@ def add_connection(db_session, test_user, *, status="valid"):
 
 
 class StubProvider:
-    def __init__(self, *, api_key, db_session, result=None, error=None):
+    def __init__(self, *, api_key, model, db_session, result=None, error=None):
         assert api_key == API_KEY
+        assert model == "mock-model"
         self.db_session = db_session
         self.result = result
         self.error = error
@@ -236,6 +237,7 @@ def test_repository_summary_success_persists_repository_scoped_analysis(
         (),
         {
             "summary": "Repository summary",
+            "key_insights": ["Prioritize verified findings"],
             "confidence": 0.88,
             "recommendations": ["Address the critical finding"],
         },

@@ -21,5 +21,8 @@ export interface Repository {
     private: boolean;
     default_branch: string | null;
     monitoring_enabled: boolean;
+    monitoring_status?: string | null;
+    monitoring_checks?: Record<string, { status: string; error_message: string | null; checked_at: string | null }> | null;
+    last_monitoring_at?: string | null;
     created_at: string;
 }

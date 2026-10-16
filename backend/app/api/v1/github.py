@@ -21,11 +21,17 @@ import uuid
 router = APIRouter(prefix="/github", tags=["github"])
 
 @router.get("/install/start")
-async def start_installation(user: User = Depends(get_current_user)):
+async def start_installation(
+    connection_id: uuid.UUID | None = None,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """
     Generates a state token and returns the installation URL.
     """
-    state = generate_install_state(user.id)
+    if connection_id is not None:
+        get_connection_or_404(db, user.id, connection_id)
+    state = generate_install_state(user.id, connection_id)
     install_url = f"https://github.com/apps/{settings.github_app_slug}/installations/new?state={state}"
     return {"install_url": install_url}
 
@@ -84,7 +90,8 @@ async def installation_callback(
             db=db,
             user_id=user.id,
             installation_id=inst_id_int,
-            client=client
+            client=client,
+            reconnect_connection_id=uuid.UUID(payload["connection_id"]) if payload.get("connection_id") else None,
         )
 
     accept_header = request.headers.get("accept", "")

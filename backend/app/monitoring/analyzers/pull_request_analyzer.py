@@ -55,47 +55,33 @@ class PullRequestAnalyzer(BaseAnalyzer):
         return []
 
     async def scan_repository_for_stale_prs(
-        self,
-        db: Session,
-        repository: Repository,
-        client: GitHubAppClient
+        self, db: Session, repository: Repository, client: GitHubAppClient
     ) -> None:
-        prs = await client.list_repository_pulls(repository.full_name)
+        items = await client.list_repository_pulls(repository.full_name)
         now = datetime.now(timezone.utc)
         threshold = timedelta(days=settings.stale_pr_days)
-
-        for pr in prs:
-            updated_at_str = pr.get("updated_at")
-            if not updated_at_str:
-                continue
-
-            updated_at = datetime.fromisoformat(
-                updated_at_str.replace("Z", "+00:00")
-            )
+        drafts = []
+        # Validate the entire response before persisting or resolving anything.
+        for item in items:
+            if (not isinstance(item, dict) or type(item.get("number")) is not int
+                    or not item.get("updated_at") or not item.get("html_url")):
+                raise ValueError("GitHub returned incomplete pull requests evidence")
+            updated_at = datetime.fromisoformat(item["updated_at"].replace("Z", "+00:00"))
+            if updated_at.tzinfo is None:
+                raise ValueError("GitHub returned a timestamp without a timezone")
             if now - updated_at > threshold:
-                pr_number = pr.get("number")
-                fingerprint = f"stale_pull_request_{pr_number}"
-                title = f"Stale Pull Request #{pr_number}"
-                description = (
-                    f"Pull Request #{pr_number} has been "
-                    f"stale for over {settings.stale_pr_days} days."
-                )
-
-                evidence = {
-                    "pull_request_url": pr.get("html_url"),
-                    "pull_request_number": pr_number,
-                    "updated_at": updated_at.isoformat(),
-                }
-
-                finding_service.create_finding(
-                    db,
-                    repository_id=repository.id,
-                    category=self.category,
-                    type_="stale_pull_request",
-                    title=title,
-                    description=description,
+                number = item["number"]
+                drafts.append(FindingDraft(
+                    category=self.category, type_="stale_pull_request",
+                    title=f"Stale Pull Request #{number}",
+                    description=f"Pull Request #{number} has been stale for over {settings.stale_pr_days} days.",
                     severity="info",
-                    source=f"repository_scan:{self.key}",
-                    evidence=evidence,
-                    fingerprint=fingerprint,
-                )
+                    evidence={"pull_request_url": item["html_url"], "pull_request_number": number,
+                              "updated_at": updated_at.isoformat()},
+                    fingerprint=f"stale_pull_request_{number}",
+                ))
+        finding_service.sync_findings_for_run(
+            db, repository_id=repository.id, category=self.category,
+            analyzer_key=self.key, drafts=drafts,
+            source=f"repository_scan:{self.key}", finding_type="stale_pull_request",
+        )

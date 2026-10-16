@@ -14,6 +14,7 @@ from app.models.repository import Repository
 from app.models.github_connection import GitHubConnection
 from app.monitoring.analyzer_base import FindingDraft
 from app.services import finding_lifecycle_service, notification_dispatch_service
+from app.services.health_score_service import HEALTH_CATEGORY_TO_FINDING_CATEGORIES
 from app.services.priority_service import compute_priority
 
 logger = get_logger(__name__)
@@ -63,6 +64,7 @@ def _create_or_update_finding(
     source: str,
     evidence: dict[str, Any],
     fingerprint: str | None,
+    commit: bool = True,
 ) -> tuple[Finding, bool]:
     """Insert a finding, or update the open row when the DB constraint wins."""
     priority = compute_priority(category=category, severity=severity)
@@ -73,18 +75,24 @@ def _create_or_update_finding(
             .filter(
                 Finding.repository_id == repository_id,
                 Finding.fingerprint == fingerprint,
-                Finding.status == "open",
+                Finding.status.in_(["open", "acknowledged", "ignored"]),
             )
             .first()
         )
         if existing:
+            if existing.status == "ignored":
+                return existing, False
             existing.title = title
             existing.description = description
-            existing.evidence = evidence
+            issue_state = existing.evidence.get("_github_issue")
+            existing.evidence = {**evidence, **({"_github_issue": issue_state} if issue_state else {})}
             existing.severity = severity
             existing.priority = priority
             existing.updated_at = datetime.now(timezone.utc)
-            db.commit()
+            if commit:
+                db.commit()
+            else:
+                db.flush()
             db.refresh(existing)
             return existing, False
 
@@ -101,10 +109,32 @@ def _create_or_update_finding(
         fingerprint=fingerprint,
     )
 
-    db.add(finding)
-    db.commit()
+    try:
+        # A concurrent webhook/scan may win the open-fingerprint unique index.
+        with db.begin_nested():
+            db.add(finding)
+            db.flush()
+    except IntegrityError:
+        if fingerprint is None:
+            raise
+        existing = db.query(Finding).filter(
+            Finding.repository_id == repository_id,
+            Finding.fingerprint == fingerprint,
+            Finding.status == "open",
+        ).first()
+        if existing is None:
+            raise
+        return _create_or_update_finding(
+            db, repository_id=repository_id, category=category, type_=type_,
+            title=title, description=description, severity=severity,
+            source=source, evidence=evidence, fingerprint=fingerprint, commit=commit,
+        )
+    if commit:
+        db.commit()
+    else:
+        db.flush()
     db.refresh(finding)
-    if finding.severity in ("critical", "high"):
+    if commit and finding.severity in ("critical", "high"):
         _trigger_finding_notification(db, finding)
     return finding, True
 
@@ -144,54 +174,68 @@ def sync_findings_for_run(
     category: str,
     analyzer_key: str,
     drafts: list[FindingDraft],
+    source: str | None = None,
+    finding_type: str | None = None,
 ) -> SyncResult:
     """Synchronize findings reported by a full-state analyzer run."""
     result = SyncResult()
     touched_fingerprints: set[str] = set()
-    source = f"on_demand:{analyzer_key}"
+    source = source or f"on_demand:{analyzer_key}"
 
-    for draft in drafts:
-        finding, created = _create_or_update_finding(
-            db,
-            repository_id=repository_id,
-            category=category,
-            type_=draft.type_,
-            title=draft.title,
-            description=draft.description,
-            severity=draft.severity,
-            source=source,
-            evidence=draft.evidence,
-            fingerprint=draft.fingerprint,
+    with db.begin_nested():
+        notifications = []
+        for draft in drafts:
+            finding, created = _create_or_update_finding(
+                db,
+                repository_id=repository_id,
+                category=category,
+                type_=draft.type_,
+                title=draft.title,
+                description=draft.description,
+                severity=draft.severity,
+                source=source,
+                evidence=draft.evidence,
+                fingerprint=draft.fingerprint, commit=False,
+            )
+            if finding.status == "ignored":
+                result.skipped_ignored += 1
+            elif created:
+                result.created += 1
+                if finding.severity in ("critical", "high"):
+                    notifications.append(finding)
+            else:
+                result.updated += 1
+            if finding.fingerprint is not None:
+                touched_fingerprints.add(finding.fingerprint)
+
+        missing_filters = [
+            Finding.repository_id == repository_id,
+            Finding.category == category,
+            Finding.source == source,
+            Finding.fingerprint.is_not(None),
+        ]
+        if finding_type is not None:
+            missing_filters.append(Finding.type == finding_type)
+        if touched_fingerprints:
+            missing_filters.append(~Finding.fingerprint.in_(touched_fingerprints))
+
+        missing_open = (
+            db.query(Finding)
+            .filter(*missing_filters, Finding.status.in_(["open", "acknowledged"]))
+            .all()
         )
-        if created:
-            result.created += 1
-        else:
-            result.updated += 1
-        if finding.fingerprint is not None:
-            touched_fingerprints.add(finding.fingerprint)
+        for finding in missing_open:
+            finding_lifecycle_service.auto_resolve_finding(db, finding, commit=False)
+            result.auto_resolved += 1
 
-    missing_filters = [
-        Finding.repository_id == repository_id,
-        Finding.category == category,
-        Finding.fingerprint.is_not(None),
-    ]
-    if touched_fingerprints:
-        missing_filters.append(~Finding.fingerprint.in_(touched_fingerprints))
-
-    missing_open = (
-        db.query(Finding)
-        .filter(*missing_filters, Finding.status == "open")
-        .all()
-    )
-    for finding in missing_open:
-        finding_lifecycle_service.auto_resolve_finding(db, finding)
-        result.auto_resolved += 1
-
-    result.skipped_ignored = (
-        db.query(Finding)
-        .filter(*missing_filters, Finding.status == "ignored")
-        .count()
-    )
+        result.skipped_ignored += (
+            db.query(Finding)
+            .filter(*missing_filters, Finding.status == "ignored")
+            .count()
+        )
+    db.commit()
+    for finding in notifications:
+        _trigger_finding_notification(db, finding)
     return result
 
 
@@ -205,7 +249,11 @@ def list_findings_for_repository(
     """List findings for a repository, optionally filtered by category."""
     query = db.query(Finding).filter(Finding.repository_id == repository_id)
     if category is not None:
-        query = query.filter(Finding.category == category)
+        mapped_categories = HEALTH_CATEGORY_TO_FINDING_CATEGORIES.get(category)
+        if mapped_categories is None:
+            query = query.filter(Finding.category == category)
+        else:
+            query = query.filter(Finding.category.in_(mapped_categories))
     return query.order_by(desc(Finding.detected_at)).limit(limit).all()
 
 
@@ -235,7 +283,11 @@ def list_findings(
     if repository_id is not None:
         query = query.filter(Finding.repository_id == repository_id)
     if category is not None:
-        query = query.filter(Finding.category == category)
+        mapped_categories = HEALTH_CATEGORY_TO_FINDING_CATEGORIES.get(category)
+        if mapped_categories is None:
+            query = query.filter(Finding.category == category)
+        else:
+            query = query.filter(Finding.category.in_(mapped_categories))
     if severity is not None:
         query = query.filter(Finding.severity == severity)
     if priority is not None:

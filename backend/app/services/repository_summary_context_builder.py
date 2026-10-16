@@ -46,8 +46,9 @@ def build_repository_summary_context(db: Session, repository_id: uuid.UUID) -> R
     safe_repo_name = truncate(repo.full_name, 200)
     parts.append(f"Repository Name: {safe_repo_name}")
     parts.append(f"Monitoring Enabled: {repo.monitoring_enabled}")
+    parts.append(f"Assessment Status: {repo.monitoring_status}")
 
-    if attention.health_snapshot:
+    if repo.monitoring_status == "success" and attention.health_snapshot:
         parts.append(f"Overall Health Score: {attention.health_snapshot.overall_score}")
         parts.append(f"Category Scores: {attention.health_snapshot.category_scores}")
         # Truncate each reason and limit to 10
@@ -55,6 +56,10 @@ def build_repository_summary_context(db: Session, repository_id: uuid.UUID) -> R
         parts.append(f"Health Reasons:\n" + "\n".join(f"- {r}" for r in safe_reasons))
     else:
         parts.append("Overall Health Score: N/A")
+        parts.append(
+            "A complete current health assessment is unavailable. "
+            "An absence of findings does not establish that the repository is healthy."
+        )
 
     if attention.findings:
         parts.append("Top Findings:")

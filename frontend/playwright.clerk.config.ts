@@ -1,19 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
-import fs from "fs";
 import path from "path";
+import fs from "fs";
+import { parseEnv } from "node:util";
 
 try {
-    const envPath = path.resolve(__dirname, ".env");
-    const envContent = fs.readFileSync(envPath, "utf8");
-    for (const line of envContent.split("\n")) {
-        if (line.includes("=")) {
-            const parts = line.split("=");
-            const key = parts[0].trim();
-            const val = parts.slice(1).join("=").trim().replace(/"/g, '');
-            process.env[key] = val;
-        }
-    }
-} catch (e) { }
+    // Node's parser preserves multiline PEMs and existing environment overrides.
+    process.loadEnvFile(path.resolve(__dirname, ".env"));
+} catch { /* Required values below fail clearly if configuration is absent. */ }
 
 const requiredEnvironment = [
     "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
@@ -33,7 +26,22 @@ const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 const clerkSecretKey = process.env.CLERK_SECRET_KEY!;
 const databaseUrl = process.env.CLERK_E2E_DATABASE_URL!;
 
+// Read backend-only secrets into the backend child environment, never process.env.
+const backendEnvPath = path.resolve(__dirname, "../backend/.env");
+const backendFileEnvironment = fs.existsSync(backendEnvPath)
+    ? parseEnv(fs.readFileSync(backendEnvPath, "utf8")) : {};
+const databaseIdentity = (url: string) => url.startsWith("sqlite:///")
+    ? path.resolve(__dirname, "../backend", url.slice("sqlite:///".length)).toLowerCase() : url;
+if (backendFileEnvironment.DATABASE_URL && databaseIdentity(databaseUrl) === databaseIdentity(backendFileEnvironment.DATABASE_URL)) {
+    throw new Error("Clerk E2E requires a separate disposable database, not the application database.");
+}
+const requiredBackendEnvironment = [
+    "GITHUB_APP_ID", "GITHUB_APP_SLUG", "GITHUB_APP_PRIVATE_KEY",
+    "GITHUB_APP_WEBHOOK_SECRET", "AI_CREDENTIAL_ENCRYPTION_KEY",
+] as const;
+
 const backendEnvironment: Record<string, string> = {
+    ...backendFileEnvironment,
     ...Object.fromEntries(
         Object.entries(process.env).filter(([, value]) => value !== undefined),
     ),
@@ -42,14 +50,11 @@ const backendEnvironment: Record<string, string> = {
     DATABASE_URL: databaseUrl,
     CLERK_SECRET_KEY: clerkSecretKey,
     CLERK_AUTHORIZED_PARTIES: "http://localhost:3005",
-    GITHUB_APP_ID: process.env.GITHUB_APP_ID || "12345",
-    GITHUB_APP_SLUG: process.env.GITHUB_APP_SLUG || "clerk-e2e-test",
-    GITHUB_APP_PRIVATE_KEY: process.env.GITHUB_APP_PRIVATE_KEY || "test-pem",
-    GITHUB_APP_WEBHOOK_SECRET: process.env.GITHUB_APP_WEBHOOK_SECRET || "test-secret",
-    AI_CREDENTIAL_ENCRYPTION_KEY:
-        process.env.AI_CREDENTIAL_ENCRYPTION_KEY ||
-        "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
 };
+for (const name of requiredBackendEnvironment) {
+    if (!backendEnvironment[name]) throw new Error(`Clerk E2E requires ${name} to be configured.`);
+}
+
 delete backendEnvironment.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 delete backendEnvironment.CLERK_E2E_EMAIL;
 delete backendEnvironment.CLERK_E2E_PASSWORD;
@@ -83,17 +88,17 @@ export default defineConfig({
     },
     webServer: [
         {
-            command: ".\\venv\\Scripts\\python.exe -m alembic upgrade head && .\\venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8005",
+            command: ".\\venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8005",
             cwd: "../backend",
             url: "http://localhost:8005/api/v1/health",
-            reuseExistingServer: false,
+            reuseExistingServer: true,
             timeout: 120_000,
             env: backendEnvironment,
         },
         {
             command: "npm run dev -- -p 3005",
             url: "http://localhost:3005",
-            reuseExistingServer: false,
+            reuseExistingServer: true,
             timeout: 120_000,
             env: frontendEnvironment,
         },

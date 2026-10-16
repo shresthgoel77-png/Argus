@@ -78,8 +78,8 @@ async def test_analyzer_github_auth_error(dependency_analyzer, mock_context):
         "403 Forbidden"
     )
 
-    findings = await dependency_analyzer.analyze(mock_context)
-    assert len(findings) == 0
+    with pytest.raises(GitHubAuthError):
+        await dependency_analyzer.analyze(mock_context)
 
 
 @pytest.mark.asyncio

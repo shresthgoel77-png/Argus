@@ -15,6 +15,15 @@ FINDING_CATEGORY_TO_HEALTH_CATEGORY = {
     "repository_activity": "ci_cd"
 }
 
+HEALTH_CATEGORY_TO_FINDING_CATEGORIES = {
+    "ci_cd": ("ci", "repository_activity"),
+    "dependencies": ("dependency",),
+    "security": ("security",),
+    "issues": ("issue",),
+    "pull_requests": ("pull_request",),
+    "code_quality": ("code_quality",),
+}
+
 HEALTH_CATEGORIES = [
     "ci_cd", 
     "dependencies", 

@@ -1,4 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const envPath = path.resolve(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+    for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
+        const match = line.match(/^\s*([^#=]+)\s*=\s*(.*)\s*$/);
+        if (match && !process.env[match[1]]) {
+            process.env[match[1]] = match[2].replace(/^["']|["']$/g, '');
+        }
+    }
+}
 
 export default defineConfig({
     testDir: './e2e',
@@ -23,18 +35,12 @@ export default defineConfig({
             url: 'http://localhost:8000/api/v1/health',
             reuseExistingServer: true,
             timeout: 120000,
-            env: {
-                AUTH_PROVIDER: "development"
-            }
         },
         {
             command: 'npm run dev',
             url: 'http://localhost:3000',
             reuseExistingServer: true,
             timeout: 120000,
-            env: {
-                NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ""
-            }
         }
     ],
 });

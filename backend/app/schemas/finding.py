@@ -37,3 +37,15 @@ class FindingListResponse(BaseModel):
 
 class FindingStatusUpdateRequest(BaseModel):
     status: Literal["acknowledged", "resolved", "ignored", "open"]
+
+
+class FindingIssuePreview(BaseModel):
+    repository: str
+    title: str
+    body: str
+    preview_token: str
+
+
+class FindingIssueCreateRequest(BaseModel):
+    approved: Literal[True]
+    preview_token: str

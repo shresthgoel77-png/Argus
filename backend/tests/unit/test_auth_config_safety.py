@@ -36,7 +36,7 @@ _PROD_EXTRAS = dict(
 
 def test_production_rejects_development_auth(monkeypatch):
     monkeypatch.delenv("CORS_ORIGINS", raising=False)
-    with pytest.raises((ValueError, ValidationError), match="Development auth provider"):
+    with pytest.raises((ValueError, ValidationError), match="auth_provider"):
         Settings(
             app_env="production",
             auth_provider="development",
@@ -73,21 +73,18 @@ def test_production_accepts_clerk_with_jwt_key(monkeypatch):
     assert s.auth_provider == "clerk"
 
 
-# ── Scenario 3: development/test + development → accept ──
+# ── Scenario 3: Clerk is the only configured application provider ──
 
 
-def test_development_env_allows_development_auth(monkeypatch):
+def test_clerk_is_the_default_provider():
+    s = Settings(app_env="development", **_BASE)
+    assert s.auth_provider == "clerk"
+
+
+def test_development_provider_is_rejected(monkeypatch):
     monkeypatch.delenv("CORS_ORIGINS", raising=False)
-    s = Settings(app_env="development", auth_provider="development", **_BASE)
-    assert s.app_env == "development"
-    assert s.auth_provider == "development"
-
-
-def test_test_env_allows_development_auth(monkeypatch):
-    monkeypatch.delenv("CORS_ORIGINS", raising=False)
-    s = Settings(app_env="test", auth_provider="development", **_BASE)
-    assert s.app_env == "test"
-    assert s.auth_provider == "development"
+    with pytest.raises((ValueError, ValidationError), match="auth_provider"):
+        Settings(app_env="development", auth_provider="development", **_BASE)
 
 
 # ── Scenario 4: production + clerk + missing config → fail-closed ──

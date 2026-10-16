@@ -8,7 +8,11 @@ from app.schemas.finding import (
     FindingResponse,
     FindingListResponse,
     FindingStatusUpdateRequest,
+    FindingIssuePreview,
+    FindingIssueCreateRequest,
 )
+from app.schemas.repository import GitHubWorkItem
+from app.services import finding_issue_service
 from app.services.finding_service import list_findings, get_finding_or_404
 from app.services import finding_lifecycle_service
 from app.services.finding_lifecycle_service import InvalidFindingTransition
@@ -22,13 +26,36 @@ from app.schemas.ai_analysis import (
 
 router = APIRouter(prefix="/findings", tags=["findings"])
 
+
+@router.get("/{finding_id}/issue-preview", response_model=FindingIssuePreview)
+def preview_finding_issue(
+    finding_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    finding = get_finding_or_404(db, user.id, finding_id)
+    return finding_issue_service.preview_issue(finding)
+
+
+@router.post("/{finding_id}/issue", response_model=GitHubWorkItem)
+async def create_finding_issue(
+    finding_id: uuid.UUID,
+    request: FindingIssueCreateRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return await finding_issue_service.create_issue(
+        db, user_id=user.id, finding_id=finding_id, preview_token=request.preview_token,
+    )
+
 @router.get("", response_model=FindingListResponse)
 def get_user_findings(
     repository_id: uuid.UUID | None = None,
     category: str | None = None,
     severity: str | None = None,
     priority: str | None = None,
-    status_: str | None = None,
+    status_: str | None = Query(default=None, alias="status"),
+    legacy_status: str | None = Query(default=None, alias="status_", include_in_schema=False),
     limit: int = Query(default=50, ge=1, le=100),
     cursor: str | None = None,
     user: User = Depends(get_current_user),
@@ -43,7 +70,7 @@ def get_user_findings(
             category=category,
             severity=severity,
             priority=priority,
-            status=status_,
+            status=status_ if status_ is not None else legacy_status,
             limit=limit,
             cursor=cursor
         )

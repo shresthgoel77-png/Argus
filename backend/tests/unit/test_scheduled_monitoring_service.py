@@ -22,6 +22,26 @@ def monitoring_mocks():
     client = MagicMock()
     client.__aenter__ = AsyncMock(return_value=client)
     client.__aexit__ = AsyncMock(return_value=None)
+    client.list_repository_workflow_runs = AsyncMock(
+        return_value=[
+            {
+                "workflow_id": 1,
+                "id": 10,
+                "status": "completed",
+                "conclusion": "success",
+            }
+        ]
+    )
+    client.list_repository_workflow_runs = AsyncMock(
+        return_value=[
+            {
+                "workflow_id": 1,
+                "id": 10,
+                "status": "completed",
+                "conclusion": "success",
+            }
+        ]
+    )
 
     issue_analyzer = MagicMock()
     issue_analyzer.scan_repository_for_stale_issues = AsyncMock()
@@ -71,6 +91,7 @@ async def test_all_monitoring_checks_run_for_healthy_repository(
         "dependency",
         "security",
         "code_quality",
+        "ci_cd",
         "health",
     }
     assert all(check.status == "success" for check in result.checks.values())
@@ -123,6 +144,9 @@ async def test_monitoring_check_failure_does_not_block_remaining_checks(
     assert result.checks["stale_issues"].error_message == (
         "The check could not be completed."
     )
+    assert result.checks["stale_issues"].checked_at is not None
+    assert enabled_repository.monitoring_checks["stale_issues"]["status"] == "failed"
+    assert enabled_repository.monitoring_status == "partial_failure"
     assert all(
         result.checks[name].status == "success"
         for name in result.checks
@@ -177,6 +201,7 @@ async def test_monitoring_service_never_raises_when_a_check_fails(
         "dependency",
         "security",
         "code_quality",
+        "ci_cd",
         "health",
     }
     assert result.checks["stale_issues"].status == "success"
@@ -222,7 +247,7 @@ async def test_monitoring_logs_reuse_one_correlation_id(
         )
 
     log_calls = [*logger.info.call_args_list, *logger.error.call_args_list]
-    assert len(log_calls) == 8
+    assert len(log_calls) == 9
     assert {
         call.kwargs["extra"]["correlation_id"] for call in log_calls
     } == {result.correlation_id}

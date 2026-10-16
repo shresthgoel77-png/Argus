@@ -20,7 +20,7 @@ const PAGE_SIZE = 20;
 const STATUSES: FindingStatus[] = ["open", "acknowledged", "resolved", "ignored"];
 const SEVERITIES: Severity[] = ["critical", "high", "medium", "low", "info"];
 const PRIORITIES = ["critical", "high", "medium", "low"] as const;
-const CATEGORIES = ["security", "performance", "code_quality", "maintenance"] as const;
+const CATEGORIES = ["ci_cd", "dependencies", "security", "issues", "pull_requests", "code_quality"] as const;
 
 type Filters = { category: string; severity: string; priority: string; status: string };
 const initialFilters: Filters = { category: "", severity: "", priority: "", status: "" };
@@ -60,6 +60,7 @@ export default function FindingsPage() {
     const [cursors, setCursors] = React.useState<(string | undefined)[]>([undefined]);
     const [retryKey, setRetryKey] = React.useState(0);
     const [selectedFinding, setSelectedFinding] = React.useState<FindingResponse | null>(null);
+    const currentCursor = cursors[pageIndex];
 
     const handleUpdateFinding = (updated: FindingResponse) => {
         setResult((current) => {
@@ -76,7 +77,7 @@ export default function FindingsPage() {
         let active = true;
         async function fetchFindings() {
             setIsLoading(true); setError(false);
-            const cursor = cursors[pageIndex];
+            const cursor = currentCursor;
             const params: Record<string, string> = { limit: PAGE_SIZE.toString() };
             if (cursor) params.cursor = cursor;
             if (filters.category) params.category = filters.category;
@@ -97,7 +98,7 @@ export default function FindingsPage() {
         }
         void fetchFindings();
         return () => { active = false; };
-    }, [filters, pageIndex, cursors, retryKey]);
+    }, [filters, pageIndex, currentCursor, retryKey]);
 
     React.useEffect(() => {
         let active = true;

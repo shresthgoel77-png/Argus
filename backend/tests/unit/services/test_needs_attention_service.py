@@ -65,6 +65,7 @@ def test_get_needs_attention_no_snapshot(db_session, test_user_repository):
 
 
 def test_get_needs_attention_with_snapshot_and_limit(db_session, test_user_repository):
+    test_user_repository.monitoring_status = "success"
     add_finding(db_session, test_user_repository, "security", {}, severity="high")
     add_finding(db_session, test_user_repository, "security", {}, severity="critical")
     add_finding(db_session, test_user_repository, "security", {}, severity="high")
@@ -76,6 +77,18 @@ def test_get_needs_attention_with_snapshot_and_limit(db_session, test_user_repos
     assert result.findings[1].severity == "high"
     assert result.health_snapshot is not None
     assert result.reasons == ["Bad things"]
+
+
+@pytest.mark.parametrize("status", ["queued", "running", "failed", "partial_failure"])
+def test_historical_snapshot_is_not_current_attention_health(db_session, test_user_repository, status):
+    test_user_repository.monitoring_status = status
+    snapshot = add_snapshot(db_session, test_user_repository, ["Historical score"])
+
+    result = get_needs_attention(db_session, test_user_repository.id)
+
+    assert result.health_snapshot is None
+    assert result.reasons == []
+    assert db_session.query(RepositoryHealthSnapshot).filter_by(id=snapshot.id).count() == 1
 
 
 def test_get_needs_attention_priority_ordering(db_session, test_user_repository):

@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -11,6 +13,7 @@ from app.core.exceptions import AppError
 from app.core.rate_limit import ApiRateLimitMiddleware
 from app.integrations.ai import register_provider
 from app.integrations.ai.gemini_provider import GeminiProvider
+from app.services.scheduled_monitoring_service import resume_queued_initial_assessments
 
 logger = get_logger(__name__)
 
@@ -38,6 +41,10 @@ async def startup_event():
     configure_logging()
     register_provider(GeminiProvider.key, GeminiProvider)
     logger.info("Application starting up...")
+    if settings.app_env != "test":
+        app.state.initial_assessment_recovery = asyncio.create_task(
+            asyncio.to_thread(resume_queued_initial_assessments)
+        )
 
 app.add_middleware(
     CORSMiddleware,

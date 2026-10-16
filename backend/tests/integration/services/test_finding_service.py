@@ -125,7 +125,7 @@ def test_sync_findings_for_run_auto_resolves_missing(db_session, repo_for_findin
         title="Missing",
         description="Missing",
         severity="high",
-        source="scanner",
+        source="on_demand:security",
         evidence={},
         fingerprint="missing",
     )
@@ -154,7 +154,7 @@ def test_sync_findings_for_run_leaves_ignored_missing_finding_untouched(
         title="Ignored",
         description="Ignored",
         severity="high",
-        source="scanner",
+        source="on_demand:security",
         evidence={},
         fingerprint="ignored",
     )
@@ -243,6 +243,13 @@ def test_list_findings_for_repository(db_session, repo_for_findings):
         evidence={}
     )
 
+    # SQLite server timestamps have second precision; give rows explicit chronology.
+    from app.models.finding import Finding
+    from datetime import datetime, timedelta
+    for index, title in enumerate(["Secret 1", "Quality 1", "Secret 2"]):
+        row = db_session.query(Finding).filter_by(repository_id=repo_for_findings.id, title=title).one()
+        row.detected_at = datetime(2026, 1, 1) + timedelta(seconds=index)
+    db_session.commit()
     findings = list_findings_for_repository(db_session, repo_for_findings.id, limit=2)
     assert len(findings) == 2
     # newest first

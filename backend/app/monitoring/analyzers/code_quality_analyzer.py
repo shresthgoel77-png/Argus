@@ -23,7 +23,7 @@ class CodeQualityAnalyzer(BaseAnalyzer):
 
     async def analyze(self, context: AnalyzerContext) -> list[FindingDraft]:
         if not context.client:
-            return []
+            raise RuntimeError("Branch protection scan requires a GitHub client")
             
         try:
             installation_id = context.repository.connection.installation_id
@@ -31,9 +31,7 @@ class CodeQualityAnalyzer(BaseAnalyzer):
                 installation_id, context.repository.full_name, context.repository.default_branch
             )
         except GitHubAuthError:
-            # 403 on client fetch -> treated as "skipped due to permissions," not a crash.
-            # This most likely reflects the GitHub App's granted permission level, not an actual security posture.
-            return []
+            raise
 
         if protection is None:
             # 404 naturally returns None from client.py get_branch_protection

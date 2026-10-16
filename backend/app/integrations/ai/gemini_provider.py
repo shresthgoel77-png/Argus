@@ -26,6 +26,17 @@ BOT_RESPONSE_SCHEMA = {
     "required": ["answer_text", "confidence"],
 }
 
+REPOSITORY_SUMMARY_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "summary": {"type": "STRING"},
+        "key_insights": {"type": "ARRAY", "items": {"type": "STRING"}},
+        "recommendations": {"type": "ARRAY", "items": {"type": "STRING"}},
+        "confidence": {"type": "NUMBER"},
+    },
+    "required": ["summary", "key_insights", "recommendations", "confidence"],
+}
+
 
 class GeminiProvider(BaseAIProvider):
     key = "gemini"
@@ -47,8 +58,15 @@ class GeminiProvider(BaseAIProvider):
     ]
     DEFAULT_MODEL = "gemini-3.8-flash"
 
-    def __init__(self, client: GeminiClient | None = None, *, api_key: str | None = None) -> None:
+    def __init__(
+        self,
+        client: GeminiClient | None = None,
+        *,
+        api_key: str | None = None,
+        model: str | None = None,
+    ) -> None:
         self._client = client or GeminiClient(api_key=api_key)
+        self._model = model or self.DEFAULT_MODEL
 
     def validate_api_key(self, api_key: str) -> None:
         self._client.validate_api_key(api_key)
@@ -56,7 +74,7 @@ class GeminiProvider(BaseAIProvider):
     def generate_analysis(self, context: FindingContext) -> StructuredAnalysisResult:
         try:
             response = self._client.generate_content(
-                model=self.DEFAULT_MODEL,
+                model=self._model,
                 system_instructions=context.system_instructions,
                 untrusted_content=context.untrusted_content,
             )
@@ -72,9 +90,10 @@ class GeminiProvider(BaseAIProvider):
     ) -> RepositorySummaryResult:
         try:
             response = self._client.generate_content(
-                model=self.DEFAULT_MODEL,
+                model=self._model,
                 system_instructions=context.system_instructions,
                 untrusted_content=context.untrusted_content,
+                response_schema=REPOSITORY_SUMMARY_SCHEMA,
             )
             generated_text = response["candidates"][0]["content"]["parts"][0]["text"]
             return RepositorySummaryResult.model_validate_json(generated_text)
@@ -92,7 +111,7 @@ class GeminiProvider(BaseAIProvider):
         )
         try:
             response = self._client.generate_content(
-                model=self.DEFAULT_MODEL,
+                model=self._model,
                 system_instructions=instructions,
                 untrusted_content=context.untrusted_content,
                 response_schema=BOT_RESPONSE_SCHEMA,

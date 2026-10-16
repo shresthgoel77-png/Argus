@@ -132,6 +132,18 @@ async def test_run_analyzer_full_state_uses_sync_result(db_session, test_user_re
 @pytest.mark.asyncio
 async def test_run_analyzer_success_computes_health(db_session, test_user_repository):
     test_user_repository.monitoring_enabled = True
+    test_user_repository.monitoring_status = "success"
+    test_user_repository.monitoring_checks = {
+        name: {"status": "success"}
+        for name in (
+            "ci_cd",
+            "stale_issues",
+            "stale_prs",
+            "dependency",
+            "security",
+            "code_quality",
+        )
+    }
     db_session.commit()
     
     # Pre-check
@@ -143,6 +155,64 @@ async def test_run_analyzer_success_computes_health(db_session, test_user_reposi
     
     snapshots = db_session.query(RepositoryHealthSnapshot).filter_by(repository_id=test_user_repository.id).all()
     assert len(snapshots) == 1
+    assert snapshots[0].category_scores["security"] == 80
+    assert snapshots[0].overall_score < 100
+
+
+@pytest.mark.asyncio
+async def test_permission_failure_never_resolves_full_state_findings(
+    db_session, test_user_repository, monkeypatch
+):
+    from app.integrations.github.exceptions import GitHubAuthError
+
+    test_user_repository.monitoring_enabled = True
+    db_session.add(
+        Finding(
+            repository_id=test_user_repository.id,
+            category="dependency",
+            type="missing_lockfile",
+            title="Existing dependency finding",
+            description="Existing open finding",
+            severity="medium",
+            status="open",
+            source="test",
+            evidence={},
+            fingerprint=f"dependency:{test_user_repository.id}:package.json",
+        )
+    )
+    db_session.commit()
+
+    class ForbiddenClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def get_repository_content(self, *args):
+            raise GitHubAuthError("permission denied", response_status=403)
+
+    monkeypatch.setattr(
+        "app.monitoring.monitor_service.GitHubAppClient",
+        lambda **kwargs: ForbiddenClient(),
+    )
+
+    result = await run_analyzer(
+        db_session, "dependency", test_user_repository
+    )
+
+    db_session.refresh(
+        db_session.query(Finding)
+        .filter(Finding.repository_id == test_user_repository.id)
+        .one()
+    )
+    finding = (
+        db_session.query(Finding)
+        .filter(Finding.repository_id == test_user_repository.id)
+        .one()
+    )
+    assert result.status == "failed"
+    assert finding.status == "open"
 
 
 @pytest.mark.asyncio

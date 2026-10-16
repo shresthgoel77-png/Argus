@@ -1,10 +1,12 @@
 import uuid
+from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 from app.schemas.health import HealthSnapshotResponse
 from app.schemas.finding import FindingResponse
 from app.schemas.activity import ActivityItem
 from app.schemas.ai_analysis import AIAnalysisResponse, AIAnalysisNotExists
 from app.schemas.trend import TrendResponse
+from app.schemas.repository import RepositoryCheckStatus
 
 class NeedsAttentionResponse(BaseModel):
     findings: list[FindingResponse]
@@ -21,3 +23,6 @@ class DashboardOverviewResponse(BaseModel):
     ai_summary: AIAnalysisResponse | AIAnalysisNotExists
     trends: TrendResponse
     finding_category_counts: dict[str, int]
+    monitoring_status: str
+    monitoring_checks: dict[str, RepositoryCheckStatus]
+    last_monitoring_at: datetime | None

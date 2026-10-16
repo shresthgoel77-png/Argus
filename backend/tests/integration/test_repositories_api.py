@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.db.session import get_db
+from app.auth.dependencies import get_current_user
 from app.models.user import User
 from app.models.github_connection import GitHubConnection
 from app.models.repository import Repository
@@ -17,6 +18,12 @@ def client(db_session):
         yield test_client
     app.dependency_overrides.clear()
 
+@pytest.fixture
+def authenticated_client(client, test_user):
+    app.dependency_overrides[get_current_user] = lambda: test_user
+    yield client
+    app.dependency_overrides.pop(get_current_user, None)
+
 
 def test_repositories_endpoints_unauthenticated(client):
     """
@@ -29,27 +36,19 @@ def test_repositories_endpoints_unauthenticated(client):
     assert client.post(f"/api/v1/repositories/{uuid.uuid4()}/refresh").status_code == 401
 
 
-def test_repositories_happy_path(client, db_session, monkeypatch):
+def test_repositories_happy_path(authenticated_client, db_session, test_user, monkeypatch):
     """
     Full happy path:
-    1. Dev Login
+    1. Use an isolated authenticated test-user override
     2. Create a connection manually
     3. List available repositories (with mock GitHub client)
     4. Add a repository
     5. List persisted repositories
     6. Toggle monitoring
     """
-    # 1. Login
-    res_login = client.post("/api/v1/auth/dev-login")
-    assert res_login.status_code == 200
-
-    # Get the user that was just created/logged in by dev-login
-    user_id = res_login.json()["id"]
-    user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
-    
     # 2. Setup connection
     connection = GitHubConnection(
-        user_id=user.id,
+        user_id=test_user.id,
         installation_id=12345,
         account_login="test_org",
         account_type="Organization"
@@ -59,6 +58,10 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
 
     # 3. List available repos
     class MockClient:
+        async def __aenter__(self):
+            return self
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
         async def list_installation_repositories(self):
             return [
                 {"id": 1001, "full_name": "test_org/repo1", "private": True, "default_branch": "main"},
@@ -71,7 +74,7 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
     monkeypatch.setattr("app.api.v1.github.GitHubAppClient", mock_init)
     monkeypatch.setattr("app.api.v1.repositories.GitHubAppClient", mock_init)
     
-    res_avail = client.get(f"/api/v1/github/connections/{connection.id}/repositories")
+    res_avail = authenticated_client.get(f"/api/v1/github/connections/{connection.id}/repositories")
     assert res_avail.status_code == 200
     avail_repos = res_avail.json()
     assert len(avail_repos) == 2
@@ -79,7 +82,7 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
     assert avail_repos[0]["already_added"] is False
 
     # 4. Add a repository
-    res_add = client.post("/api/v1/repositories", json={
+    res_add = authenticated_client.post("/api/v1/repositories", json={
         "connection_id": str(connection.id),
         "github_repo_id": 1001
     })
@@ -90,36 +93,38 @@ def test_repositories_happy_path(client, db_session, monkeypatch):
     repo_id = added_repo["id"]
 
     # 5. List persisted repositories
-    res_list = client.get("/api/v1/repositories")
+    res_list = authenticated_client.get("/api/v1/repositories")
     assert res_list.status_code == 200
     repos = res_list.json()
     assert len(repos) >= 1
     assert any(repo["id"] == repo_id for repo in repos)
     
     # Also verify that list_available returns already_added=True now
-    res_avail_after = client.get(f"/api/v1/github/connections/{connection.id}/repositories")
+    res_avail_after = authenticated_client.get(f"/api/v1/github/connections/{connection.id}/repositories")
     assert res_avail_after.status_code == 200
     assert res_avail_after.json()[0]["already_added"] is True
 
     # 6. Toggle monitoring
-    res_toggle = client.patch(f"/api/v1/repositories/{repo_id}", json={
+    from unittest.mock import Mock
+    start_assessment = Mock()
+    monkeypatch.setattr(
+        "app.api.v1.repositories.run_initial_assessment_in_background",
+        start_assessment,
+    )
+    res_toggle = authenticated_client.patch(f"/api/v1/repositories/{repo_id}", json={
         "monitoring_enabled": True
     })
     assert res_toggle.status_code == 200
     assert res_toggle.json()["monitoring_enabled"] is True
+    start_assessment.assert_called_once_with(repo_id)
 
 
-def test_repositories_ownership_protection(client, db_session, monkeypatch):
+def test_repositories_ownership_protection(authenticated_client, db_session, test_user, monkeypatch):
     """
     Verify that ownership is respected:
     Adding a repository via a connection owned by another user is rejected with 404.
     Toggling monitoring on another user's repository is rejected with 404.
     """
-    res_login = client.post("/api/v1/auth/dev-login")
-    # Current logged in dev user
-    user_id = res_login.json()["id"]
-    my_user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
-    
     # Create another user
     other_user = User(email="other@example.com", auth_provider="github", external_auth_id="gh_999")
     db_session.add(other_user)
@@ -136,11 +141,15 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
     db_session.commit()
     
     # Try to list available repositories for other user's connection
-    res_avail = client.get(f"/api/v1/github/connections/{other_conn.id}/repositories")
+    res_avail = authenticated_client.get(f"/api/v1/github/connections/{other_conn.id}/repositories")
     assert res_avail.status_code == 404
     
     # Try to add repository using other user's connection
     class MockClient:
+        async def __aenter__(self):
+            return self
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
         async def list_installation_repositories(self):
             return [{"id": 2001, "full_name": "other_org/repo1", "private": True, "default_branch": "main"}]
     def mock_init(*args, **kwargs):
@@ -148,7 +157,7 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
         
     monkeypatch.setattr("app.api.v1.repositories.GitHubAppClient", mock_init)
     
-    res_add = client.post("/api/v1/repositories", json={
+    res_add = authenticated_client.post("/api/v1/repositories", json={
         "connection_id": str(other_conn.id),
         "github_repo_id": 2001
     })
@@ -167,17 +176,13 @@ def test_repositories_ownership_protection(client, db_session, monkeypatch):
     db_session.commit()
     
     # Try to toggle monitoring on this other user's repository
-    res_toggle = client.patch(f"/api/v1/repositories/{other_repo.id}", json={"monitoring_enabled": True})
+    res_toggle = authenticated_client.patch(f"/api/v1/repositories/{other_repo.id}", json={"monitoring_enabled": True})
     assert res_toggle.status_code == 404
 
 
-def test_repository_refresh_happy_path(client, db_session, monkeypatch):
-    res_login = client.post("/api/v1/auth/dev-login")
-    user_id = res_login.json()["id"]
-    user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
-
+def test_repository_refresh_happy_path(authenticated_client, db_session, test_user, monkeypatch):
     connection = GitHubConnection(
-        user_id=user.id,
+        user_id=test_user.id,
         installation_id=123,
         account_login="test_org",
         account_type="Organization"
@@ -208,20 +213,16 @@ def test_repository_refresh_happy_path(client, db_session, monkeypatch):
         mock_run_checks
     )
 
-    res = client.post(f"/api/v1/repositories/{repo.id}/refresh")
+    res = authenticated_client.post(f"/api/v1/repositories/{repo.id}/refresh")
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "success"
     assert data["correlation_id"] == "test-corr"
 
 
-def test_repository_refresh_disabled(client, db_session):
-    res_login = client.post("/api/v1/auth/dev-login")
-    user_id = res_login.json()["id"]
-    user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
-
+def test_repository_refresh_disabled(authenticated_client, db_session, test_user):
     connection = GitHubConnection(
-        user_id=user.id,
+        user_id=test_user.id,
         installation_id=123,
         account_login="test_org",
         account_type="Organization"
@@ -238,15 +239,12 @@ def test_repository_refresh_disabled(client, db_session):
     db_session.add(repo)
     db_session.commit()
 
-    res = client.post(f"/api/v1/repositories/{repo.id}/refresh")
+    res = authenticated_client.post(f"/api/v1/repositories/{repo.id}/refresh")
     assert res.status_code == 400
     assert "not enabled" in res.json()["detail"]
 
 
-def test_repository_refresh_ownership_protection(client, db_session):
-    res_login = client.post("/api/v1/auth/dev-login")
-    user_id = res_login.json()["id"]
-    my_user = db_session.query(User).filter(User.id == uuid.UUID(user_id)).first()
+def test_repository_refresh_ownership_protection(authenticated_client, db_session):
     other_user = User(email="other@example.com", auth_provider="github", external_auth_id="gh_999")
     db_session.add(other_user)
     db_session.commit()
@@ -269,5 +267,5 @@ def test_repository_refresh_ownership_protection(client, db_session):
     db_session.add(other_repo)
     db_session.commit()
 
-    res = client.post(f"/api/v1/repositories/{other_repo.id}/refresh")
+    res = authenticated_client.post(f"/api/v1/repositories/{other_repo.id}/refresh")
     assert res.status_code == 404

@@ -81,9 +81,22 @@ class GitHubAuthError(GitHubAPIError):
         self.response_status = response_status
         AppError.__init__(
             self,
-            code="github_auth_error",
+            code="github_permission_error" if response_status == 403 else "github_auth_error",
             message=message,
-            status_code=401,
+            status_code=403 if response_status == 403 else 502,
+        )
+
+
+class GitHubInstallationError(GitHubAPIError):
+    """The configured App cannot authenticate the stored installation."""
+
+    def __init__(self, installation_id: int):
+        self.response_status = 404
+        AppError.__init__(
+            self, code="github_installation_unavailable", status_code=409,
+            message=(f"GitHub installation {installation_id} is unavailable to the configured App. "
+                     "In Settings, reconnect the same GitHub account and include this repository. "
+                     "Existing records have been preserved; do not substitute another account's installation."),
         )
 
 

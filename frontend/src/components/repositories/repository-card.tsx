@@ -23,13 +23,17 @@ function getScoreVariant(score: number) {
 }
 
 export function RepositoryCard({ repository, onToggle }: RepositoryCardProps) {
+    const monitoringStatus = repository.monitoring_status ?? "unknown";
     const [isPending, setIsPending] = React.useState(false);
+    const [toggleError, setToggleError] = React.useState<string | null>(null);
     const [health, setHealth] = React.useState<RepositoryHealthSnapshot | null>(null);
-    const [isLoadingHealth, setIsLoadingHealth] = React.useState(repository.monitoring_enabled);
+    const [isLoadingHealth, setIsLoadingHealth] = React.useState(
+        repository.monitoring_enabled && monitoringStatus === "success",
+    );
 
     React.useEffect(() => {
         let active = true;
-        if (repository.monitoring_enabled) {
+        if (repository.monitoring_enabled && monitoringStatus === "success") {
             void getRepositoryHealth(repository.id.toString()).then((res) => {
                 if (active) {
                     setHealth(res);
@@ -40,13 +44,18 @@ export function RepositoryCard({ repository, onToggle }: RepositoryCardProps) {
         return () => {
             active = false;
         };
-    }, [repository.id, repository.monitoring_enabled]);
+    }, [repository.id, repository.monitoring_enabled, monitoringStatus]);
 
     const handleToggle = async (checked: boolean) => {
         setIsPending(true);
-        await setMonitoringEnabled(repository.id.toString(), checked);
+        setToggleError(null);
+        const updated = await setMonitoringEnabled(repository.id, checked);
         setIsPending(false);
-        onToggle();
+        if (updated) {
+            onToggle();
+        } else {
+            setToggleError("Monitoring could not be updated. Please try again.");
+        }
     };
 
     return (
@@ -60,14 +69,16 @@ export function RepositoryCard({ repository, onToggle }: RepositoryCardProps) {
                         {repository.full_name}
                     </Link>
                     {repository.monitoring_enabled && (
-                        isLoadingHealth ? (
+                        monitoringStatus === "queued" || monitoringStatus === "running" || isLoadingHealth ? (
                             <Loader2 className="size-4 animate-spin text-muted-foreground" />
-                        ) : health ? (
+                        ) : monitoringStatus === "success" && health ? (
                             <Badge variant={getScoreVariant(health.overall_score)}>
                                 Score: {health.overall_score}
                             </Badge>
                         ) : (
-                            <Badge variant="secondary">Not yet checked</Badge>
+                            <Badge variant="secondary">
+                                {monitoringStatus.replace(/_/g, " ")}
+                            </Badge>
                         )
                     )}
                 </div>
@@ -83,6 +94,7 @@ export function RepositoryCard({ repository, onToggle }: RepositoryCardProps) {
                     disabled={isPending}
                 />
             </div>
+            {toggleError && <p className="w-full text-sm text-destructive" role="alert">{toggleError}</p>}
         </div>
     );
 }

@@ -9,13 +9,13 @@ from app.auth.factory import get_auth_provider
 from app.auth.development.adapter import DevelopmentAuthProvider
 
 
-def test_factory_returns_dev_in_development(monkeypatch):
+def test_factory_rejects_dev_provider_outside_test(monkeypatch):
     from app.core.config import settings
     monkeypatch.setattr(settings, "auth_provider", "development")
     monkeypatch.setattr(settings, "app_env", "development")
 
-    provider = get_auth_provider()
-    assert isinstance(provider, DevelopmentAuthProvider)
+    with pytest.raises(ValueError, match="outside the test environment"):
+        get_auth_provider()
 
 
 def test_factory_returns_dev_in_test(monkeypatch):
@@ -34,7 +34,7 @@ def test_factory_raises_on_dev_in_production(monkeypatch):
 
     with pytest.raises(
         ValueError,
-        match="DevelopmentAuthProvider must never be instantiated in production",
+        match="outside the test environment",
     ):
         get_auth_provider()
 

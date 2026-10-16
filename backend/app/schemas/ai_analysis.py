@@ -15,9 +15,11 @@ class AIAnalysisResponse(BaseModel):
     requested_at: datetime
     completed_at: datetime | None = None
     summary: str | None = None
+    key_insights: list[str] | None = None
+    error_message: str | None = None
     severity_assessment: str | None = None
-    confidence: str | None = None
-    recommendations: str | None = None
+    confidence: float | None = None
+    recommendations: list[str] | None = None
 
     @field_validator("finding_id", "repository_id", mode="before")
     @classmethod

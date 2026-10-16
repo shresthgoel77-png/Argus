@@ -100,11 +100,33 @@ def generate_reasons(
 
 def compute_and_persist_health(
     db: Session, repository_id: uuid.UUID
-) -> RepositoryHealthSnapshot:
+) -> RepositoryHealthSnapshot | None:
     """
     Computes health scores based on all open findings, compares with
     previous snapshot to generate reasons, and persists a new snapshot.
     """
+    repository = (
+        db.query(Repository)
+        .filter(Repository.id == repository_id)
+        .first()
+    )
+    if repository is None:
+        return None
+
+    required_checks = {
+        "ci_cd",
+        "stale_issues",
+        "stale_prs",
+        "dependency",
+        "security",
+        "code_quality",
+    }
+    if any(
+        repository.monitoring_checks.get(name, {}).get("status") != "success"
+        for name in required_checks
+    ):
+        return None
+
     open_findings = get_all_open_findings_for_repository(db, repository_id)
 
     category_scores = compute_category_scores(open_findings)
@@ -183,7 +205,7 @@ def compute_and_persist_health(
 
 def recalculate_repository_health(
     db: Session, repository_id: uuid.UUID
-) -> RepositoryHealthSnapshot:
+) -> RepositoryHealthSnapshot | None:
     """
     Recomputes RepositoryHealthSnapshot for a given repository unconditionally,
     independent of any event or analyzer run side effect.

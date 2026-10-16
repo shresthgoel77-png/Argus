@@ -24,6 +24,7 @@ class AIAnalysis(Base):
     provider: Mapped[str] = mapped_column(String, nullable=False)
     model: Mapped[str] = mapped_column(String, nullable=False)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    key_insights: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     severity_assessment: Mapped[str | None] = mapped_column(String, nullable=True)
     confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     recommendations: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)

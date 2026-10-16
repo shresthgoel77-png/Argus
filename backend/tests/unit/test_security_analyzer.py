@@ -91,8 +91,8 @@ async def test_analyzer_github_auth_error(security_analyzer, mock_context):
         "403 Forbidden"
     )
 
-    findings = await security_analyzer.analyze(mock_context)
-    assert len(findings) == 0
+    with pytest.raises(GitHubAuthError):
+        await security_analyzer.analyze(mock_context)
 
 
 @pytest.mark.asyncio
@@ -106,13 +106,8 @@ async def test_analyzer_missing_fields_graceful(
             # Missing security_advisory and dependency
         }
     ]
-    findings = await security_analyzer.analyze(mock_context)
-    assert len(findings) == 1
-
-    finding = findings[0]
-    assert finding.severity == "low"
-    assert "unknown" in finding.title
-    assert finding.evidence["package_name"] == "unknown"
+    with pytest.raises(ValueError, match="incomplete security advisory"):
+        await security_analyzer.analyze(mock_context)
 
 
 @pytest.mark.asyncio

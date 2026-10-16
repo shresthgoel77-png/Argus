@@ -124,7 +124,8 @@ def request_finding_analysis(finding: Finding, user: User) -> AIAnalysis:
         context = ai_context_builder.build_context(finding)
         provider_class = get_provider(connection.provider)
         provider = provider_class(
-            api_key=ai_connection_service.get_decrypted_api_key(db, user.id)
+            api_key=ai_connection_service.get_decrypted_api_key(db, user.id),
+            model=connection.model,
         )
         result = provider.generate_analysis(context)
         analysis.status = "completed"
@@ -172,11 +173,13 @@ def request_repository_summary(
         )
         provider_class = get_provider(connection.provider)
         provider = provider_class(
-            api_key=ai_connection_service.get_decrypted_api_key(db, user.id)
+            api_key=ai_connection_service.get_decrypted_api_key(db, user.id),
+            model=connection.model,
         )
         result = provider.generate_repository_summary(context)
         analysis.status = "completed"
         analysis.summary = result.summary
+        analysis.key_insights = result.key_insights
         analysis.confidence = result.confidence
         analysis.recommendations = result.recommendations
         analysis.error_message = None

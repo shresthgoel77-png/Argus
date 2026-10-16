@@ -18,33 +18,25 @@ export default {
         const secret = env.SCHEDULER_SHARED_SECRET;
 
         if (!targetUrl || !secret) {
-            console.error("Missing BACKEND_URL or SCHEDULER_SHARED_SECRET environment variables.");
-            return;
+            throw new Error("Missing required scheduler configuration.");
         }
 
-        try {
-            console.log(`Firing scheduled run to ${targetUrl}...`);
+        const target = new URL(targetUrl);
+        if (target.pathname !== "/api/v1/internal/scheduled-monitoring/run") {
+            throw new Error("BACKEND_URL must target the scheduled-monitoring endpoint.");
+        }
 
-            const response = await fetch(targetUrl, {
-                method: "POST",
-                headers: {
-                    "X-Scheduler-Secret": secret,
-                    "Content-Type": "application/json"
-                }
-            });
-
-            const status = response.status;
-            const text = await response.text();
-
-            if (response.ok) {
-                console.log(`Success [${status}]:`, text);
-            } else {
-                console.error(`Failed [${status}]:`, text);
+        const response = await fetch(target, {
+            method: "POST",
+            headers: {
+                "X-Scheduler-Secret": secret,
+                "Content-Type": "application/json"
             }
-        } catch (error) {
-            // Do not throw the error to avoid the worker retrying the same invocation.
-            // Simply log and exit cleanly.
-            console.error("Error during scheduled fetch:", error);
+        });
+        if (!response.ok) {
+            throw new Error(`Scheduled backend returned HTTP ${response.status}.`);
         }
+
+        console.info(`Scheduled monitoring completed with HTTP ${response.status}.`);
     },
 };

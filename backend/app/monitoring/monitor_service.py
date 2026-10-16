@@ -118,7 +118,7 @@ async def run_analyzer(
 
     created_findings = []
     source = f"on_demand:{analyzer_key}" if not normalized_event else f"webhook:{normalized_event.event_type}"
-    for draft in findings_drafts:
+    for index, draft in enumerate(findings_drafts):
         finding = finding_service.create_finding(
             db=db,
             repository_id=repository.id,
@@ -128,7 +128,16 @@ async def run_analyzer(
             description=draft.description,
             severity=draft.severity,
             source=source,
-            evidence=draft.evidence
+            evidence=draft.evidence,
+            fingerprint=(
+                draft.fingerprint
+                or (
+                    f"webhook:{normalized_event.delivery_id}:"
+                    f"{analyzer_key}:{index}"
+                    if normalized_event
+                    else None
+                )
+            ),
         )
         created_findings.append(FindingSummary(
             id=str(finding.id),

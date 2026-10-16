@@ -23,6 +23,7 @@ from app.integrations.github.app_auth import (
 from app.integrations.github.exceptions import (
     GitHubAPIError,
     GitHubNotFoundError,
+    GitHubInstallationError,
 )
 
 logger = get_logger(__name__)
@@ -36,6 +37,7 @@ _DEFAULT_HEADERS = {
     "X-GitHub-Api-Version": "2022-11-28",
 }
 _MAX_PER_PAGE = 100  # GitHub's max per_page value
+_MAX_SCAN_PAGES = 5
 
 
 def _redact_auth_headers(headers: dict[str, str]) -> dict[str, str]:
@@ -82,6 +84,7 @@ class GitHubAppClient:
         self._http = httpx.AsyncClient(
             base_url=_GITHUB_API_BASE,
             headers=_DEFAULT_HEADERS,
+            timeout=httpx.Timeout(10.0),
         )
         return self
 
@@ -127,7 +130,12 @@ class GitHubAppClient:
                 "(async with GitHubAppClient(...) as client:)"
             )
 
-        auth_headers = await self._auth_headers(use_app_jwt=use_app_jwt)
+        try:
+            auth_headers = await self._auth_headers(use_app_jwt=use_app_jwt)
+        except GitHubNotFoundError as exc:
+            raise GitHubInstallationError(self._installation_id) from exc
+        except httpx.RequestError as exc:
+            raise GitHubAPIError("GitHub installation authentication could not be reached. Please retry.") from exc
 
         # SECURITY: Log the request but redact the Authorization header.
         logger.debug(
@@ -138,14 +146,18 @@ class GitHubAppClient:
             params,
         )
 
-        if json is not None:
-            response = await self._http.request(
-                method, url, headers=auth_headers, params=params, json=json
-            )
-        else:
-            response = await self._http.request(
-                method, url, headers=auth_headers, params=params
-            )
+        try:
+            if json is not None:
+                response = await self._http.request(
+                    method, url, headers=auth_headers, params=params, json=json
+                )
+            else:
+                response = await self._http.request(
+                    method, url, headers=auth_headers, params=params
+                )
+
+        except httpx.RequestError as exc:
+            raise GitHubAPIError("GitHub could not be reached due to a timeout or connection error. Please retry.") from exc
 
         logger.debug(
             "GitHub API response: %s %s -> %d",
@@ -190,11 +202,12 @@ class GitHubAppClient:
         Returns:
             The installation metadata dict as returned by GitHub.
         """
-        response = await self._request(
-            "GET",
-            f"/app/installations/{installation_id}",
-            use_app_jwt=True,
-        )
+        try:
+            response = await self._request(
+                "GET", f"/app/installations/{installation_id}", use_app_jwt=True,
+            )
+        except GitHubNotFoundError as exc:
+            raise GitHubInstallationError(installation_id) from exc
         return response.json()
 
     async def list_installation_repositories(self) -> list[dict[str, Any]]:
@@ -237,6 +250,10 @@ class GitHubAppClient:
             link_header = response.headers.get("link", "")
             if 'rel="next"' not in link_header:
                 break
+            if page >= _MAX_SCAN_PAGES:
+                raise GitHubAPIError(
+                    "Repository issue scan exceeded the configured page limit"
+                )
             page += 1
 
         logger.info(
@@ -257,6 +274,8 @@ class GitHubAppClient:
             )
             return response.json()
         except GitHubNotFoundError:
+            # A removed/inaccessible repository must not look like a missing file.
+            await self._request("GET", f"/repos/{full_name}")
             return None
 
     async def get_pull_request(
@@ -300,27 +319,24 @@ class GitHubAppClient:
         all_alerts: list[dict[str, Any]] = []
         page = 1
         while True:
-            try:
-                response = await self._request(
-                    "GET",
-                    f"/repos/{full_name}/dependabot/alerts",
-                    params={"per_page": _MAX_PER_PAGE, "page": page},
+            response = await self._request(
+                "GET",
+                f"/repos/{full_name}/dependabot/alerts",
+                params={"per_page": _MAX_PER_PAGE, "page": page},
+            )
+            data = response.json()
+            if not isinstance(data, list):
+                raise GitHubAPIError("GitHub returned an invalid Dependabot alert list")
+            all_alerts.extend(data)
+
+            link_header = response.headers.get("link", "")
+            if 'rel="next"' not in link_header:
+                break
+            if page >= _MAX_SCAN_PAGES:
+                raise GitHubAPIError(
+                    "Dependabot alert scan exceeded the configured page limit"
                 )
-                data = response.json()
-                if not isinstance(data, list):
-                    # In case the API returns an object instead of a list
-                    # incorrectly, though it shouldn't
-                    break
-                all_alerts.extend(data)
-
-                link_header = response.headers.get("link", "")
-                if 'rel="next"' not in link_header:
-                    break
-                page += 1
-            except GitHubNotFoundError:
-                # 404 indicates dependable is disabled or repo not found
-                return []
-
+            page += 1
         return all_alerts
 
     async def get_branch_protection(
@@ -334,37 +350,50 @@ class GitHubAppClient:
             )
             return response.json()
         except GitHubNotFoundError:
+            response = await self._request("GET", f"/repos/{full_name}/branches/{branch}")
+            if response.json().get("protected") is not False:
+                raise GitHubAPIError("Branch protection could not be verified")
             return None
 
     async def list_repository_issues(
-        self, full_name: str
+        self, full_name: str, *, state: str = "open"
     ) -> list[dict[str, Any]]:
         """List open issues for a repository (includes pull requests per GitHub API)."""
         all_issues: list[dict[str, Any]] = []
         page = 1
         while True:
-            try:
-                response = await self._request(
-                    "GET",
-                    f"/repos/{full_name}/issues",
-                    params={
-                        "state": "open",
-                        "per_page": _MAX_PER_PAGE,
-                        "page": page},
-                )
-                data = response.json()
-                if not isinstance(data, list):
-                    break
-                all_issues.extend(data)
+            response = await self._request(
+                "GET",
+                f"/repos/{full_name}/issues",
+                params={
+                    "state": state,
+                    "per_page": _MAX_PER_PAGE,
+                    "page": page},
+            )
+            data = response.json()
+            if not isinstance(data, list):
+                raise GitHubAPIError("GitHub returned an invalid issue list")
+            all_issues.extend(data)
 
-                link_header = response.headers.get("link", "")
-                if 'rel="next"' not in link_header:
-                    break
-                page += 1
-            except GitHubNotFoundError:
-                return []
+            link_header = response.headers.get("link", "")
+            if 'rel="next"' not in link_header:
+                break
+            if page >= _MAX_SCAN_PAGES:
+                raise GitHubAPIError(
+                    "Repository issue scan exceeded the configured page limit"
+                )
+            page += 1
 
         return all_issues
+
+    async def create_repository_issue(
+        self, full_name: str, *, title: str, body: str
+    ) -> dict[str, Any]:
+        response = await self._request(
+            "POST", f"/repos/{full_name}/issues",
+            json={"title": title, "body": body},
+        )
+        return response.json()
 
     async def list_repository_pulls(
             self, full_name: str) -> list[dict[str, Any]]:
@@ -372,42 +401,64 @@ class GitHubAppClient:
         all_prs: list[dict[str, Any]] = []
         page = 1
         while True:
+            response = await self._request(
+                "GET",
+                f"/repos/{full_name}/pulls",
+                params={
+                    "state": "open",
+                    "per_page": _MAX_PER_PAGE,
+                    "page": page},
+            )
+            data = response.json()
+            if not isinstance(data, list):
+                raise GitHubAPIError("GitHub returned an invalid pull request list")
+            all_prs.extend(data)
+
+            link_header = response.headers.get("link", "")
+            if 'rel="next"' not in link_header:
+                break
+            if page >= _MAX_SCAN_PAGES:
+                raise GitHubAPIError(
+                    "Repository pull request scan exceeded the configured page limit"
+                )
+            page += 1
+
+        return all_prs
+
+    async def list_repository_workflow_runs(
+        self, full_name: str
+    ) -> list[dict[str, Any]]:
+        """Fetch a bounded recent workflow history for a full-state CI scan."""
+        all_runs: list[dict[str, Any]] = []
+        page = 1
+        while True:
             try:
                 response = await self._request(
                     "GET",
-                    f"/repos/{full_name}/pulls",
-                    params={
-                        "state": "open",
-                        "per_page": _MAX_PER_PAGE,
-                        "page": page},
+                    f"/repos/{full_name}/actions/runs",
+                    params={"per_page": _MAX_PER_PAGE, "page": page},
                 )
-                data = response.json()
-                if not isinstance(data, list):
-                    break
-                all_prs.extend(data)
-
-                link_header = response.headers.get("link", "")
-                if 'rel="next"' not in link_header:
-                    break
-                page += 1
             except GitHubNotFoundError:
                 return []
-
-        return all_prs
+            data = response.json()
+            if not isinstance(data, dict):
+                raise GitHubAPIError("GitHub returned an invalid workflow-run response")
+            runs = data.get("workflow_runs", [])
+            if not isinstance(runs, list):
+                raise GitHubAPIError("GitHub returned an invalid workflow-run list")
+            all_runs.extend(runs)
+            if 'rel="next"' not in response.headers.get("link", ""):
+                return all_runs
+            if page >= _MAX_SCAN_PAGES:
+                raise GitHubAPIError(
+                    "Repository workflow scan exceeded the configured page limit"
+                )
+            page += 1
 
 
 async def get_branch_protection(
     installation_id: int, full_name: str, branch: str
 ) -> dict[str, Any] | None:
-    """Fetch branch protection rules for a repository branch standalone."""
-    from app.integrations.github.exceptions import GitHubNotFoundError
-
+    """Fetch branch protection using the same verified-absence behavior."""
     async with GitHubAppClient(installation_id) as client:
-        try:
-            response = await client._request(
-                "GET",
-                f"/repos/{full_name}/branches/{branch}/protection"
-            )
-            return response.json()
-        except GitHubNotFoundError:
-            return None
+        return await client.get_branch_protection(full_name, branch)

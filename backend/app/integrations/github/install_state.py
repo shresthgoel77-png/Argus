@@ -1,12 +1,13 @@
 import time
 import uuid
-from typing import TypedDict
+from typing import TypedDict, NotRequired
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from app.core.config import settings
 
 class InstallStatePayload(TypedDict):
     user_id: str
     issued_at: float
+    connection_id: NotRequired[str]
 
 def get_serializer() -> URLSafeTimedSerializer:
     return URLSafeTimedSerializer(
@@ -14,13 +15,15 @@ def get_serializer() -> URLSafeTimedSerializer:
         salt="github-install-state"
     )
 
-def generate_install_state(user_id: uuid.UUID) -> str:
+def generate_install_state(user_id: uuid.UUID, connection_id: uuid.UUID | None = None) -> str:
     """Generates a signed state token for the GitHub App installation flow."""
     serializer = get_serializer()
     payload: InstallStatePayload = {
         "user_id": str(user_id),
         "issued_at": time.time()
     }
+    if connection_id is not None:
+        payload["connection_id"] = str(connection_id)
     return serializer.dumps(payload)
 
 def verify_install_state(state: str) -> InstallStatePayload:

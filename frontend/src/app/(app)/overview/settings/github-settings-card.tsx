@@ -41,7 +41,7 @@ export function GitHubSettingsCard() {
         };
     }, [router]);
 
-    const handleConnectClick = async () => {
+    const handleConnectClick = async (connectionId?: string) => {
         setInstallError(null);
         const installWindow = window.open("about:blank", "_blank");
         if (!installWindow) {
@@ -51,7 +51,7 @@ export function GitHubSettingsCard() {
 
         try {
             setIsInstalling(true);
-            const result = await startInstall();
+            const result = await startInstall(connectionId);
             if (!result?.install_url) {
                 throw new Error("GitHub installation URL was not returned.");
             }
@@ -84,12 +84,14 @@ export function GitHubSettingsCard() {
                                         <p className="font-medium">{conn.account_login}</p>
                                         <p className="text-sm text-muted-foreground capitalize">Status: {conn.status}</p>
                                     </div>
-                                    <div className="flex h-2 w-2 rounded-full bg-green-500" title="Connected"></div>
+                                    <button className="text-sm text-primary underline" disabled={isInstalling} onClick={() => void handleConnectClick(conn.id)}>
+                                        Reconnect {conn.account_login}
+                                    </button>
                                 </div>
                             ))}
                         </div>
                         <button
-                            onClick={handleConnectClick}
+                            onClick={() => void handleConnectClick()}
                             disabled={isInstalling}
                             className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
                         >
@@ -107,7 +109,7 @@ export function GitHubSettingsCard() {
                         description="Connect your GitHub account to access your repositories."
                         action={
                             <button
-                                onClick={handleConnectClick}
+                                onClick={() => void handleConnectClick()}
                                 disabled={isInstalling}
                                 className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 disabled:opacity-50"
                             >

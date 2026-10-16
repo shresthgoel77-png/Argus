@@ -9,6 +9,13 @@ from app.services.github_connection_service import (
     handle_installation_status_change
 )
 from app.core.exceptions import NotFoundError
+from fastapi import HTTPException
+from unittest.mock import AsyncMock
+from app.core.config import settings
+
+@pytest.fixture(autouse=True)
+def verified_new_account(monkeypatch):
+    monkeypatch.setattr("app.services.github_connection_service.verify_new_installation_account", AsyncMock())
 
 class MockGitHubAppClient:
     """Mock client for testing."""
@@ -18,11 +25,16 @@ class MockGitHubAppClient:
         
     async def get_installation(self, installation_id: int):
         return {
+            "id": installation_id, "app_id": int(settings.github_app_id),
+            "permissions": {name: "write" for name in ["issues", "pull_requests", "contents", "actions", "administration", "vulnerability_alerts"]},
             "account": {
                 "login": self.login,
                 "type": self.acc_type
             }
         }
+
+    async def list_installation_repositories(self):
+        return []
 
 @pytest.fixture
 def mock_client():
@@ -52,17 +64,16 @@ async def test_upsert_connection_idempotent_update(db_session, test_user):
         db_session, test_user.id, inst_id, mock_client
     )
     
-    # Simulating update via reinstall
-    mock_client.login = "test-org-renamed"
-    connection2 = await upsert_connection_from_installation(
-        db_session, test_user.id, inst_id, mock_client
-    )
-    
-    assert connection1.id == connection2.id
-    assert connection2.account_login == "test-org-renamed"
+    # A different account name must not silently replace the persisted identity.
+    mock_client.login = "different-account"
+    with pytest.raises(HTTPException) as error:
+        await upsert_connection_from_installation(db_session, test_user.id, inst_id, mock_client)
+    assert error.value.status_code == 403
+    db_session.refresh(connection1)
+    assert connection1.account_login == "test-org"
 
 @pytest.mark.asyncio
-async def test_upsert_connection_ownership_reassignment(db_session, test_user):
+async def test_upsert_connection_rejects_cross_user_reassignment(db_session, test_user):
     user2 = User(
         email=f"test_{uuid.uuid4()}@example.com",
         display_name="User 2",
@@ -80,13 +91,11 @@ async def test_upsert_connection_ownership_reassignment(db_session, test_user):
         db_session, test_user.id, inst_id, mock_client
     )
     
-    # User2 re-authorizes same installation
-    connection2 = await upsert_connection_from_installation(
-        db_session, user2.id, inst_id, mock_client
-    )
-    
-    assert connection1.id == connection2.id
-    assert connection2.user_id == user2.id
+    with pytest.raises(HTTPException) as error:
+        await upsert_connection_from_installation(db_session, user2.id, inst_id, mock_client)
+    assert error.value.status_code == 403
+    db_session.refresh(connection1)
+    assert connection1.user_id == test_user.id
 
 def test_list_connections(db_session, test_user):
     inst_id_1 = 999441

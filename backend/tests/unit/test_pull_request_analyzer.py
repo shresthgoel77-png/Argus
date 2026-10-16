@@ -94,8 +94,12 @@ async def test_scan_repository_for_stale_prs():
         await analyzer.scan_repository_for_stale_prs(db, repo, client)
         
         client.list_repository_pulls.assert_called_once_with("my/repo")
-        pr_analyzer_mdl.finding_service.create_finding.assert_called_once()
-        kwargs = pr_analyzer_mdl.finding_service.create_finding.call_args.kwargs
+        pr_analyzer_mdl.finding_service.sync_findings_for_run.assert_called_once()
+        call = pr_analyzer_mdl.finding_service.sync_findings_for_run.call_args.kwargs
+        assert call["source"] == "repository_scan:pull_request"
+        assert len(call["drafts"]) == 1
+        draft = call["drafts"][0]
+        kwargs = {"fingerprint": draft.fingerprint, "type_": draft.type_, "severity": draft.severity}
         assert kwargs["fingerprint"] == "stale_pull_request_1"
         assert kwargs["type_"] == "stale_pull_request"
         assert kwargs["severity"] == "info"

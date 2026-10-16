@@ -1,6 +1,4 @@
-import { GitPullRequest } from "lucide-react";
-
-import { EmptyState } from "@/components/rm/empty-state";
+import { RepositoryWorkItems } from "@/components/repositories/repository-work-items";
 import { SectionHeading } from "@/components/rm/section-heading";
 
 export default function PullRequestsPage() {
@@ -11,11 +9,7 @@ export default function PullRequestsPage() {
                 title="Pull requests"
                 description="Track review status and repository health signals across pull requests."
             />
-            <EmptyState
-                icon={<GitPullRequest className="size-6" aria-hidden="true" />}
-                title="No pull requests to show"
-                description="Pull request activity will appear here once a repository is connected."
-            />
+            <RepositoryWorkItems kind="pull-requests" />
         </div>
     );
 }

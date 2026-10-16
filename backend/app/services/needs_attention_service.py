@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.finding import Finding
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
+from app.models.repository import Repository
 
 
 @dataclass
@@ -33,8 +34,9 @@ def get_needs_attention(db: Session, repository_id: uuid.UUID, limit: int = 5) -
         Finding.severity.in_(("critical", "high")),
     ).order_by(severity_order, priority_order, desc(Finding.detected_at)).limit(limit).all()
 
-    snapshot = db.query(RepositoryHealthSnapshot).filter(
-        RepositoryHealthSnapshot.repository_id == repository_id
+    snapshot = db.query(RepositoryHealthSnapshot).join(Repository).filter(
+        RepositoryHealthSnapshot.repository_id == repository_id,
+        Repository.monitoring_status == "success",
     ).order_by(desc(RepositoryHealthSnapshot.computed_at)).first()
 
     reasons = snapshot.reasons if snapshot is not None else []

@@ -232,17 +232,6 @@ export default function AppOverviewPage() {
                                     ))}
                                 </div>
                             )}
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                {Object.entries(overview.health.category_scores).map(([category, score]) => (
-                                    <div key={category} className="rounded-lg border bg-card p-4">
-                                        <p className="text-sm text-muted-foreground">{category.replace(/_/g, " ")}</p>
-                                        <div className="mt-2 flex items-center justify-between gap-2">
-                                            <span className="text-2xl font-semibold tracking-tight">{score}</span>
-                                            <Badge variant={getScoreVariant(score)}>{score >= 80 ? "Good" : score >= 50 ? "Fair" : "Poor"}</Badge>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     ) : overview.last_recorded_health ? (
                         <StatCard
@@ -282,7 +271,51 @@ export default function AppOverviewPage() {
                 <section className="space-y-3" aria-labelledby="trend-overview-heading">
                     <h2 id="trend-overview-heading" className="text-lg font-semibold tracking-tight">Trend overview</h2>
                     <div className="rounded-lg border bg-card p-4">
-                        <TrendVisualization trends={overview.trends ?? null} />
+                        <div className="space-y-4">
+                            {overview.trends ? (
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Overall delta</span>
+                                    <span className="font-medium text-foreground">{overview.trends.health_trend.overall_delta > 0 ? "+" : ""}{overview.trends.health_trend.overall_delta}</span>
+                                </div>
+                            ) : (
+                                <TrendVisualization trends={null} />
+                            )}
+                            {([
+                                ["ci_cd", "CI/CD"],
+                                ["dependencies", "Dependencies"],
+                                ["security", "Security"],
+                                ["issues", "Issues"],
+                                ["pull_requests", "Pull Requests"],
+                            ] as const).filter(([category]) => overview.health?.category_scores[category] != null || overview.health?.coverage?.excluded_categories[category] != null || overview.monitoring_checks?.[category] != null).map(([category, label]) => (
+                                <div key={category} className="space-y-1.5">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">{label}</span>
+                                        <div className="flex items-center gap-2">
+                                            {overview.health?.coverage?.excluded_categories[category] ? (
+                                                <Badge variant="outline">{overview.health.coverage.excluded_categories[category].status}</Badge>
+                                            ) : overview.health?.category_scores[category] != null ? (
+                                                <>
+                                                    <span className="font-medium text-foreground">{overview.health.category_scores[category]}</span>
+                                                    <Badge variant={getScoreVariant(overview.health.category_scores[category])}>
+                                                        {overview.health.category_scores[category] >= 80 ? "Good" : overview.health.category_scores[category] >= 50 ? "Fair" : "Poor"}
+                                                    </Badge>
+                                                </>
+                                            ) : overview.monitoring_checks?.[category] ? (
+                                                <Badge variant="outline">{overview.monitoring_checks[category].status}</Badge>
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                    {!overview.health?.coverage?.excluded_categories[category] && overview.health?.category_scores[category] != null && (
+                                        <div className="h-2 overflow-hidden rounded-full bg-muted">
+                                            <div
+                                                className={`h-full rounded-full ${overview.health.category_scores[category] >= 80 ? "bg-success" : overview.health.category_scores[category] >= 50 ? "bg-warning" : "bg-destructive"}`}
+                                                style={{ width: `${overview.health.category_scores[category]}%` }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </section>
 

@@ -1,7 +1,10 @@
+import { auth } from "@clerk/nextjs/server";
 import { RepositoryWorkItems } from "@/components/repositories/repository-work-items";
 import { SectionHeading } from "@/components/rm/section-heading";
 
-export default function IssuesPage() {
+export default async function IssuesPage() {
+    await auth.protect();
+
     return (
         <div className="space-y-6">
             <SectionHeading

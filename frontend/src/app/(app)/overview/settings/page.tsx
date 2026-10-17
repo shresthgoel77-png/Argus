@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SectionHeading } from "@/components/rm/section-heading";
 import { GitHubSettingsCard } from "./github-settings-card";
@@ -14,7 +15,9 @@ const settingsSections = [
     },
 ];
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+    await auth.protect();
+
     return (
         <div className="space-y-6">
             <SectionHeading

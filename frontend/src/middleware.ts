@@ -1,11 +1,11 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 
 const isClerkEnabled =
     typeof process !== "undefined" &&
     typeof process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY === "string" &&
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.length > 0;
 
-export default async function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest, event: NextFetchEvent) {
     if (!isClerkEnabled) {
         throw new Error(
             "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required; authentication cannot be bypassed.",
@@ -13,28 +13,22 @@ export default async function middleware(request: NextRequest) {
     }
 
     // Dynamically import Clerk after validating its required configuration.
-    const { clerkMiddleware, createRouteMatcher } = await import(
+    const { clerkMiddleware } = await import(
         "@clerk/nextjs/server"
     );
 
-    const isPublicRoute = createRouteMatcher([
-        "/",
-        "/login",
-        "/sign-in(.*)",
-        "/sign-up(.*)",
-        "/api(.*)",
-    ]);
-
     const handler = clerkMiddleware(async (auth, req) => {
-        const authObj = await auth();
-        if (!isPublicRoute(req)) {
-            await auth.protect();
-        } else if (req.nextUrl.pathname === "/" && authObj.userId) {
-            return NextResponse.redirect(new URL("/dashboard", req.url));
+        // Resource auth lives in server pages and the backend API. Keep only
+        // the existing signed-in landing-page redirect here.
+        if (req.nextUrl.pathname === "/") {
+            const { userId } = await auth();
+            if (userId) {
+                return NextResponse.redirect(new URL("/dashboard", req.url));
+            }
         }
     });
 
-    return handler(request, {} as any);
+    return handler(request, event);
 }
 
 export const config = {

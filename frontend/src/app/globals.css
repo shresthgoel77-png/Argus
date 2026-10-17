@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@config "../../tailwind.config.ts";
+@config "../../tailwind.config.cjs";
 
 :root {
   --background: 210 20% 98%;

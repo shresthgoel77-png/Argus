@@ -1,14 +1,17 @@
 import type { ReactNode } from "react";
+import { auth } from "@clerk/nextjs/server";
 
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppTopbar } from "@/components/layout/app-topbar";
 import { ProtectedShell } from "@/components/auth/protected-shell";
 
 /**
- * Client-side protection is appropriate while this app uses static dashboard data.
- * Server-side protection will be needed before introducing sensitive server-rendered data.
+ * Preserve signed-out navigation for client pages. Protected data is authenticated
+ * and ownership-scoped by the backend; server pages also check auth individually.
  */
-export default function AppLayout({ children }: { children: ReactNode }) {
+export default async function AppLayout({ children }: { children: ReactNode }) {
+    await auth.protect();
+
     return (
         <ProtectedShell>
             <div className="flex h-screen overflow-hidden">

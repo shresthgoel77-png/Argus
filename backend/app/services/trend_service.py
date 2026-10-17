@@ -31,11 +31,13 @@ def get_health_trend(db: Session, repository_id: uuid.UUID, window_days: int = 3
     oldest = snapshots[0]
     newest = snapshots[-1]
 
-    overall_delta = newest.overall_score - oldest.overall_score
+    overall_delta = (
+        newest.overall_score - oldest.overall_score
+        if set(newest.category_scores) == set(oldest.category_scores) else 0
+    )
     for cat in HEALTH_CATEGORIES:
-        old_val = oldest.category_scores.get(cat, 100)
-        new_val = newest.category_scores.get(cat, 100)
-        category_deltas[cat] = new_val - old_val
+        if cat in oldest.category_scores and cat in newest.category_scores:
+            category_deltas[cat] = newest.category_scores[cat] - oldest.category_scores[cat]
 
     return overall_delta, category_deltas
 

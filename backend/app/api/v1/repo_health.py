@@ -42,19 +42,14 @@ def get_repository_health(
     repository = get_repository_or_404(
         db=db, user_id=user.id, repository_id=repository_id
     )
-    if repository.monitoring_status != "success":
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A complete health score is unavailable until all checks succeed.",
-        )
-    
     latest = health_service.get_latest_snapshot(db, repository_id)
-    if not latest:
+    if (latest is None and repository.monitoring_status in {"success", "partial_failure"}
+            and repository.monitoring_checks.get("health", {}).get("status") == "success"):
         latest = health_service.compute_and_persist_health(db, repository_id)
-    if latest is None:
+    if not health_service.is_current_snapshot(repository, latest):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A complete health score is unavailable until all checks succeed.",
+            detail="A current health score is unavailable. Check assessment coverage and health history.",
         )
     latest = _with_previous_score(db, latest)
     return HealthSnapshotResponse.model_validate(latest)
@@ -104,17 +99,17 @@ def create_repository_health_run(
     repository = get_repository_or_404(
         db=db, user_id=user.id, repository_id=repository_id
     )
-    if repository.monitoring_status != "success":
+    if repository.monitoring_status not in {"success", "partial_failure"}:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A complete health score is unavailable until all checks succeed.",
+            detail="Complete an assessment before recalculating health.",
         )
     
     new_snapshot = health_service.compute_and_persist_health(db, repository_id)
     if new_snapshot is None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A complete health score is unavailable until all checks succeed.",
+            detail="No category was successfully assessed; a current health score is unavailable.",
         )
     new_snapshot = _with_previous_score(db, new_snapshot)
     

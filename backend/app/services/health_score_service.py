@@ -33,6 +33,37 @@ HEALTH_CATEGORIES = [
     "code_quality"
 ]
 
+HEALTH_CATEGORY_TO_CHECK = {
+    "ci_cd": "ci_cd",
+    "dependencies": "dependency",
+    "security": "security",
+    "issues": "stale_issues",
+    "pull_requests": "stale_prs",
+    "code_quality": "code_quality",
+}
+
+
+def assessment_coverage(checks: dict) -> dict:
+    assessed = []
+    excluded = {}
+    for category, name in HEALTH_CATEGORY_TO_CHECK.items():
+        check = checks.get(name, {})
+        if check.get("status") == "success":
+            assessed.append(category)
+        else:
+            excluded[category] = {
+                "status": check.get("status", "not_started"),
+                "reason": check.get("error_message") or "This category has not been successfully assessed.",
+            }
+    return {
+        "assessed_categories": assessed,
+        "excluded_categories": excluded,
+        "checks": {
+            name: {"status": "not_started", **checks.get(name, {})}
+            for name in HEALTH_CATEGORY_TO_CHECK.values()
+        },
+    }
+
 SEVERITY_DEDUCTIONS = {
     "critical": 40,
     "high": 20,
@@ -41,12 +72,14 @@ SEVERITY_DEDUCTIONS = {
     "info": 0
 }
 
-def compute_category_scores(open_findings: Sequence[Finding]) -> dict[str, int]:
+def compute_category_scores(
+    open_findings: Sequence[Finding], categories: Sequence[str] = HEALTH_CATEGORIES
+) -> dict[str, int]:
     """
-    Computes a score [0, 100] for each configured HEALTH_CATEGORIES.
+    Computes a score [0, 100] for each included health category.
     Deductions are based on severity of each mapped finding.
     """
-    scores = {category: 100 for category in HEALTH_CATEGORIES}
+    scores = {category: 100 for category in categories}
     
     for finding in open_findings:
         if finding.category not in FINDING_CATEGORY_TO_HEALTH_CATEGORY:
@@ -64,14 +97,14 @@ def compute_category_scores(open_findings: Sequence[Finding]) -> dict[str, int]:
         
     return scores
 
-def compute_overall_score(category_scores: dict[str, int]) -> int:
+def compute_overall_score(category_scores: dict[str, int]) -> int | None:
     """
-    Computes an unweighted average of the fixed category scores.
+    Computes an unweighted average of included category scores.
     """
     if not category_scores:
-        return 100
+        return None
         
-    # As per prompt, unweighted average across all 6 fixed categories, rounded, clamped to [0, 100]
+    # Preserve equal weighting and rounding for the categories actually assessed.
     total_score = 0
     for val in category_scores.values():
         total_score += val

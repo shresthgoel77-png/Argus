@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.finding import Finding
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
 from app.models.repository import Repository
+from app.services.health_service import get_latest_snapshot, is_current_snapshot
 
 
 @dataclass
@@ -13,6 +14,7 @@ class NeedsAttentionDTO:
     findings: list[Finding]
     health_snapshot: RepositoryHealthSnapshot | None
     reasons: list[str]
+    last_recorded_health: RepositoryHealthSnapshot | None = None
 
 
 def get_needs_attention(db: Session, repository_id: uuid.UUID, limit: int = 5) -> NeedsAttentionDTO:
@@ -34,15 +36,15 @@ def get_needs_attention(db: Session, repository_id: uuid.UUID, limit: int = 5) -
         Finding.severity.in_(("critical", "high")),
     ).order_by(severity_order, priority_order, desc(Finding.detected_at)).limit(limit).all()
 
-    snapshot = db.query(RepositoryHealthSnapshot).join(Repository).filter(
-        RepositoryHealthSnapshot.repository_id == repository_id,
-        Repository.monitoring_status == "success",
-    ).order_by(desc(RepositoryHealthSnapshot.computed_at)).first()
+    repository = db.query(Repository).filter(Repository.id == repository_id).first()
+    latest = get_latest_snapshot(db, repository_id)
+    snapshot = latest if repository and is_current_snapshot(repository, latest) else None
 
     reasons = snapshot.reasons if snapshot is not None else []
 
     return NeedsAttentionDTO(
         findings=findings,
         health_snapshot=snapshot,
-        reasons=reasons
+        reasons=reasons,
+        last_recorded_health=latest if snapshot is None else None,
     )

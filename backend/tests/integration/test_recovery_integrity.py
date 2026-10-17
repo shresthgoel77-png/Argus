@@ -159,7 +159,8 @@ async def test_incomplete_ci_preserves_findings_and_health(db_session, test_user
     assert result.checks["ci_cd"].status == "unavailable"
     db_session.refresh(finding)
     assert finding.status == "open" and finding.severity == "high"
-    assert db_session.query(RepositoryHealthSnapshot).filter_by(repository_id=repo.id).count() == 1
+    assert db_session.query(RepositoryHealthSnapshot).filter_by(repository_id=repo.id).count() == 2
+    assert result.checks["health"].status == "success"
     assert snapshot.overall_score == 80
 
 

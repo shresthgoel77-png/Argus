@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.models.repository import Repository
 from app.monitoring.analyzers import get_analyzer
 from app.monitoring.analyzer_base import AnalyzerContext
+from app.monitoring.analyzers.security_analyzer import security_failure_reason
 from app.services import finding_service
 from app.services.health_service import compute_and_persist_health
 from app.integrations.github.client import GitHubAppClient
@@ -22,7 +23,8 @@ async def run_analyzer(
     analyzer_key: str,
     repository: Repository,
     *,
-    normalized_event: Optional[Any] = None
+    normalized_event: Optional[Any] = None,
+    recompute_health: bool = True,
 ) -> MonitorRunResult:
     if not repository.monitoring_enabled:
         return MonitorRunResult(status="skipped", reason="monitoring_disabled")
@@ -67,7 +69,7 @@ async def run_analyzer(
                 findings_drafts = await res
             else:
                 findings_drafts = res
-    except Exception:
+    except Exception as exc:
         logger.error(
             "Analyzer failed with exception",
             exc_info=True,
@@ -78,7 +80,10 @@ async def run_analyzer(
             }
         )
         return MonitorRunResult(
-            status="failed", error_message="The analyzer could not be completed."
+            status="failed", error_message=(
+                security_failure_reason(exc) if analyzer_key == "security"
+                else "The analyzer could not be completed."
+            )
         )
 
     if analyzer.full_state_sync:
@@ -99,7 +104,8 @@ async def run_analyzer(
             },
         )
         try:
-            compute_and_persist_health(db, repository.id)
+            if recompute_health:
+                compute_and_persist_health(db, repository.id)
         except Exception:
             logger.warning(
                 "Health recomputation failed after analyzer run",
@@ -157,7 +163,8 @@ async def run_analyzer(
         }
     )
     try:
-        compute_and_persist_health(db, repository.id)
+        if recompute_health:
+            compute_and_persist_health(db, repository.id)
     except Exception:
         logger.warning(
             "Health recomputation failed after analyzer run",

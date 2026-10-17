@@ -192,7 +192,7 @@ export default function AppOverviewPage() {
                 </div>
                 {monitoringStatus !== "success" && (
                     <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                        <p>A complete health score is unavailable until every required check succeeds.</p>
+                        <p>Health uses successfully assessed categories. Excluded categories do not affect the score.</p>
                         {Object.entries(overview.monitoring_checks ?? {}).map(([name, check]) => (
                                 <p key={name}>
                                     {name.replace(/_/g, " ")}: {check.status}
@@ -206,7 +206,11 @@ export default function AppOverviewPage() {
 
             <div className="grid gap-4 xl:grid-cols-2">
                 <section className="space-y-3" aria-labelledby="health-score-heading">
-                    <h2 id="health-score-heading" className="text-lg font-semibold tracking-tight">Health score</h2>
+                    <h2 id="health-score-heading" className="text-lg font-semibold tracking-tight">
+                        {overview.health?.coverage && overview.health.coverage.assessed_categories.length < 6
+                            ? `Health score — partial coverage (${overview.health.coverage.assessed_categories.length}/6 categories assessed)`
+                            : "Health score"}
+                    </h2>
                     {overview.health ? (
                         <div className="space-y-3">
                             <StatCard
@@ -220,6 +224,14 @@ export default function AppOverviewPage() {
                                 }
                                 description={overview.health.computed_at ? `Last computed ${new Date(overview.health.computed_at).toLocaleString()}` : "No compute timestamp yet"}
                             />
+                            {overview.health.coverage && (
+                                <div className="space-y-1 text-sm text-muted-foreground">
+                                    {overview.health.coverage.assessed_categories.length === 6 && <p>6/6 categories assessed.</p>}
+                                    {Object.entries(overview.health.coverage.excluded_categories).map(([category, check]) => (
+                                        <p key={category}>Excluded {category.replace(/_/g, " ")}: {check.status} — {check.reason}</p>
+                                    ))}
+                                </div>
+                            )}
                             <div className="grid gap-3 sm:grid-cols-2">
                                 {Object.entries(overview.health.category_scores).map(([category, score]) => (
                                     <div key={category} className="rounded-lg border bg-card p-4">
@@ -232,6 +244,15 @@ export default function AppOverviewPage() {
                                 ))}
                             </div>
                         </div>
+                    ) : overview.last_recorded_health ? (
+                        <StatCard
+                            label="Last recorded score"
+                            value={overview.last_recorded_health.overall_score}
+                            trend={<Badge variant="outline">Historical</Badge>}
+                            description={`Recorded ${new Date(overview.last_recorded_health.computed_at).toLocaleString()}. Historical score, not a current assessment. ${overview.last_recorded_health.coverage
+                                ? `${overview.last_recorded_health.coverage.assessed_categories.length}/6 categories assessed at the time.`
+                                : "Coverage unknown."}`}
+                        />
                     ) : (
                         <EmptyState
                             icon={<HeartPulse className="size-6" aria-hidden="true" />}

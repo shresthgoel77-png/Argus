@@ -1,9 +1,30 @@
 from typing import Any
 from app.monitoring.analyzer_base import BaseAnalyzer, AnalyzerContext, FindingDraft
-from app.integrations.github.exceptions import GitHubAuthError
+from app.integrations.github.exceptions import GitHubAuthError, GitHubAPIError
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def security_failure_reason(error: Exception) -> str:
+    """Classify known upstream failures without exposing arbitrary response text."""
+    if isinstance(error, GitHubAPIError):
+        status = error.response_status
+        message = str(error).lower()
+        if status == 403 and "dependabot alerts are disabled for this repository" in message:
+            return "GitHub reports Dependabot alerts are disabled for this repository. Enable alerts in GitHub, then reassess."
+        if status == 429 or (status == 403 and "rate limit" in message):
+            return "GitHub rate limit prevented the security check. Retry after the rate limit resets."
+        if status == 401:
+            return "GitHub rejected authentication for the security check. Verify the existing GitHub App installation, then retry."
+        if status == 403:
+            return "GitHub denied access to Dependabot alerts (HTTP 403). Verify the App's Dependabot alerts read permission and repository access."
+        if status == 404:
+            return "GitHub could not provide Dependabot alerts (HTTP 404). Verify repository access and alert availability."
+        if status == 400:
+            return "GitHub rejected the Dependabot alerts request (HTTP 400). Inspect the backend logs for an unsupported request parameter."
+        return "GitHub could not complete the security request. Retry; if it persists, inspect the backend logs."
+    return "The security check failed unexpectedly. Retry; if it persists, inspect the backend logs."
 
 
 def _map_severity(github_severity: str) -> str:

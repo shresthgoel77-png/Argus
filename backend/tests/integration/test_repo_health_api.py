@@ -48,7 +48,14 @@ async def test_repo_health_lazy_compute_and_post(db_session, authorized_client: 
     db_session.add(finding)
     db_session.commit()
 
-    # Access health endpoint - should lazily compute
+    from app.services.health_score_service import HEALTH_CATEGORY_TO_CHECK
+    test_user_repository.monitoring_status = "success"
+    test_user_repository.monitoring_checks = {
+        name: {"status": "success"} for name in [*HEALTH_CATEGORY_TO_CHECK.values(), "health"]
+    }
+    db_session.commit()
+
+    # Access the current assessed score
     response = await authorized_client.get(
         f"/api/v1/repositories/{test_user_repository.id}/health"
     )

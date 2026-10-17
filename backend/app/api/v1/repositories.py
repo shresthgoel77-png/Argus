@@ -49,7 +49,6 @@ from app.schemas.trend import (
 )
 from app.services.trend_service import get_health_trend, get_finding_velocity
 from app.schemas.dashboard_overview import DashboardOverviewResponse
-from app.services.health_service import get_latest_snapshot
 from app.services.needs_attention_service import get_needs_attention
 from app.services.finding_service import get_all_open_findings_for_repository
 from app.services.health_score_service import FINDING_CATEGORY_TO_HEALTH_CATEGORY
@@ -379,13 +378,6 @@ def get_dashboard_overview(
         db=db, user_id=user.id, repository_id=repository_id
     )
 
-    # 1. Health
-    health_snapshot = (
-        get_latest_snapshot(db, repository_id)
-        if repository.monitoring_status == "success"
-        else None
-    )
-
     # 2. Needs Attention (uses open findings inside)
     # The return type of get_needs_attention is NeedsAttentionDTO
     # Which maps easily to our NeedsAttentionResponse schema via from_attributes=True mapping, because Finding mapped to FindingResponse
@@ -441,7 +433,8 @@ def get_dashboard_overview(
     # Assemble composed response
     return DashboardOverviewResponse(
         repository_id=repository_id,
-        health=health_snapshot,
+        health=needs_attention_dto.health_snapshot,
+        last_recorded_health=needs_attention_dto.last_recorded_health,
         needs_attention=needs_attention_dto,
         activity_feed=activity_items,
         ai_summary=latest_ai_summary if latest_ai_summary else AIAnalysisNotExists(),

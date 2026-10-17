@@ -230,7 +230,7 @@ class TestListDependabotAlerts:
         page1_resp = _mock_response(
             200,
             json_data=[{"number": 1}],
-            headers={"link": '<https://api.github.com/repos/org/repo/dependabot/alerts?page=2>; rel="next"'},
+            headers={"link": '<https://api.github.com/repos/org/repo/dependabot/alerts?per_page=100&after=cursor-2>; rel="next"'},
         )
         page2_resp = _mock_response(
             200,
@@ -238,9 +238,24 @@ class TestListDependabotAlerts:
             headers={},
         )
         async with GitHubAppClient(installation_id=1) as client:
-            with patch.object(client._http, "request", new_callable=AsyncMock, side_effect=[page1_resp, page2_resp]):
+            with patch.object(client._http, "request", new_callable=AsyncMock, side_effect=[page1_resp, page2_resp]) as request:
                 result = await client.list_dependabot_alerts("org/repo")
         assert result == [{"number": 1}, {"number": 2}]
+        assert request.call_args_list[0].kwargs["params"] == {"per_page": 100}
+        assert request.call_args_list[1].kwargs["params"] == {"per_page": 100, "after": "cursor-2"}
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("next_url", [
+        "https://untrusted.example/repos/org/repo/dependabot/alerts?after=x",
+        "https://api.github.com/repos/org/repo/dependabot/alerts?page=2",
+    ])
+    async def test_invalid_cursor_never_returns_partial_success(self, _patch_auth, next_url):
+        response = _mock_response(200, json_data=[{"number": 1}], headers={"link": f'<{next_url}>; rel="next"'})
+        async with GitHubAppClient(installation_id=1) as client:
+            with patch.object(client._http, "request", new_callable=AsyncMock, return_value=response) as request:
+                with pytest.raises(GitHubAPIError, match="invalid Dependabot pagination"):
+                    await client.list_dependabot_alerts("org/repo")
+                assert request.await_count == 1
 
     @pytest.mark.asyncio
     async def test_raises_on_ambiguous_dependabot_404(self, _patch_auth):

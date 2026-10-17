@@ -111,11 +111,9 @@ async def run_monitoring_checks_for_repository(
             check_status = getattr(operation_result, "status", "success")
             if check_status in {"failed", "skipped", "unavailable"}:
                 error_message = getattr(operation_result, "error_message", None)
-                if check_status == "failed":
-                    raise RuntimeError(error_message or "Check reported failure")
                 result.checks[name] = CheckResult(
                     status=check_status,
-                    error_message=error_message,
+                    error_message=error_message or "The check could not be completed.",
                 )
                 result.status = "partial_failure"
                 save_check(name, result.checks[name])
@@ -232,14 +230,15 @@ async def run_monitoring_checks_for_repository(
         return CheckResult(status="success")
 
     async def run_named_analyzer(name: str) -> object:
-        return await run_analyzer(db, name, repository)
+        # Persist a single snapshot after all current-run category checks finish.
+        return await run_analyzer(db, name, repository, recompute_health=False)
 
     async def recalculate_health() -> CheckResult:
         snapshot = compute_and_persist_health(db, repository.id)
         if snapshot is None:
             return CheckResult(
                 status="unavailable",
-                error_message="A health score requires successful results for every category check.",
+                error_message="No category was successfully assessed; a current health score is unavailable.",
             )
         return CheckResult(status="success")
 

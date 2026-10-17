@@ -5,6 +5,7 @@ import pytest
 from app.models.finding import Finding
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
 from app.services.needs_attention_service import get_needs_attention
+from app.services.health_score_service import assessment_coverage
 
 
 def add_finding(db_session, repository, category, evidence, severity="high", priority=None):
@@ -66,10 +67,13 @@ def test_get_needs_attention_no_snapshot(db_session, test_user_repository):
 
 def test_get_needs_attention_with_snapshot_and_limit(db_session, test_user_repository):
     test_user_repository.monitoring_status = "success"
+    test_user_repository.monitoring_checks = {"security": {"status": "success"}, "health": {"status": "success"}}
     add_finding(db_session, test_user_repository, "security", {}, severity="high")
     add_finding(db_session, test_user_repository, "security", {}, severity="critical")
     add_finding(db_session, test_user_repository, "security", {}, severity="high")
-    add_snapshot(db_session, test_user_repository, ["Bad things"])
+    snapshot = add_snapshot(db_session, test_user_repository, ["Bad things"])
+    snapshot.coverage = assessment_coverage(test_user_repository.monitoring_checks)
+    db_session.commit()
     
     result = get_needs_attention(db_session, test_user_repository.id, limit=2)
     assert len(result.findings) == 2

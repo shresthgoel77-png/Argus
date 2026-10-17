@@ -318,11 +318,15 @@ class GitHubAppClient:
         """List dependabot alerts for a repository with pagination."""
         all_alerts: list[dict[str, Any]] = []
         page = 1
+        cursor: str | None = None
         while True:
+            params: dict[str, Any] = {"per_page": _MAX_PER_PAGE}
+            if cursor is not None:
+                params["after"] = cursor
             response = await self._request(
                 "GET",
                 f"/repos/{full_name}/dependabot/alerts",
-                params={"per_page": _MAX_PER_PAGE, "page": page},
+                params=params,
             )
             data = response.json()
             if not isinstance(data, list):
@@ -336,6 +340,16 @@ class GitHubAppClient:
                 raise GitHubAPIError(
                     "Dependabot alert scan exceeded the configured page limit"
                 )
+            # Dependabot rejects offset pagination. Use only the cursor from
+            # GitHub's Link header, never an arbitrary URL with our credentials.
+            next_link = httpx.Response(200, headers={"link": link_header}).links.get("next")
+            next_url = httpx.URL(next_link["url"]) if next_link else None
+            if (next_url is None or next_url.scheme != "https"
+                    or next_url.host != "api.github.com"
+                    or next_url.path != f"/repos/{full_name}/dependabot/alerts"
+                    or not next_url.params.get("after")):
+                raise GitHubAPIError("GitHub returned an invalid Dependabot pagination cursor")
+            cursor = next_url.params["after"]
             page += 1
         return all_alerts
 

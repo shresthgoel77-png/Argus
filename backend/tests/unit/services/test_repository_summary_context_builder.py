@@ -120,7 +120,7 @@ def test_incomplete_assessment_does_not_present_historical_score_as_current(
     snapshot.overall_score = 100
     snapshot.category_scores = {"security": 100}
     mock_attention.return_value = NeedsAttentionDTO(
-        findings=[], health_snapshot=snapshot, reasons=["Initial health score computed."]
+        findings=[], health_snapshot=None, last_recorded_health=snapshot, reasons=[]
     )
 
     context = build_repository_summary_context(mock_db_session, mock_repository.id)

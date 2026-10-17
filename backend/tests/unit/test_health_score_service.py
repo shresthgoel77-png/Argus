@@ -58,4 +58,4 @@ def test_unmapped_category_is_ignored():
     assert all(scores[cat] == 100 for cat in scores if cat != "ci_cd"), "Unmapped categories must be silently ignored"
 
 def test_compute_overall_empty():
-    assert compute_overall_score({}) == 100, "Empty category scores dict should return 100"
+    assert compute_overall_score({}) is None, "No included categories means no score"

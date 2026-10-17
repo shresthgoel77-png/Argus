@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
@@ -23,7 +23,7 @@ def _item(
 ) -> ActivityItem:
     return ActivityItem(
         source=source,
-        timestamp=timestamp,
+        timestamp=timestamp.replace(tzinfo=timezone.utc) if timestamp.tzinfo is None else timestamp,
         title=title,
         summary=summary[:500],
         reference_id=reference_id,
@@ -81,15 +81,20 @@ def get_activity_feed(
             items.append(_item(ActivitySource.finding_resolved, resolved_at, title, f"{severity} finding resolved", finding_id))
 
     if source in (None, ActivitySource.health_changed):
-        query = db.query(
-            RepositoryHealthSnapshot.id,
-            RepositoryHealthSnapshot.overall_score,
-            RepositoryHealthSnapshot.computed_at,
-        ).filter(RepositoryHealthSnapshot.repository_id == repository_id)
+        query = db.query(RepositoryHealthSnapshot).filter(RepositoryHealthSnapshot.repository_id == repository_id)
         if before is not None:
             query = query.filter(RepositoryHealthSnapshot.computed_at < before)
-        for snapshot_id, overall_score, computed_at in query.order_by(desc(RepositoryHealthSnapshot.computed_at), desc(RepositoryHealthSnapshot.id)).limit(limit).all():
-            items.append(_item(ActivitySource.health_changed, computed_at, "Repository health changed", f"Overall score: {overall_score}", snapshot_id))
+        for snapshot in query.order_by(desc(RepositoryHealthSnapshot.computed_at), desc(RepositoryHealthSnapshot.id)).limit(limit).all():
+            coverage = snapshot.coverage
+            label = (
+                f"{len(coverage['assessed_categories'])}/6 categories assessed"
+                if coverage else "coverage unknown"
+            )
+            items.append(_item(
+                ActivitySource.health_changed, snapshot.computed_at, "Repository health recorded",
+                f"Overall score: {snapshot.overall_score} (historical record; {label})", snapshot.id,
+                details={"coverage": coverage},
+            ))
 
     if source in (None, ActivitySource.bot_interaction):
         query = db.query(

@@ -101,9 +101,9 @@ def test_compute_and_persist_health_zero_findings(monkeypatch):
     assert snapshot in db.added
 
 
-def test_incomplete_check_set_never_returns_a_health_score(monkeypatch):
+def test_no_successful_categories_never_returns_a_health_score(monkeypatch):
     db = MockSession()
-    db.repository.monitoring_checks["security"] = {"status": "failed"}
+    db.repository.monitoring_checks = {"security": {"status": "failed"}}
 
     snapshot = compute_and_persist_health(db, uuid.uuid4())
 
@@ -278,7 +278,7 @@ def test_health_drop_notification_thresholds(monkeypatch):
         lambda db, repo: [],
     )
     monkeypatch.setattr(
-        "app.services.health_service.compute_category_scores", lambda f: {}
+        "app.services.health_service.compute_category_scores", lambda f, categories: {}
     )
 
     def get_mock_db():
@@ -426,7 +426,7 @@ def test_health_drop_notification_exception_handling(monkeypatch):
         lambda db, repo: [],
     )
     monkeypatch.setattr(
-        "app.services.health_service.compute_category_scores", lambda f: {}
+        "app.services.health_service.compute_category_scores", lambda f, categories: {}
     )
     # 30 point drop
     monkeypatch.setattr(

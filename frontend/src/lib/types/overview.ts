@@ -41,6 +41,7 @@ export interface DashboardOverviewTrends {
 export interface DashboardOverviewResponse {
     repository_id: string;
     health: RepositoryHealthSnapshot | null;
+    last_recorded_health?: RepositoryHealthSnapshot | null;
     needs_attention: DashboardOverviewNeedsAttention;
     activity_feed: OverviewActivityItem[];
     ai_summary: AIAnalysisResponse;

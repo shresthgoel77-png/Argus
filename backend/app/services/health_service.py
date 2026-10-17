@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
@@ -15,6 +16,7 @@ from app.services.health_score_service import (
     compute_category_scores,
     compute_overall_score,
     FINDING_CATEGORY_TO_HEALTH_CATEGORY,
+    assessment_coverage,
 )
 
 logger = get_logger(__name__)
@@ -98,6 +100,16 @@ def generate_reasons(
     return reasons
 
 
+def is_current_snapshot(repository: Repository, snapshot: RepositoryHealthSnapshot | None) -> bool:
+    if snapshot is None or snapshot.coverage is None:
+        return False
+    return (
+        repository.monitoring_status in {"success", "partial_failure"}
+        and repository.monitoring_checks.get("health", {}).get("status") == "success"
+        and snapshot.coverage == assessment_coverage(repository.monitoring_checks)
+    )
+
+
 def compute_and_persist_health(
     db: Session, repository_id: uuid.UUID
 ) -> RepositoryHealthSnapshot | None:
@@ -113,32 +125,33 @@ def compute_and_persist_health(
     if repository is None:
         return None
 
-    required_checks = {
-        "ci_cd",
-        "stale_issues",
-        "stale_prs",
-        "dependency",
-        "security",
-        "code_quality",
-    }
-    if any(
-        repository.monitoring_checks.get(name, {}).get("status") != "success"
-        for name in required_checks
-    ):
+    coverage = assessment_coverage(repository.monitoring_checks)
+    categories = coverage["assessed_categories"]
+    if not categories:
         return None
 
     open_findings = get_all_open_findings_for_repository(db, repository_id)
 
-    category_scores = compute_category_scores(open_findings)
+    open_findings = [
+        finding for finding in open_findings
+        if FINDING_CATEGORY_TO_HEALTH_CATEGORY.get(finding.category) in categories
+    ]
+    category_scores = compute_category_scores(open_findings, categories)
     overall_score = compute_overall_score(category_scores)
+    if overall_score is None:
+        return None
 
     previous = get_latest_snapshot(db, repository_id)
 
-    reasons = generate_reasons(
-        previous, category_scores, overall_score, open_findings
+    comparable = previous is not None and set(previous.category_scores) == set(category_scores)
+    reasons = (
+        generate_reasons(previous, category_scores, overall_score, open_findings)
+        if previous is None or comparable
+        else ["Assessment coverage changed; scores are not directly comparable."]
     )
     
-    if previous is not None and overall_score == previous.overall_score and reasons == ["No change since last check."]:
+    if (previous is not None and previous.coverage == coverage
+            and category_scores == previous.category_scores):
         return previous
 
     snapshot = RepositoryHealthSnapshot(
@@ -146,13 +159,15 @@ def compute_and_persist_health(
         overall_score=overall_score,
         category_scores=category_scores,
         reasons=reasons,
+        coverage=coverage,
+        computed_at=datetime.now(timezone.utc),
     )
 
     db.add(snapshot)
     db.commit()
     db.refresh(snapshot)
 
-    if previous is not None:
+    if comparable:
         drop = previous.overall_score - snapshot.overall_score
         if drop >= settings.health_drop_notification_threshold:
             try:

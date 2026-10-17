@@ -7,6 +7,7 @@ import pytest
 
 from app.models.repository import Repository
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
+from app.services.health_score_service import assessment_coverage
 from app.models.finding import Finding
 from app.models.ai_analysis import AIAnalysis
 
@@ -41,6 +42,7 @@ async def test_get_dashboard_overview(
         computed_at=datetime.now(timezone.utc),
         overall_score=85,
         category_scores={"security": 90},
+        coverage=assessment_coverage(valid_repository.monitoring_checks),
         reasons=["Good security score"]
     )
     db_session.add(snapshot)
@@ -147,9 +149,11 @@ async def test_incomplete_dashboard_retains_history_without_claiming_current_hea
     assert response.status_code == 200
     data = response.json()
     assert data["health"] is None
+    assert data["last_recorded_health"]["overall_score"] == 100
+    assert data["last_recorded_health"]["coverage"] is None
     assert data["needs_attention"]["health_snapshot"] is None
     assert data["needs_attention"]["reasons"] == []
-    assert any(item["summary"] == "Overall score: 100" for item in data["activity_feed"])
+    assert any(item["summary"].startswith("Overall score: 100") for item in data["activity_feed"])
     assert db_session.query(RepositoryHealthSnapshot).filter_by(
         repository_id=test_user_repository.id
     ).count() == 1

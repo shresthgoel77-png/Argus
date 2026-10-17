@@ -48,9 +48,10 @@ def build_repository_summary_context(db: Session, repository_id: uuid.UUID) -> R
     parts.append(f"Monitoring Enabled: {repo.monitoring_enabled}")
     parts.append(f"Assessment Status: {repo.monitoring_status}")
 
-    if repo.monitoring_status == "success" and attention.health_snapshot:
+    if attention.health_snapshot:
         parts.append(f"Overall Health Score: {attention.health_snapshot.overall_score}")
         parts.append(f"Category Scores: {attention.health_snapshot.category_scores}")
+        parts.append(f"Health Coverage: {attention.health_snapshot.coverage}")
         # Truncate each reason and limit to 10
         safe_reasons = [truncate(r, 200) for r in attention.reasons[:10]]
         parts.append(f"Health Reasons:\n" + "\n".join(f"- {r}" for r in safe_reasons))
@@ -60,6 +61,12 @@ def build_repository_summary_context(db: Session, repository_id: uuid.UUID) -> R
             "A complete current health assessment is unavailable. "
             "An absence of findings does not establish that the repository is healthy."
         )
+        if attention.last_recorded_health:
+            historical = attention.last_recorded_health
+            parts.append(
+                f"Last recorded score (historical, not current): {historical.overall_score}; "
+                f"computed at {historical.computed_at}; coverage: {historical.coverage or 'unknown'}"
+            )
 
     if attention.findings:
         parts.append("Top Findings:")

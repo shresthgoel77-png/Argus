@@ -8,6 +8,7 @@ from app.integrations.github.webhook_events import NormalizedWebhookEvent, RepoR
 from app.models.finding import Finding
 from app.models.repository_health_snapshot import RepositoryHealthSnapshot
 from app.services.ai_context_builder import build_context
+from app.services.health_score_service import assessment_coverage
 
 
 def event(payload):
@@ -122,11 +123,16 @@ async def test_repo_attention_aggregates_findings_and_latest_reasons(
     db_session, test_user_repository
 ):
     add_finding(db_session, test_user_repository, "security", {}, severity="critical")
+    test_user_repository.monitoring_status = "partial_failure"
+    test_user_repository.monitoring_checks = {
+        "security": {"status": "success"}, "health": {"status": "success"},
+    }
     snapshot = RepositoryHealthSnapshot(
         repository_id=test_user_repository.id,
         overall_score=50,
         category_scores={"security": 20},
         reasons=["Security needs attention."],
+        coverage=assessment_coverage(test_user_repository.monitoring_checks),
     )
     db_session.add(snapshot)
     db_session.commit()
@@ -135,6 +141,12 @@ async def test_repo_attention_aggregates_findings_and_latest_reasons(
 
     assert "[critical] Test finding" in context.untrusted_content
     assert "Security needs attention." in context.untrusted_content
+
+    test_user_repository.monitoring_checks = {"security": {"status": "failed"}}
+    db_session.commit()
+    context = await build_bot_context(BotIntent.repo_attention, test_user_repository, event({}))
+    assert "[critical] Test finding" in context.untrusted_content
+    assert "Security needs attention." not in context.untrusted_content
 
 
 @pytest.mark.asyncio

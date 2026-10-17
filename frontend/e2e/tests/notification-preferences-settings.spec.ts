@@ -101,7 +101,6 @@ test.describe('Notification Preferences Settings Flow', () => {
     });
 
     test('shows an error state if saving fails', async ({ page }) => {
-        let isGet = true;
         await page.route('**/api/v1/notifications/preferences', async (route) => {
             if (route.request().method() === 'GET') {
                 await route.fulfill({
@@ -112,7 +111,6 @@ test.describe('Notification Preferences Settings Flow', () => {
                         min_severity_email: 'critical'
                     }),
                 });
-                isGet = false;
             } else if (route.request().method() === 'PUT') {
                 await route.fulfill({
                     status: 400,

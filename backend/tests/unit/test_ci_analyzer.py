@@ -1,3 +1,4 @@
+import uuid
 import pytest
 from app.monitoring.analyzers.ci_analyzer import CIAnalyzer
 from app.monitoring.analyzer_base import AnalyzerContext
@@ -20,7 +21,7 @@ def create_context(event_type: str, action: str, conclusion: str, name: str = "C
         workflow_run_conclusion=conclusion,
         workflow_run_url="http://example.com",
     )
-    repo = Repository(github_repo_id=1, full_name="my/repo", private=False, monitoring_enabled=True)
+    repo = Repository(id=uuid.uuid4(), github_repo_id=1, full_name="my/repo", private=False, monitoring_enabled=True)
     return AnalyzerContext(repository=repo, normalized_event=ev)
     
 def test_ci_analyzer_ignores_non_workflow_run():
@@ -48,7 +49,8 @@ def test_ci_analyzer_failure_gives_high_severity():
     assert len(findings) == 1
     assert findings[0].severity == "high"
     assert findings[0].type_ == "workflow_run_failed"
-    assert findings[0].fingerprint is None
+    assert findings[0].fingerprint == f"ci:{ctx.repository.id}:workflow_run:100"
+    assert analyzer.analyze(ctx)[0].fingerprint == findings[0].fingerprint
 
 def test_ci_analyzer_cancelled_gives_low_severity():
     analyzer = CIAnalyzer()
@@ -57,4 +59,4 @@ def test_ci_analyzer_cancelled_gives_low_severity():
     assert len(findings) == 1
     assert findings[0].severity == "low"
     assert findings[0].type_ == "workflow_run_cancelled"
-    assert findings[0].fingerprint is None
+    assert findings[0].fingerprint == f"ci:{ctx.repository.id}:workflow_run:100"

@@ -94,9 +94,9 @@ def mock_ai_analysis(test_finding):
     mock.completed_at = datetime.now(timezone.utc)
     mock.summary = "Test summary"
     mock.severity_assessment = "High"
-    mock.confidence = "High"
-    mock.recommendations = "Fix it"
-    mock.error_message = None # Explicitly ensuring not in schema
+    mock.confidence = 0.9
+    mock.recommendations = ["Fix it"]
+    mock.error_message = None
     return mock
 
 
@@ -111,7 +111,9 @@ async def test_trigger_analysis_success(mock_request, authorized_client, test_fi
     data = response.json()
     assert data["id"] == str(mock_ai_analysis.id)
     assert data["provider"] == "gemini"
-    assert "error_message" not in data
+    assert data["confidence"] == 0.9
+    assert data["recommendations"] == ["Fix it"]
+    assert data["error_message"] is None
     mock_request.assert_called_once()
     
 
@@ -172,6 +174,8 @@ async def test_get_latest_analysis_success(mock_get, authorized_client, test_fin
     data = response.json()
     assert data["id"] == str(mock_ai_analysis.id)
     assert "exists" not in data
+    assert data["confidence"] == 0.9
+    assert data["recommendations"] == ["Fix it"]
 
 
 @pytest.mark.asyncio
@@ -193,6 +197,8 @@ async def test_list_analyses_history(mock_list, authorized_client, test_finding,
     assert data["total"] == 1
     assert len(data["items"]) == 1
     assert data["items"][0]["id"] == str(mock_ai_analysis.id)
+    assert data["items"][0]["confidence"] == 0.9
+    assert data["items"][0]["recommendations"] == ["Fix it"]
     assert data["limit"] == 50
     assert data["offset"] == 0
 

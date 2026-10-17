@@ -62,7 +62,7 @@ class TestFromResponse:
         "status, expected_type, expected_code",
         [
             (401, GitHubAuthError, "github_auth_error"),
-            (403, GitHubAuthError, "github_auth_error"),
+            (403, GitHubAuthError, "github_permission_error"),
             (404, GitHubNotFoundError, "github_not_found"),
             (429, GitHubRateLimitError, "github_rate_limit"),
             (500, GitHubAPIError, "github_api_error"),
@@ -77,6 +77,8 @@ class TestFromResponse:
         assert type(exc) is expected_type
         assert exc.code == expected_code
         assert exc.response_status == status
+        if status in (401, 403):
+            assert exc.status_code == (403 if status == 403 else 502)
         assert "test message" in exc.message
 
     def test_preserves_response_status(self):
@@ -107,7 +109,7 @@ class TestDefaultAttributes:
     def test_github_auth_error_defaults(self):
         exc = GitHubAuthError()
         assert exc.code == "github_auth_error"
-        assert exc.status_code == 401
+        assert exc.status_code == 502
 
     def test_github_not_found_defaults(self):
         exc = GitHubNotFoundError()

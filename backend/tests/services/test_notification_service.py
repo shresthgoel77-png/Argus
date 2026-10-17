@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 import pytest
 from fastapi import HTTPException
+from app.models.user import User
 
 from app.schemas.notification import NotificationCreate
 from app.services.notification_service import (
@@ -14,8 +15,8 @@ from app.services.notification_service import (
 
 
 
-def test_create_and_list_notifications(db_session):
-    user_id = uuid.uuid4()
+def test_create_and_list_notifications(db_session, test_user):
+    user_id = test_user.id
     
     # Create notification 1
     notif1 = create_notification(
@@ -56,8 +57,8 @@ def test_create_and_list_notifications(db_session):
     # Unread count
     assert get_unread_count(db_session, user_id=user_id) == 2
     
-def test_mark_read_and_permissions(db_session):
-    user_id = uuid.uuid4()
+def test_mark_read_and_permissions(db_session, test_user):
+    user_id = test_user.id
     other_user_id = uuid.uuid4()
     
     notif = create_notification(
@@ -89,8 +90,8 @@ def test_mark_read_and_permissions(db_session):
     
     assert get_unread_count(db_session, user_id) == 0
     
-def test_mark_all_read(db_session):
-    user_id = uuid.uuid4()
+def test_mark_all_read(db_session, test_user):
+    user_id = test_user.id
     # create two
     for _ in range(2):
         create_notification(
@@ -106,7 +107,10 @@ def test_mark_all_read(db_session):
             )
         )
         
-    other_user_id = uuid.uuid4()
+    other_user = User(email="other_notifications@example.com", auth_provider="test")
+    db_session.add(other_user)
+    db_session.flush()
+    other_user_id = other_user.id
     create_notification(
         db_session,
         NotificationCreate(

@@ -146,3 +146,56 @@ async def test_slow_clerk_call_does_not_block_other_requests(request_factory, st
         released.set()
     context, _ = await asyncio.gather(adapter.resolve_identity(request_factory()), other_request())
     assert context is not None and context.external_id == 'user_verified'
+
+
+@pytest.mark.asyncio
+async def test_reused_adapter_verifies_every_request_and_keeps_users_isolated(request_factory):
+    from types import SimpleNamespace
+    from unittest.mock import MagicMock, call
+
+    client = MagicMock()
+    client.authenticate_request.side_effect = [
+        SimpleNamespace(is_signed_in=True, payload={"sub": "user_first"}),
+        SimpleNamespace(is_signed_in=True, payload={"sub": "user_second"}),
+        SimpleNamespace(is_signed_in=False, payload=None),
+    ]
+    client.users.get.side_effect = [
+        SimpleNamespace(email_addresses=[SimpleNamespace(email_address=email)])
+        for email in ["first@example.com", "second@example.com"]
+    ]
+    adapter = ClerkAuthAdapter(clerk_client=client)
+    first = await adapter.resolve_identity(request_factory("Bearer first"))
+    second = await adapter.resolve_identity(request_factory("Bearer second"))
+    assert (first.external_id, first.email) == ("user_first", "first@example.com")
+    assert (second.external_id, second.email) == ("user_second", "second@example.com")
+    assert await adapter.resolve_identity(request_factory("Bearer expired")) is None
+    assert client.authenticate_request.call_count == 3
+    assert client.users.get.call_args_list == [call(user_id="user_first"), call(user_id="user_second")]
+
+
+@pytest.mark.asyncio
+async def test_cold_provider_construction_does_not_block_event_loop(monkeypatch, request_factory):
+    import asyncio
+    import threading
+    from app.auth import dependencies
+    from app.core.exceptions import NotAuthenticatedError
+
+    released = threading.Event()
+
+    def construct():
+        if not released.wait(timeout=2):
+            raise TimeoutError("Provider construction blocked the event loop")
+        return ClerkAuthAdapter(clerk_client=type("Client", (), {
+            "authenticate_request": lambda *args: type("State", (), {"is_signed_in": False})(),
+        })())
+
+    monkeypatch.setattr(dependencies, "get_auth_provider", construct)
+
+    async def other_request():
+        released.set()
+
+    try:
+        with pytest.raises(NotAuthenticatedError):
+            await asyncio.gather(dependencies.get_current_user(request_factory(), db=None), other_request())
+    finally:
+        released.set()

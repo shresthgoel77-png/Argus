@@ -25,6 +25,19 @@ if not settings.test_database_url:
     raise ValueError("TEST_DATABASE_URL environment variable must be provided for integration tests.")
 settings.database_url = settings.test_database_url
 
+@pytest.fixture(autouse=True)
+def isolate_api_rate_limit_state():
+    # Tests share the application and client IP, but not a rate-limit window.
+    # Limits still apply to every request within each test, including 429 tests.
+    from app.core.rate_limit import ApiRateLimitMiddleware
+    middleware = app.middleware_stack
+    while middleware is not None:
+        if isinstance(middleware, ApiRateLimitMiddleware):
+            with middleware._lock:
+                middleware._requests.clear()
+            break
+        middleware = getattr(middleware, "app", None)
+
 @pytest.fixture(scope="session")
 def client():
     with TestClient(app) as c:

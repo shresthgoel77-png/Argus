@@ -6,6 +6,7 @@ from app.models.repository import Repository
 from app.integrations.github.webhook_events import NormalizedWebhookEvent, RepoRef
 from app.services.github_event_service import process_webhook_event
 from app.monitoring import monitor_service
+from app.schemas.monitoring import MonitorRunResult
 
 def test_process_webhook_event_analyzes_pull_request(db_session, monkeypatch):
     u = User(email="t4@a.com", display_name="T4", auth_provider="o", external_auth_id="4")
@@ -37,7 +38,7 @@ def test_process_webhook_event_analyzes_pull_request(db_session, monkeypatch):
         nonlocal fake_run_analyzer_called
         assert analyzer_key == "pull_request"
         fake_run_analyzer_called = True
-        return []
+        return MonitorRunResult(status="success")
         
     monkeypatch.setattr(monitor_service, "run_analyzer", fake_run_analyzer)
 

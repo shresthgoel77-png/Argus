@@ -1,4 +1,4 @@
-import { AvailableRepository, Repository } from "../types/github";
+import { AvailableRepository, Repository, RepositoryCheckResult } from "../types/github";
 import type { DashboardOverviewResponse } from "../types/overview";
 import { getClerkAuthorizationHeaders } from "../auth/clerk-token";
 
@@ -102,7 +102,7 @@ export async function getDashboardOverview(repositoryId: string): Promise<Dashbo
     }
 }
 
-export async function refreshRepository(repositoryId: string): Promise<any | null> {
+export async function refreshRepository(repositoryId: string): Promise<RepositoryCheckResult | null> {
     try {
         const res = await fetchClient(`/api/v1/repositories/${repositoryId}/refresh`, {
             method: "POST"

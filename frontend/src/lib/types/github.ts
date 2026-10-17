@@ -26,3 +26,14 @@ export interface Repository {
     last_monitoring_at?: string | null;
     created_at: string;
 }
+
+export interface RepositoryCheckResult {
+    correlation_id: string;
+    status: string;
+    checks: Record<string, {
+        status: string;
+        error_message?: string | null;
+        checked_at?: string | null;
+    }>;
+    reason?: string | null;
+}

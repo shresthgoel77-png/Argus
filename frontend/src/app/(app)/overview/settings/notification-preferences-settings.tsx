@@ -8,8 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import {
     NotificationPreferencesApiError,
     getNotificationPreferences,
-    updateNotificationPreferences,
-    NotificationPreferences
+    updateNotificationPreferences
 } from "@/lib/api/notification-preferences";
 
 type Severity = "critical" | "high" | "medium" | "low" | "info";

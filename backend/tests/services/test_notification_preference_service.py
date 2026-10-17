@@ -1,11 +1,10 @@
-import uuid
 from app.models.notification_preference import NotificationSeverity
 from app.services.notification_preference_service import get_or_create_preference, update_preference
 
 
 
-def test_get_or_create_preference_new_user(db_session):
-    user_id = uuid.uuid4()
+def test_get_or_create_preference_new_user(db_session, test_user):
+    user_id = test_user.id
     
     # First time access creates defaults
     pref = get_or_create_preference(db_session, user_id)
@@ -17,8 +16,8 @@ def test_get_or_create_preference_new_user(db_session):
     pref2 = get_or_create_preference(db_session, user_id)
     assert pref2.id == pref.id
 
-def test_update_preference_round_trip(db_session):
-    user_id = uuid.uuid4()
+def test_update_preference_round_trip(db_session, test_user):
+    user_id = test_user.id
     
     # Update without pre-existing preference
     pref = update_preference(

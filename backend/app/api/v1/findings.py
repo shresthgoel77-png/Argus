@@ -1,5 +1,5 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.auth.dependencies import get_current_user
@@ -41,11 +41,14 @@ def preview_finding_issue(
 async def create_finding_issue(
     finding_id: uuid.UUID,
     request: FindingIssueCreateRequest,
+    background_tasks: BackgroundTasks,
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     return await finding_issue_service.create_issue(
         db, user_id=user.id, finding_id=finding_id, preview_token=request.preview_token,
+        background_tasks=background_tasks, recipient_email=user.email,
+        recipient_auth_provider=user.auth_provider, recipient_external_id=user.external_auth_id,
     )
 
 @router.get("", response_model=FindingListResponse)

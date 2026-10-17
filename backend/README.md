@@ -42,6 +42,23 @@ To autogenerate a new migration after updating models:
 alembic revision --autogenerate -m "description of changes"
 ```
 
+## GitHub issue confirmation emails
+
+Optional confirmation emails use the existing SMTP provider. Set `SMTP_HOST`,
+`SMTP_USERNAME`, and `SMTP_PASSWORD` in the backend environment. Optional settings:
+`SMTP_PORT` (587 with TLS, otherwise 25), `SMTP_FROM_ADDRESS` (defaults to the SMTP
+username), and `SMTP_USE_TLS` (defaults to true). `CLERK_SECRET_KEY` is also needed
+to confirm that the initiating authenticated user's registered email is verified.
+Missing configuration or a missing verified address skips the email.
+
+Only a newly created GitHub issue with a confirmed issue URL schedules an email;
+failed, skipped, duplicate, and reconciled requests do not. Delivery runs in
+FastAPI background tasks after the response, with a separate database session
+for an optional saved, completed finding AI summary. It does not generate AI
+content or change notification preferences. This confirmation is independent of
+severity-filtered finding alerts. Delivery is best effort and is not durable
+across a process restart; failures are logged without email content or secrets.
+
 ## Integration Tests
 
 Integration tests run against a real PostgreSQL database instance to ensure database interactions work accurately. They use a separate test database so as not to interfere with development data.

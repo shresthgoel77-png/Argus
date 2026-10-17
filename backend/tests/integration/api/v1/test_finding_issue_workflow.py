@@ -10,6 +10,13 @@ from app.services.finding_service import sync_findings_for_run
 from app.monitoring.analyzer_base import FindingDraft
 
 
+@pytest.fixture(autouse=True)
+def email_delivery(monkeypatch):
+    delivery = MagicMock()
+    monkeypatch.setattr('app.services.finding_issue_service.send_issue_created_email', delivery)
+    return delivery
+
+
 @pytest.fixture
 def finding(db_session, test_user_repository):
     test_user_repository.monitoring_checks = {"security": {"status": "success"}}
@@ -59,7 +66,7 @@ async def test_preview_approval_idempotency_and_rescan(authorized_client, db_ses
 
 
 @pytest.mark.asyncio
-async def test_stale_preview_and_unowned_finding_rejected(authorized_client, db_session, finding, github):
+async def test_stale_preview_and_unowned_finding_rejected(authorized_client, db_session, finding, github, email_delivery):
     path = f'/api/v1/findings/{finding.id}'
     token = (await authorized_client.get(path + '/issue-preview')).json()['preview_token']
     finding.severity = 'critical'
@@ -76,10 +83,11 @@ async def test_stale_preview_and_unowned_finding_rejected(authorized_client, db_
     assert (await authorized_client.get(path + '/issue-preview')).status_code == 404
     assert (await authorized_client.post(path + '/issue', json={'approved': True, 'preview_token': token})).status_code == 404
     github.create_repository_issue.assert_not_called()
+    email_delivery.assert_not_called()
 
 
 @pytest.mark.asyncio
-async def test_ambiguous_github_result_never_reposts(authorized_client, finding, github):
+async def test_ambiguous_github_result_never_reposts(authorized_client, finding, github, email_delivery):
     path = f'/api/v1/findings/{finding.id}'
     token = (await authorized_client.get(path + '/issue-preview')).json()['preview_token']
     github.create_repository_issue.side_effect = httpx.ReadTimeout('timed out')
@@ -93,10 +101,11 @@ async def test_ambiguous_github_result_never_reposts(authorized_client, finding,
     assert (await authorized_client.post(path + '/issue', json=payload)).status_code == 200
     assert github.create_repository_issue.await_count == 1
     github.list_repository_issues.assert_awaited_with(finding.repository.full_name, state='all')
+    email_delivery.assert_not_called()
 
 
 @pytest.mark.asyncio
-async def test_github_permission_error_is_visible_and_retryable(authorized_client, finding, github):
+async def test_github_permission_error_is_visible_and_retryable(authorized_client, finding, github, email_delivery):
     path = f'/api/v1/findings/{finding.id}'
     token = (await authorized_client.get(path + '/issue-preview')).json()['preview_token']
     github.create_repository_issue.side_effect = GitHubAuthError('Issues write permission required', response_status=403)
@@ -104,6 +113,7 @@ async def test_github_permission_error_is_visible_and_retryable(authorized_clien
     assert response.status_code in {401, 403}
     assert 'permission' in str(response.json())
     assert finding.evidence['_github_issue']['status'] == 'failed'
+    email_delivery.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -217,3 +227,137 @@ def test_concurrent_open_fingerprint_conflict_keeps_session_usable(db_session, f
             evidence={'github_alert_number': 1}, fingerprint=finding.fingerprint)
     assert updated.id == finding.id and updated.severity == 'critical'
     assert db_session.query(Finding).filter_by(repository_id=finding.repository_id).count() == 1
+
+
+@pytest.mark.asyncio
+async def test_new_issue_notifies_initiator_once_after_confirmation(
+    authorized_client, finding, github, test_user, email_delivery,
+):
+    path = f'/api/v1/findings/{finding.id}'
+    token = (await authorized_client.get(path + '/issue-preview')).json()['preview_token']
+    payload = {'approved': True, 'preview_token': token}
+    response = await authorized_client.post(path + '/issue', json=payload)
+    assert response.status_code == 200
+    assert response.json()['html_url'] == github.create_repository_issue.return_value['html_url']
+    assert finding.evidence['_github_issue']['status'] == 'created'
+    email_delivery.assert_called_once_with(
+        user_id=str(test_user.id), recipient_email=test_user.email,
+        auth_provider=test_user.auth_provider, external_id=test_user.external_auth_id,
+        finding_id=str(finding.id), repository_name=finding.repository.full_name,
+        issue_title='Published finding', issue_url=response.json()['html_url'],
+        category='security', severity='high', description='Advisory evidence',
+    )
+    assert (await authorized_client.post(path + '/issue', json=payload)).status_code == 200
+    email_delivery.assert_called_once()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('missing', ['html_url', 'number'])
+async def test_unconfirmed_issue_never_notifies(authorized_client, finding, github, email_delivery, missing):
+    github.create_repository_issue.return_value.pop(missing)
+    path = f'/api/v1/findings/{finding.id}'
+    token = (await authorized_client.get(path + '/issue-preview')).json()['preview_token']
+    response = await authorized_client.post(path + '/issue', json={'approved': True, 'preview_token': token})
+    assert response.status_code == 502
+    email_delivery.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_email_scheduling_failure_preserves_issue_response(
+    authorized_client, finding, github, email_delivery, monkeypatch,
+):
+    from fastapi import BackgroundTasks
+    scheduler = MagicMock(side_effect=RuntimeError('smtp-secret'))
+    logger = MagicMock()
+    monkeypatch.setattr(BackgroundTasks, 'add_task', scheduler)
+    monkeypatch.setattr('app.services.finding_issue_service.logger', logger)
+    path = f'/api/v1/findings/{finding.id}'
+    token = (await authorized_client.get(path + '/issue-preview')).json()['preview_token']
+    response = await authorized_client.post(path + '/issue', json={'approved': True, 'preview_token': token})
+    assert response.status_code == 200
+    assert response.json()['html_url'] == github.create_repository_issue.return_value['html_url']
+    assert finding.evidence['_github_issue']['status'] == 'created'
+    email_delivery.assert_not_called()
+    scheduler.assert_called_once()
+    logger.warning.assert_called_once_with('Issue email scheduling failed')
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('result', ['success', 'exception', 'failure'])
+async def test_http_response_is_sent_while_email_delivery_is_blocked(
+    authorized_client, db_session, finding, github, test_user, monkeypatch, result,
+):
+    import asyncio
+    import json
+    import threading
+    from types import SimpleNamespace
+    from pydantic import SecretStr
+    from app.main import app
+    from app.services import issue_notification_service as mail
+
+    test_user.auth_provider = 'clerk'
+    test_user.external_auth_id = 'user_initiator'
+    db_session.commit()
+    for name, value in {
+        'smtp_host': 'smtp.example.com', 'smtp_username': 'sender',
+        'smtp_password': SecretStr('smtp-secret'), 'clerk_secret_key': SecretStr('clerk-secret'),
+    }.items():
+        monkeypatch.setattr(mail.settings, name, value)
+    clerk = MagicMock()
+    clerk.users.get.return_value = SimpleNamespace(id='user_initiator', email_addresses=[
+        SimpleNamespace(email_address=test_user.email, verification=SimpleNamespace(status='verified')),
+    ])
+    monkeypatch.setattr(mail, 'Clerk', MagicMock(return_value=clerk))
+    monkeypatch.setattr(mail, 'SessionLocal', MagicMock(side_effect=RuntimeError('No saved AI summary')))
+    monkeypatch.setattr('app.services.finding_issue_service.send_issue_created_email', mail.send_issue_created_email)
+    started, release = threading.Event(), threading.Event()
+    provider = MagicMock()
+
+    def deliver(**kwargs):
+        started.set()
+        release.wait(timeout=5)
+        if result == 'exception':
+            raise RuntimeError('smtp-secret')
+        return SimpleNamespace(success=result == 'success')
+
+    provider.send.side_effect = deliver
+    monkeypatch.setattr(mail, 'get_provider', MagicMock(return_value=MagicMock(return_value=provider)))
+    path = f'/api/v1/findings/{finding.id}'
+    token = (await authorized_client.get(path + '/issue-preview')).json()['preview_token']
+    path += '/issue'
+    body = json.dumps({'approved': True, 'preview_token': token}).encode()
+    scope = {
+        'type': 'http', 'asgi': {'version': '3.0'}, 'http_version': '1.1',
+        'method': 'POST', 'scheme': 'http', 'path': path, 'raw_path': path.encode(),
+        'query_string': b'', 'root_path': '', 'server': ('test', 80), 'client': ('127.0.0.1', 1234),
+        'headers': [(b'content-type', b'application/json'), (b'content-length', str(len(body)).encode())],
+    }
+    messages, response_sent = [], asyncio.Event()
+    received = False
+
+    async def receive():
+        nonlocal received
+        if not received:
+            received = True
+            return {'type': 'http.request', 'body': body, 'more_body': False}
+        await asyncio.Event().wait()
+
+    async def send(message):
+        messages.append(message)
+        if message['type'] == 'http.response.body' and not message.get('more_body', False):
+            response_sent.set()
+
+    request_task = asyncio.create_task(app(scope, receive, send))
+    try:
+        await asyncio.wait_for(response_sent.wait(), timeout=3)
+        assert await asyncio.to_thread(started.wait, 2)
+        assert not release.is_set()
+        assert not request_task.done()  # Email is still held after the full HTTP response.
+        assert next(m for m in messages if m['type'] == 'http.response.start')['status'] == 200
+        response_body = b''.join(m.get('body', b'') for m in messages if m['type'] == 'http.response.body')
+        assert json.loads(response_body)['html_url'] == github.create_repository_issue.return_value['html_url']
+    finally:
+        release.set()
+        await asyncio.wait_for(request_task, timeout=3)
+    assert finding.evidence['_github_issue']['status'] == 'created'
+    assert provider.send.call_args.kwargs['to'] == test_user.email

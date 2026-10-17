@@ -2,17 +2,22 @@
 import hashlib
 import json
 
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from sqlalchemy import String, cast, or_, update
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.logging import get_logger
 from app.integrations.github.client import GitHubAppClient
 from app.integrations.github.exceptions import GitHubAPIError
 from app.models.finding import Finding
 from app.schemas.finding import FindingIssuePreview
 from app.services.finding_service import get_finding_or_404
+from app.services.issue_notification_service import send_issue_created_email
+
+
+logger = get_logger(__name__)
 
 
 def _serializer():
@@ -80,7 +85,11 @@ def preview_issue(finding: Finding) -> FindingIssuePreview:
     )
 
 
-async def create_issue(db: Session, *, user_id, finding_id, preview_token: str):
+async def create_issue(
+    db: Session, *, user_id, finding_id, preview_token: str,
+    background_tasks: BackgroundTasks, recipient_email: str | None,
+    recipient_auth_provider: str, recipient_external_id: str | None,
+):
     finding = get_finding_or_404(db, user_id, finding_id)
     preview = preview_issue(finding)
     try:
@@ -143,4 +152,16 @@ async def create_issue(db: Session, *, user_id, finding_id, preview_token: str):
         db.refresh(finding)
         finding.evidence = {**finding.evidence, "_github_issue": {"status": "created", "item": item}}
         db.commit()
+        try:
+            background_tasks.add_task(
+                send_issue_created_email,
+                user_id=str(user_id), recipient_email=recipient_email,
+                auth_provider=recipient_auth_provider, external_id=recipient_external_id,
+                finding_id=str(finding.id), repository_name=preview.repository,
+                issue_title=item.get("title") or preview.title, issue_url=item["html_url"],
+                category=finding.category, severity=finding.severity,
+                description=finding.description,
+            )
+        except Exception:
+            logger.warning("Issue email scheduling failed")
         return item

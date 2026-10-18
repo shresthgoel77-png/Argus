@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.db.session import get_db
@@ -54,6 +54,27 @@ from app.services.finding_service import get_all_open_findings_for_repository
 from app.services.health_score_service import FINDING_CATEGORY_TO_HEALTH_CATEGORY
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
+
+
+@router.get("/{repository_id}/activity-metadata")
+async def get_repository_activity_metadata(
+    repository_id: uuid.UUID,
+    response: Response,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Read metadata only for a currently owned connected repository, even on cache hits."""
+    from app.services.activity_metadata_service import get_activity_metadata
+
+    response.headers["Cache-Control"] = "private, no-store"
+    repository = get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    connection = get_connection_or_404(db=db, user_id=user.id, connection_id=repository.connection_id)
+    return await get_activity_metadata(
+        user_id=str(user.id), repository_id=str(repository.id), connection_id=str(connection.id),
+        installation_id=connection.installation_id, github_id=repository.github_repo_id,
+        full_name=repository.full_name,
+    )
+
 
 @router.post("", response_model=RepositoryRead)
 async def create_repository(

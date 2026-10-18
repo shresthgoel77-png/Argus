@@ -22,6 +22,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/api/repositories", () => ({ getRepositories: vi.fn() }));
 vi.mock("@/lib/api/repository-work-items", () => ({ listRepositoryWorkItems: vi.fn() }));
 vi.mock("@/lib/api/activity", () => ({ listRepositoryActivity: vi.fn() }));
+vi.mock("@/components/activity/use-activity-metadata", () => ({ useActivityMetadata: () => ({}) }));
 
 const repositories: Repository[] = [
     { id: "repo-a", full_name: "acme/alpha", private: false, default_branch: "main", monitoring_enabled: false, created_at: "2026-01-01" },
@@ -56,7 +57,7 @@ it("defaults to the first authorized repo and Contributions without detail/event
     expect(window.location.search).toBe("?repo=repo-a&tab=contributions");
     expect(screen.getByRole("heading", { name: "Your contribution heatmap" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Language footprint" })).toBeInTheDocument();
-    expect(screen.getAllByText("Not available yet")).toHaveLength(2);
+    expect(screen.getAllByText("Not available yet")).toHaveLength(1);
     expect(listRepositoryWorkItems).not.toHaveBeenCalled();
     expect(listRepositoryActivity).not.toHaveBeenCalled();
     expect(screen.queryByRole("group", { name: "Filter activity by source" })).not.toBeInTheDocument();
@@ -153,7 +154,7 @@ it("revalidates revoked repositories on focus, falls back, and clears detail whe
     fireEvent(window, new Event("focus"));
     await waitFor(() => expect(screen.getByRole("heading", { name: "acme/alpha" })).toBeInTheDocument());
     expect(screen.queryByRole("button", { name: "Select acme/beta" })).not.toBeInTheDocument();
-    expect(listRepositoryWorkItems).toHaveBeenLastCalledWith("repo-a", "issues");
+    await waitFor(() => expect(listRepositoryWorkItems).toHaveBeenLastCalledWith("repo-a", "issues"));
     vi.mocked(getRepositories).mockResolvedValueOnce([]);
     fireEvent.click(screen.getByRole("button", { name: "Refresh repositories" }));
     expect(await screen.findByText("No connected repositories")).toBeInTheDocument();

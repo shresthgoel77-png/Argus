@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import { Activity, AlertTriangle, CalendarDays, Check, Code2, ExternalLink, GitFork, Search } from "lucide-react";
+import { Activity, AlertTriangle, CalendarDays, ExternalLink, GitFork, Search } from "lucide-react";
 
 import { IssuesFeature } from "@/components/repositories/issues-feature";
 import { PullRequestsFeature } from "@/components/repositories/pull-requests-feature";
@@ -12,7 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRepositories } from "@/lib/api/repositories";
 import type { Repository } from "@/lib/types/github";
-import { cn } from "@/lib/utils";
+import { ActivityRepositoryCard } from "./activity-repository-card";
+import { LanguageFootprint } from "./language-footprint";
+import { useActivityMetadata } from "./use-activity-metadata";
 import { githubRepositoryUrl, readWorkspaceSelection, workspaceUrl, workspaceViews, type WorkspaceView } from "./workspace-selection";
 
 export function ActivityWorkspace() {
@@ -23,6 +25,7 @@ export function ActivityWorkspace() {
     const [retryKey, setRetryKey] = React.useState(0);
     const [existingId, setExistingId] = React.useState("");
     const [search, setSearch] = React.useState("");
+    const metadata = useActivityMetadata(repositories, retryKey);
     const { repository, view } = readWorkspaceSelection(params, repositories, existingId);
 
     // Remember history selections for invalid URL fallback. React retries this guarded
@@ -38,7 +41,7 @@ export function ActivityWorkspace() {
             try { response = await getRepositories(); }
             catch { response = null; }
             if (!active || request !== generation) return;
-            setRepositories(response ?? []);
+            setRepositories([...new Map((response ?? []).map((item) => [item.id, item])).values()]);
             setError(response === null);
             setIsLoading(false);
         }
@@ -87,10 +90,7 @@ export function ActivityWorkspace() {
                         <p className="max-w-xl text-sm text-muted-foreground">Your GitHub contribution calendar is not connected yet. No contribution data is available to display.</p>
                     </div>
                 </section>
-                <section className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card p-5 shadow-soft" aria-labelledby="language-footprint-title">
-                    <div className="flex items-center gap-2"><Code2 className="size-4 text-accent" aria-hidden="true" /><h2 id="language-footprint-title" className="font-semibold">Language footprint</h2></div>
-                    <div className="my-auto space-y-2 pt-5"><p className="text-sm font-medium">Not available yet</p><p className="text-sm text-muted-foreground">Language usage is not available for your connected repositories yet.</p></div>
-                </section>
+                <LanguageFootprint repositories={repositories} metadata={metadata} loading={isLoading} error={error} />
             </div>
             <section className="min-w-0 space-y-4" aria-labelledby="connected-repositories-title">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -119,11 +119,7 @@ export function ActivityWorkspace() {
                                 {filtered.map((candidate) => {
                                     const selected = candidate.id === repository?.id;
                                     return <li key={candidate.id} className="min-w-0">
-                                        <button type="button" aria-label={`Select ${candidate.full_name}`} aria-pressed={selected} aria-controls="repository-workspace" onClick={() => navigate(candidate.id, view)} style={selected ? { borderColor: "hsl(var(--accent))" } : undefined} className={cn("h-full w-full min-w-0 space-y-3 rounded-xl border bg-card p-5 text-left shadow-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", selected ? "bg-accent/5" : "hover:bg-muted/50")}>
-                                            <span className="flex items-start justify-between gap-3"><span className={cn("min-w-0 break-words font-semibold [overflow-wrap:anywhere]", selected && "text-accent")}>{candidate.full_name}</span>{selected && <Check className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden="true" />}</span>
-                                            <span className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground"><span>{candidate.private ? "Private" : "Public"}</span><span className="break-all">{candidate.default_branch ? `Branch: ${candidate.default_branch}` : "Default branch unavailable"}</span></span>
-                                            <span className={cn("block text-xs font-medium", selected ? "text-accent" : "text-muted-foreground")}>{selected ? "Selected" : "Open workspace"}</span>
-                                        </button>
+                                        <ActivityRepositoryCard repository={candidate} selected={selected} metadata={metadata[candidate.id]} onSelect={() => navigate(candidate.id, view)} />
                                     </li>;
                                 })}
                             </ul>

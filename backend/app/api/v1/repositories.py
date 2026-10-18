@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime, timezone
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
@@ -54,6 +54,39 @@ from app.services.finding_service import get_all_open_findings_for_repository
 from app.services.health_score_service import FINDING_CATEGORY_TO_HEALTH_CATEGORY
 
 router = APIRouter(prefix="/repositories", tags=["repositories"])
+
+
+@router.get("/{repository_id}/contributions")
+async def get_repository_contributions_read(
+    repository_id: uuid.UUID,
+    response: Response,
+    start: date | None = None,
+    end: date | None = None,
+    cursor: str | None = Query(default=None, max_length=100),
+    limit: int = Query(default=20, ge=1, le=100),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Bounded default-branch commit snapshot; totals cover the retrieved subset."""
+    from app.services.repository_contribution_service import (
+        ContributionCursorError, contribution_range, get_repository_contributions,
+    )
+
+    response.headers["Cache-Control"] = "private, no-store"
+    repository = get_repository_or_404(db=db, user_id=user.id, repository_id=repository_id)
+    connection = get_connection_or_404(db=db, user_id=user.id, connection_id=repository.connection_id)
+    try:
+        start, end = contribution_range(start, end, datetime.now(timezone.utc).date())
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from None
+    try:
+        return await get_repository_contributions(
+            user_id=str(user.id), repository_id=str(repository.id), connection_id=str(connection.id),
+            installation_id=connection.installation_id, github_id=repository.github_repo_id,
+            full_name=repository.full_name, start=start, end=end, cursor=cursor, limit=limit,
+        )
+    except ContributionCursorError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
 
 
 @router.get("/{repository_id}/activity-metadata")

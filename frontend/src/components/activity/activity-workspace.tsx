@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import { Activity, AlertTriangle, CalendarDays, ExternalLink, GitFork, Search } from "lucide-react";
+import { Activity, AlertTriangle, ExternalLink, GitFork, Search } from "lucide-react";
 
 import { IssuesFeature } from "@/components/repositories/issues-feature";
 import { PullRequestsFeature } from "@/components/repositories/pull-requests-feature";
@@ -14,6 +14,7 @@ import { getRepositories } from "@/lib/api/repositories";
 import type { Repository } from "@/lib/types/github";
 import { ActivityRepositoryCard } from "./activity-repository-card";
 import { LanguageFootprint } from "./language-footprint";
+import { ContributionHeatmap } from "./contribution-heatmap";
 import { useActivityMetadata } from "./use-activity-metadata";
 import { githubRepositoryUrl, readWorkspaceSelection, workspaceUrl, workspaceViews, type WorkspaceView } from "./workspace-selection";
 
@@ -82,14 +83,8 @@ export function ActivityWorkspace() {
     return (
         <div className="min-w-0 space-y-8">
             <SectionHeading eyebrow="Workspace" title="Activity" description="Your unified workspace for connected repositories, contributions, issues, and pull requests." />
-            <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Workspace summaries">
-                <section className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card p-5 shadow-soft xl:col-span-2" aria-labelledby="contribution-heatmap-title">
-                    <div className="flex items-center gap-2"><CalendarDays className="size-4 text-accent" aria-hidden="true" /><h2 id="contribution-heatmap-title" className="font-semibold">Your contribution heatmap</h2></div>
-                    <div className="my-auto space-y-2 pt-5">
-                        <p className="text-sm font-medium">Not available yet</p>
-                        <p className="max-w-xl text-sm text-muted-foreground">Your GitHub contribution calendar is not connected yet. No contribution data is available to display.</p>
-                    </div>
-                </section>
+            <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)]" aria-label="Workspace summaries">
+                <ContributionHeatmap />
                 <LanguageFootprint repositories={repositories} metadata={metadata} loading={isLoading} error={error} />
             </div>
             <section className="min-w-0 space-y-4" aria-labelledby="connected-repositories-title">

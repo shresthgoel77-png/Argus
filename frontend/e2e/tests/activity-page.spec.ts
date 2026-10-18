@@ -47,7 +47,7 @@ test.describe('Activity workspace (mocked APIs)', () => {
         await expect(page.getByText(/open .*opened by octocat.*updated/)).toBeVisible();
         await expect(page.getByText('review', { exact: true })).toBeVisible();
         await expect(page.getByRole('link', { name: 'Open acme/beta on GitHub' })).toHaveAttribute('href', 'https://github.com/acme/beta');
-        await expect(page.getByRole('combobox')).toHaveCount(1);
+        await expect(page.locator('#repository-workspace').getByRole('combobox')).toHaveCount(1);
         await dropdown.selectOption('pull-requests');
         await expect(page.getByText('hub-1 pull-requests item', { exact: false })).toBeVisible();
         await expect(page.getByText(/open .*draft .*opened by octocat/)).toBeVisible();
@@ -79,7 +79,7 @@ test.describe('Activity workspace (mocked APIs)', () => {
             expect(await page.locator('main').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
             const heatmap = await page.getByRole('region', { name: 'Your contribution heatmap' }).boundingBox();
             const language = await page.getByRole('region', { name: 'Language footprint' }).boundingBox();
-            if (width >= 768) expect(heatmap!.y).toBe(language!.y);
+            if (width >= 1024) expect(heatmap!.y).toBe(language!.y);
             else expect(language!.y).toBeGreaterThan(heatmap!.y);
             if ([1440, 390, 320].includes(width)) {
                 await page.screenshot({ path: testInfo.outputPath(`activity-${width}.png`), fullPage: true });
@@ -123,7 +123,7 @@ test.describe('Activity workspace (mocked APIs)', () => {
         await page.route('**/api/v1/repositories/hub-0/issues*', route => itemFailed
             ? route.fulfill({ status: 403, json: { error: { code: 'github_permission_error', message: 'Access revoked' } } })
             : route.fulfill({ json: [] }));
-        await page.getByRole('combobox').selectOption('issues');
+        await page.getByRole('combobox', { name: 'Workspace view' }).selectOption('issues');
         await expect(page.locator('main').getByRole('alert')).toContainText('Access revoked');
         await expect(page.locator('main').getByRole('alert')).toContainText("GitHub App's repository permissions");
         await expect(page.getByRole('heading', { name: 'No open issues', exact: true })).toHaveCount(0);
@@ -135,7 +135,7 @@ test.describe('Activity workspace (mocked APIs)', () => {
         await expect(page).toHaveURL(/repo=hub-1&tab=issues/);
         available = []; await page.getByRole('button', { name: 'Refresh repositories' }).click();
         await expect(page.getByText('No connected repositories')).toBeVisible();
-        await expect(page.getByRole('combobox')).toHaveCount(0);
+        await expect(page.getByRole('combobox', { name: 'Workspace view' })).toHaveCount(0);
         await expect(page).toHaveURL(/activity\?tab=issues$/);
     });
 
@@ -153,7 +153,7 @@ test.describe('Activity workspace (mocked APIs)', () => {
         await expect.poll(() => started).toBe(true);
         await page.getByRole('button', { name: 'Select acme/beta', exact: true }).click();
         await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
-        await page.getByRole('combobox').selectOption('pull-requests');
+        await page.getByRole('combobox', { name: 'Workspace view' }).selectOption('pull-requests');
         await expect(page.getByText('hub-1 pull-requests item', { exact: false })).toBeVisible();
         const obsoleteResponse = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/hub-0/issues'));
         release(); await obsoleteResponse;

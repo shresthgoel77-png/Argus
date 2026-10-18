@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from app.models.user import User
@@ -19,6 +19,21 @@ from app.schemas.repository import AvailableRepository
 import uuid
 
 router = APIRouter(prefix="/github", tags=["github"])
+
+
+@router.get("/contributions")
+async def get_personal_contributions(
+    response: Response,
+    year: int = Query(ge=2008),
+    user: User = Depends(get_current_user),
+):
+    from datetime import datetime, timezone
+    from app.services.user_contribution_service import get_user_contributions
+
+    if year > datetime.now(timezone.utc).year:
+        raise HTTPException(422, "Choose the current calendar year or an earlier year.")
+    response.headers["Cache-Control"] = "private, no-store"
+    return await get_user_contributions(user, year)
 
 @router.get("/install/start")
 async def start_installation(

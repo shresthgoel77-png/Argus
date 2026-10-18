@@ -23,6 +23,7 @@ vi.mock("@/lib/api/repositories", () => ({ getRepositories: vi.fn() }));
 vi.mock("@/lib/api/repository-work-items", () => ({ listRepositoryWorkItems: vi.fn() }));
 vi.mock("@/lib/api/activity", () => ({ listRepositoryActivity: vi.fn() }));
 vi.mock("@/components/activity/use-activity-metadata", () => ({ useActivityMetadata: () => ({}) }));
+vi.mock("@/components/activity/contribution-heatmap", () => ({ ContributionHeatmap: () => <section><h2>Your contribution heatmap</h2><p>Personal calendar unavailable</p></section> }));
 
 const repositories: Repository[] = [
     { id: "repo-a", full_name: "acme/alpha", private: false, default_branch: "main", monitoring_enabled: false, created_at: "2026-01-01" },
@@ -57,7 +58,7 @@ it("defaults to the first authorized repo and Contributions without detail/event
     expect(window.location.search).toBe("?repo=repo-a&tab=contributions");
     expect(screen.getByRole("heading", { name: "Your contribution heatmap" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Language footprint" })).toBeInTheDocument();
-    expect(screen.getAllByText("Not available yet")).toHaveLength(1);
+    expect(screen.getByText("Personal calendar unavailable")).toBeInTheDocument();
     expect(listRepositoryWorkItems).not.toHaveBeenCalled();
     expect(listRepositoryActivity).not.toHaveBeenCalled();
     expect(screen.queryByRole("group", { name: "Filter activity by source" })).not.toBeInTheDocument();

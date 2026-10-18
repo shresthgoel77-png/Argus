@@ -10,17 +10,65 @@ import { RepositoryAISummaryPanel } from "@/components/overview/repository-ai-su
 import { TrendVisualization } from "@/components/overview/trend-visualization";
 import { EmptyState } from "@/components/rm/empty-state";
 import { SectionHeading } from "@/components/rm/section-heading";
-import { StatCard } from "@/components/rm/stat-card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getDashboardOverview, getRepositories } from "@/lib/api/repositories";
+import { AssessmentPanel } from "@/components/overview/assessment-panel";
+import { HealthSummary, AssessmentRetry } from "@/components/overview/health-summary";
+import { getDashboardOverview, getRepositories, refreshRepository } from "@/lib/api/repositories";
 import type { Repository } from "@/lib/types/github";
 import type { DashboardOverviewResponse } from "@/lib/types/overview";
 
-function getScoreVariant(score: number) {
-    if (score >= 80) return "success";
-    if (score >= 50) return "warning";
-    return "destructive";
+function OverviewContent({ overview, repository, monitoringStatus, onRefresh }: {
+    overview: DashboardOverviewResponse; repository: Repository; monitoringStatus: string; onRefresh: () => void;
+}) {
+    const [pending, setPending] = React.useState(false);
+    const [retryError, setRetryError] = React.useState<string | null>(null);
+    const mounted = React.useRef(false);
+    React.useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+
+    async function retryAssessment() {
+        if (pending) return;
+        setPending(true);
+        setRetryError(null);
+        try {
+            const result = await refreshRepository(repository.id);
+            if (!mounted.current) return;
+            if (result) onRefresh();
+            else setRetryError("The assessment could not be retried. Try again in a moment.");
+        } finally {
+            if (mounted.current) setPending(false);
+        }
+    }
+    const retry = <AssessmentRetry onClick={() => void retryAssessment()} pending={pending} disabled={!repository.monitoring_enabled || monitoringStatus === "running"} />;
+
+    return <>
+        {retryError && <p role="alert" className="rounded-lg border border-destructive/20 p-3 text-sm text-destructive">{retryError}</p>}
+        {!repository.monitoring_enabled && <p className="text-sm text-muted-foreground">Monitoring is disabled for this repository. Enable it in repository settings to retry assessments.</p>}
+        <div className="grid min-w-0 overflow-hidden rounded-xl border bg-card shadow-soft xl:grid-cols-12" aria-label="Repository health and triage">
+            <HealthSummary overview={overview} retry={retry} />
+            <div className="min-w-0 border-t xl:col-span-9 xl:border-t-0">
+                <RepositoryAISummaryPanel repositoryId={repository.id} embedded />
+                <section className="min-w-0 space-y-4 border-t p-5 sm:p-6" aria-labelledby="attention-heading">
+                    <h2 id="attention-heading" className="text-base font-semibold">Needs attention</h2>
+                    <NeedsAttentionList findings={overview.needs_attention.findings} reasons={overview.needs_attention.reasons} assessmentAvailable={!!overview.health} />
+                </section>
+            </div>
+        </div>
+        <div className="grid min-w-0 items-start gap-5 xl:grid-cols-3">
+            <section className="min-w-0 space-y-5 rounded-xl border bg-card p-5 sm:p-6 xl:h-full" aria-labelledby="category-intelligence-heading">
+                <h2 id="category-intelligence-heading" className="text-base font-semibold">Category intelligence</h2>
+                <CategoryIntelligenceCards overview={overview} />
+            </section>
+            <section className="min-w-0 space-y-5 rounded-xl border bg-card p-5 sm:p-6 xl:h-full" aria-labelledby="trend-overview-heading">
+                <h2 id="trend-overview-heading" className="text-base font-semibold">Trend overview</h2>
+                <TrendVisualization overview={overview} />
+            </section>
+            <section className="min-w-0 space-y-5 rounded-xl border bg-card p-5 sm:p-6 xl:h-full" aria-labelledby="recent-activity-heading">
+                <h2 id="recent-activity-heading" className="text-base font-semibold">Recent activity</h2>
+                <RecentActivityPreview items={overview.activity_feed} />
+            </section>
+        </div>
+        <AssessmentPanel overview={overview} monitoringStatus={monitoringStatus} retry={retry} />
+    </>;
 }
 
 export default function AppOverviewPage() {
@@ -29,6 +77,7 @@ export default function AppOverviewPage() {
     const [overview, setOverview] = React.useState<DashboardOverviewResponse | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
+    const [refreshKey, setRefreshKey] = React.useState(0);
 
     React.useEffect(() => {
         let active = true;
@@ -83,19 +132,19 @@ export default function AppOverviewPage() {
         return () => {
             active = false;
         };
-    }, [selectedRepositoryId]);
+    }, [selectedRepositoryId, refreshKey]);
 
     const selectedRepository = repositories.find((repository) => repository.id === selectedRepositoryId) ?? null;
     const monitoringStatus = overview?.monitoring_status ?? selectedRepository?.monitoring_status ?? "unknown";
 
     const repositorySelector = repositories.length > 0 ? (
-        <label className="flex items-center gap-3 text-sm">
+        <label className="flex w-full min-w-0 flex-col gap-2 text-sm sm:w-auto sm:max-w-sm">
             <span className="font-medium">Repository</span>
             <select
                 aria-label="Select repository"
-                className="h-10 max-w-full rounded-md border bg-background px-3"
+                className="h-10 w-full min-w-0 rounded-md border bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={selectedRepositoryId ?? ""}
-                onChange={(event) => setSelectedRepositoryId(event.target.value)}
+                onChange={(event) => { setIsLoading(true); setOverview(null); setSelectedRepositoryId(event.target.value); }}
             >
                 {repositories.map((repository) => (
                     <option key={repository.id} value={repository.id}>
@@ -114,7 +163,8 @@ export default function AppOverviewPage() {
                     title="Overview"
                     description="A health check across your connected repositories and engineering activity."
                 />
-                <div className="grid gap-4 xl:grid-cols-2">
+                {repositorySelector}
+                <div className="grid gap-4 xl:grid-cols-3" aria-label="Loading overview" aria-busy="true">
                     {Array.from({ length: 4 }).map((_, index) => (
                         <div key={index} className="h-40 animate-pulse rounded-lg border bg-card" />
                     ))}
@@ -174,156 +224,12 @@ export default function AppOverviewPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <SectionHeading
-                eyebrow="Workspace"
-                title="Overview"
-                description={`Health check for ${selectedRepository.full_name}.`}
-            />
-            {repositorySelector}
-            <section className="rounded-lg border bg-card p-4" aria-label="Assessment status">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h2 className="font-semibold">Assessment status: {monitoringStatus.replace(/_/g, " ")}</h2>
-                    <p className="text-sm text-muted-foreground">
-                        {overview.last_monitoring_at
-                            ? `Last checked ${new Date(overview.last_monitoring_at).toLocaleString()}`
-                            : "No assessment has completed yet"}
-                    </p>
-                </div>
-                {monitoringStatus !== "success" && (
-                    <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                        <p>Health uses successfully assessed categories. Excluded categories do not affect the score.</p>
-                        {Object.entries(overview.monitoring_checks ?? {}).map(([name, check]) => (
-                                <p key={name}>
-                                    {name.replace(/_/g, " ")}: {check.status}
-                                    {check.checked_at ? ` · checked ${new Date(check.checked_at).toLocaleString()}` : ""}
-                                    {check.error_message ? ` — ${check.error_message}` : ""}
-                                </p>
-                            ))}
-                    </div>
-                )}
-            </section>
-
-            <div className="grid gap-4 xl:grid-cols-2">
-                <section className="space-y-3" aria-labelledby="health-score-heading">
-                    <h2 id="health-score-heading" className="text-lg font-semibold tracking-tight">
-                        {overview.health?.coverage && overview.health.coverage.assessed_categories.length < 6
-                            ? `Health score — partial coverage (${overview.health.coverage.assessed_categories.length}/6 categories assessed)`
-                            : "Health score"}
-                    </h2>
-                    {overview.health ? (
-                        <div className="space-y-3">
-                            <StatCard
-                                className="border-primary/20 bg-muted/20"
-                                label="Overall health score"
-                                value={overview.health.overall_score}
-                                trend={
-                                    <Badge variant={getScoreVariant(overview.health.overall_score)}>
-                                        {overview.health.overall_score >= 80 ? "Healthy" : overview.health.overall_score >= 50 ? "Warning" : "Critical"}
-                                    </Badge>
-                                }
-                                description={overview.health.computed_at ? `Last computed ${new Date(overview.health.computed_at).toLocaleString()}` : "No compute timestamp yet"}
-                            />
-                            {overview.health.coverage && (
-                                <div className="space-y-1 text-sm text-muted-foreground">
-                                    {overview.health.coverage.assessed_categories.length === 6 && <p>6/6 categories assessed.</p>}
-                                    {Object.entries(overview.health.coverage.excluded_categories).map(([category, check]) => (
-                                        <p key={category}>Excluded {category.replace(/_/g, " ")}: {check.status} — {check.reason}</p>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    ) : overview.last_recorded_health ? (
-                        <StatCard
-                            label="Last recorded score"
-                            value={overview.last_recorded_health.overall_score}
-                            trend={<Badge variant="outline">Historical</Badge>}
-                            description={`Recorded ${new Date(overview.last_recorded_health.computed_at).toLocaleString()}. Historical score, not a current assessment. ${overview.last_recorded_health.coverage
-                                ? `${overview.last_recorded_health.coverage.assessed_categories.length}/6 categories assessed at the time.`
-                                : "Coverage unknown."}`}
-                        />
-                    ) : (
-                        <EmptyState
-                            icon={<HeartPulse className="size-6" aria-hidden="true" />}
-                            title="No health score yet"
-                            description="This repository has not produced a health snapshot yet."
-                        />
-                    )}
-                </section>
-
-                <section className="space-y-3" aria-labelledby="attention-heading">
-                    <h2 id="attention-heading" className="text-lg font-semibold tracking-tight">Needs attention</h2>
-                    <NeedsAttentionList findings={overview.needs_attention.findings} reasons={overview.needs_attention.reasons} />
-                </section>
-
-                <section className="space-y-3" aria-labelledby="category-intelligence-heading">
-                    <h2 id="category-intelligence-heading" className="text-lg font-semibold tracking-tight">Category intelligence</h2>
-                    <CategoryIntelligenceCards counts={overview.finding_category_counts} />
-                </section>
-
-                <section className="space-y-3" aria-labelledby="recent-activity-heading">
-                    <h2 id="recent-activity-heading" className="text-lg font-semibold tracking-tight">Recent activity</h2>
-                    <RecentActivityPreview items={overview.activity_feed} />
-                </section>
-            </div>
-
-            <div className="grid gap-4 xl:grid-cols-2">
-                <section className="space-y-3" aria-labelledby="trend-overview-heading">
-                    <h2 id="trend-overview-heading" className="text-lg font-semibold tracking-tight">Trend overview</h2>
-                    <div className="rounded-lg border bg-card p-4">
-                        <div className="space-y-4">
-                            {overview.trends ? (
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Overall delta</span>
-                                    <span className="font-medium text-foreground">{overview.trends.health_trend.overall_delta > 0 ? "+" : ""}{overview.trends.health_trend.overall_delta}</span>
-                                </div>
-                            ) : (
-                                <TrendVisualization trends={null} />
-                            )}
-                            {([
-                                ["ci_cd", "CI/CD"],
-                                ["dependencies", "Dependencies"],
-                                ["security", "Security"],
-                                ["issues", "Issues"],
-                                ["pull_requests", "Pull Requests"],
-                            ] as const).filter(([category]) => overview.health?.category_scores[category] != null || overview.health?.coverage?.excluded_categories[category] != null || overview.monitoring_checks?.[category] != null).map(([category, label]) => (
-                                <div key={category} className="space-y-1.5">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">{label}</span>
-                                        <div className="flex items-center gap-2">
-                                            {overview.health?.coverage?.excluded_categories[category] ? (
-                                                <Badge variant="outline">{overview.health.coverage.excluded_categories[category].status}</Badge>
-                                            ) : overview.health?.category_scores[category] != null ? (
-                                                <>
-                                                    <span className="font-medium text-foreground">{overview.health.category_scores[category]}</span>
-                                                    <Badge variant={getScoreVariant(overview.health.category_scores[category])}>
-                                                        {overview.health.category_scores[category] >= 80 ? "Good" : overview.health.category_scores[category] >= 50 ? "Fair" : "Poor"}
-                                                    </Badge>
-                                                </>
-                                            ) : overview.monitoring_checks?.[category] ? (
-                                                <Badge variant="outline">{overview.monitoring_checks[category].status}</Badge>
-                                            ) : null}
-                                        </div>
-                                    </div>
-                                    {!overview.health?.coverage?.excluded_categories[category] && overview.health?.category_scores[category] != null && (
-                                        <div className="h-2 overflow-hidden rounded-full bg-muted">
-                                            <div
-                                                className={`h-full rounded-full ${overview.health.category_scores[category] >= 80 ? "bg-success" : overview.health.category_scores[category] >= 50 ? "bg-warning" : "bg-destructive"}`}
-                                                style={{ width: `${overview.health.category_scores[category]}%` }}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                <section className="space-y-3" aria-labelledby="ai-summary-heading">
-                    <h2 id="ai-summary-heading" className="text-lg font-semibold tracking-tight">AI summary</h2>
-                    <RepositoryAISummaryPanel repositoryId={selectedRepository.id} />
-                </section>
-            </div>
+        <div className="min-w-0 space-y-6">
+            <header className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+                <SectionHeading eyebrow="Workspace" title="Overview" description={`Health check for ${selectedRepository.full_name}.`} className="min-w-0 break-words" />
+                {repositorySelector}
+            </header>
+            <OverviewContent key={selectedRepository.id} overview={overview} repository={selectedRepository} monitoringStatus={monitoringStatus} onRefresh={() => setRefreshKey((key) => key + 1)} />
         </div>
     );
 }

@@ -170,8 +170,8 @@ test.describe('Overview dashboard', () => {
         await page.goto('/overview');
 
         await expect(page.getByText('No health score yet')).toBeVisible();
-        await expect(page.getByText('Nothing needs attention')).toBeVisible();
-        await expect(page.getByText('No category signals yet')).toBeVisible();
+        await expect(page.getByText('No active findings available')).toBeVisible();
+        await expect(page.getByText('Findings unavailable')).toHaveCount(4);
         await expect(page.getByText('No recent activity')).toBeVisible();
         await expect(page.getByText('No trend data yet')).toBeVisible();
         await expect(page.getByRole('button', { name: 'Generate Summary' })).toBeVisible();

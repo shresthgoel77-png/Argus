@@ -1,58 +1,44 @@
+"use client";
+
 import Link from "next/link";
-import { AlertTriangle, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-import { EmptyState } from "@/components/rm/empty-state";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FindingIssuePreviewPanel } from "@/components/repositories/finding-issue-preview";
 import type { FindingResponse } from "@/lib/types/findings";
+import { displayValue, formatDate } from "./presentation";
 
-function displayValue(value: string) {
-    return value.replace(/[_-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-export function NeedsAttentionList({ findings, reasons }: { findings: FindingResponse[]; reasons: string[] }) {
-    if (!findings.length) {
-        return (
-            <EmptyState
-                icon={<AlertTriangle className="size-6" aria-hidden="true" />}
-                title="Nothing needs attention"
-                description="High-priority findings will appear here once RepoMedic identifies issues to review."
-            />
-        );
-    }
-
+export function NeedsAttentionList({ findings, reasons, assessmentAvailable = true }: { findings: FindingResponse[]; reasons: string[]; assessmentAvailable?: boolean }) {
+    const [active, ...remaining] = findings;
     return (
-        <div className="space-y-3">
-            {reasons.length > 0 && (
-                <div className="rounded-md border border-amber-500/20 bg-amber-500/5 p-3 text-sm text-amber-900 dark:text-amber-100">
-                    <p className="font-medium">Health reasons</p>
-                    <ul className="mt-2 list-disc space-y-1 pl-5">
-                        {reasons.map((reason) => <li key={reason}>{reason}</li>)}
-                    </ul>
+        <div className="space-y-4 break-words">
+            {active ? (
+                <article className="space-y-3">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                        <Link href={`/overview/findings/${encodeURIComponent(active.id)}`} className="min-w-0 flex-1 font-semibold hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{active.title}<ArrowUpRight className="ml-1 inline size-4" aria-hidden="true" /></Link>
+                        <Badge variant={active.severity === "critical" ? "destructive" : active.severity === "high" ? "warning" : "outline"} className="capitalize">{displayValue(active.severity)}</Badge>
+                    </div>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{active.description}</p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        <span className="capitalize">Source: {displayValue(active.source)}</span>
+                        <span>Detected {formatDate(active.detected_at)}</span>
+                        <Link href={`/overview/findings?category=${encodeURIComponent(active.category)}`} className="capitalize underline underline-offset-4">{displayValue(active.category)}</Link>
+                        <span className="capitalize">Priority: {active.priority ? displayValue(active.priority) : "Unassigned"}</span>
+                    </div>
+                    {["open", "acknowledged"].includes(active.status) && <>
+                        <FindingIssuePreviewPanel key={active.id} findingId={active.id} triggerLabel="Auto-Generate GitHub Issue" actions={<Button variant="outline" disabled aria-describedby="fix-preview-unavailable" className="h-auto min-h-10 whitespace-normal">Preview Automated Fix</Button>} />
+                        <p id="fix-preview-unavailable" className="text-xs text-muted-foreground">Automated fix preview is unavailable: RepoMedic does not currently provide a fix-preview action. Issue generation opens a preview for approval.</p>
+                    </>}
+                </article>
+            ) : (
+                <div className="rounded-lg bg-muted/30 p-4 text-sm">
+                    <h3 className="font-medium">{assessmentAvailable ? "Nothing needs attention" : "No active findings available"}</h3>
+                    <p className="mt-1 text-muted-foreground">{assessmentAvailable ? "High-priority findings will appear here when there are issues to review." : "Assessment coverage is incomplete. An empty findings list does not confirm repository health."}</p>
                 </div>
             )}
-
-            {findings.map((finding) => (
-                <Link
-                    key={finding.id}
-                    href={`/overview/findings?category=${encodeURIComponent(finding.category)}`}
-                    className="block rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
-                >
-                    <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 space-y-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="truncate font-semibold text-foreground">{finding.title}</h3>
-                                <Badge variant="warning" className="capitalize">{displayValue(finding.severity)}</Badge>
-                            </div>
-                            <p className="line-clamp-2 text-sm text-muted-foreground">{finding.description}</p>
-                        </div>
-                        <ArrowUpRight className="mt-1 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                    </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span className="rounded-full border px-2 py-1 capitalize">{displayValue(finding.category)}</span>
-                        <span>Priority: {finding.priority ? displayValue(finding.priority) : "Unassigned"}</span>
-                    </div>
-                </Link>
-            ))}
+            {reasons.length > 0 && <details className="text-sm text-muted-foreground"><summary className="cursor-pointer font-medium text-foreground">Health reasons ({reasons.length})</summary><ul className="mt-2 list-disc space-y-1 pl-5">{reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></details>}
+            {remaining.length > 0 && <details className="border-t pt-3 text-sm"><summary className="cursor-pointer font-medium">More findings ({remaining.length})</summary><div className="mt-3 divide-y">{remaining.map((finding) => <Link key={finding.id} href={`/overview/findings/${encodeURIComponent(finding.id)}`} className="flex items-start justify-between gap-3 py-3 text-muted-foreground hover:text-accent"><span>{finding.title}</span><Badge variant="outline" className="capitalize">{finding.severity}</Badge></Link>)}</div></details>}
         </div>
     );
 }

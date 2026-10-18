@@ -9,6 +9,7 @@ import type { Repository } from "@/lib/types/github";
 vi.mock("@/lib/api/repositories", () => ({
     getDashboardOverview: vi.fn(),
     getRepositories: vi.fn(),
+    refreshRepository: vi.fn(),
 }));
 
 vi.mock("@/components/overview/needs-attention-list", () => ({ NeedsAttentionList: () => null }));
@@ -87,10 +88,11 @@ describe("Overview monitoring status compatibility", () => {
         await renderOverview(overview);
         expect(screen.getByText("98")).toBeInTheDocument();
         if (count < 6) {
-            expect(screen.getByRole("heading", { name: `Health score — partial coverage (${count}/6 categories assessed)` })).toBeInTheDocument();
+            expect(screen.getByRole("heading", { name: "Health score" })).toBeInTheDocument();
+            expect(screen.getByText(`Snapshot available · ${count}/6 categories assessed · partial coverage`)).toBeInTheDocument();
             expect(screen.getByText(/Excluded ci cd: unavailable/)).toBeInTheDocument();
         } else {
-            expect(screen.getByText("6/6 categories assessed.")).toBeInTheDocument();
+            expect(screen.getByText("Snapshot available · 6/6 categories assessed.")).toBeInTheDocument();
         }
         expect(screen.getByRole("heading", { name: "Assessment status: partial failure" })).toBeInTheDocument();
         expect(screen.queryByText("No health score yet")).not.toBeInTheDocument();

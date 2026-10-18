@@ -1,59 +1,41 @@
-import { Activity } from "lucide-react";
+import type { DashboardOverviewResponse } from "@/lib/types/overview";
+import type { HealthCategory } from "@/lib/types/health";
+import { Badge } from "@/components/ui/badge";
+import { categoryCheck, displayValue, HEALTH_CATEGORIES, signedDelta } from "./presentation";
 
-import { EmptyState } from "@/components/rm/empty-state";
-import type { DashboardOverviewTrends } from "@/lib/types/overview";
-
-const CATEGORY_LABELS: Record<string, string> = {
-    ci_cd: "CI/CD",
-    dependencies: "Dependencies",
-    security: "Security",
-    issues: "Issues",
-    pull_requests: "Pull Requests",
-    code_quality: "Code Quality",
-};
-
-export function TrendVisualization({ trends }: { trends: DashboardOverviewTrends | null }) {
-    if (!trends) {
-        return (
-            <EmptyState
-                icon={<Activity className="size-6" aria-hidden="true" />}
-                title="No trend data yet"
-                description="Health and finding velocity will appear once the repository has enough history."
-            />
-        );
-    }
-
-    const deltas = trends.health_trend.category_deltas.slice(0, 5);
-    const maxDelta = Math.max(1, ...deltas.map((entry) => Math.abs(entry.delta)));
-
+export function TrendVisualization({ overview }: { overview: DashboardOverviewResponse }) {
+    const { health, trends } = overview;
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Overall delta</span>
-                <span className="font-medium text-foreground">{trends.health_trend.overall_delta > 0 ? "+" : ""}{trends.health_trend.overall_delta}</span>
-            </div>
-            {deltas.length > 0 ? (
-                <div className="space-y-3">
-                    {deltas.map((entry) => (
-                        <div key={entry.category} className="space-y-1.5">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">{CATEGORY_LABELS[entry.category] ?? entry.category}</span>
-                                <span className={entry.delta >= 0 ? "text-success" : "text-destructive"}>
-                                    {entry.delta > 0 ? "+" : ""}{entry.delta}
-                                </span>
-                            </div>
-                            <div className="h-2 overflow-hidden rounded-full bg-muted">
-                                <div
-                                    className={entry.delta >= 0 ? "h-full rounded-full bg-success" : "h-full rounded-full bg-destructive"}
-                                    style={{ width: `${Math.min((Math.abs(entry.delta) / maxDelta) * 100, 100)}%` }}
-                                />
+            {trends ? (
+                <div className="flex items-center justify-between gap-2 rounded-md bg-muted/40 p-3 text-sm">
+                    <span className="text-muted-foreground">Overall delta <span className="text-xs">· {trends.window_days} days</span></span>
+                    <span className="font-semibold tabular-nums">{signedDelta(trends.health_trend.overall_delta)}</span>
+                </div>
+            ) : <p className="text-sm text-muted-foreground">No trend data yet</p>}
+            {(Object.entries(HEALTH_CATEGORIES) as [HealthCategory, string][]).filter(([category]) =>
+                health?.category_scores[category] != null || health?.coverage?.excluded_categories[category] || categoryCheck(overview, category) || trends?.health_trend.category_deltas.some((entry) => entry.category === category)
+            ).map(([category, label]) => {
+                const excluded = health?.coverage?.excluded_categories[category];
+                const score = excluded ? undefined : health?.category_scores[category];
+                const delta = trends?.health_trend.category_deltas.find((entry) => entry.category === category)?.delta;
+                return (
+                    <div key={category} className="space-y-1.5">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-xs">
+                            <span className="font-medium">{label}</span>
+                            <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+                                {score != null ? <span>Score <strong className="font-medium tabular-nums text-foreground">{score}</strong></span> : <Badge variant="outline" className="capitalize">{displayValue(excluded?.status ?? categoryCheck(overview, category)?.status ?? "unavailable")}</Badge>}
+                                {delta != null && <span>Δ <span className="tabular-nums text-foreground">{signedDelta(delta)}</span></span>}
                             </div>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <p className="text-sm text-muted-foreground">No trend changes have been recorded yet.</p>
-            )}
+                        {score != null && (
+                            <div role="progressbar" aria-label={`${label} score`} aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} className="h-1.5 overflow-hidden rounded-full bg-muted">
+                                <div className={`h-full rounded-full ${score >= 80 ? "bg-success" : score >= 50 ? "bg-warning" : "bg-destructive"}`} style={{ width: `${Math.max(0, Math.min(score, 100))}%` }} />
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
         </div>
     );
 }

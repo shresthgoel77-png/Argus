@@ -22,10 +22,10 @@ export function RecentActivityPreview({ items }: { items: OverviewActivityItem[]
     }
 
     return (
-        <div className="space-y-3">
+        <div className="divide-y">
             {items.map((item) => (
-                <div key={`${item.reference_id}-${item.timestamp}`} className="rounded-lg border bg-card p-3">
-                    <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                <div key={`${item.reference_id}-${item.timestamp}`} className="min-w-0 break-words py-4 first:pt-0 last:pb-0">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
                         <span className="rounded-full border px-2 py-1 capitalize">{item.source.replace(/_/g, " ")}</span>
                         <span>{formatDate(item.timestamp)}</span>
                     </div>

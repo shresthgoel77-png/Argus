@@ -16,7 +16,7 @@ function formatDate(value: string) {
     return Number.isNaN(date.getTime()) ? "Date unavailable" : new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
-export function RepositoryAISummaryPanel({ repositoryId }: { repositoryId: string }) {
+export function RepositoryAISummaryPanel({ repositoryId, embedded = false }: { repositoryId: string; embedded?: boolean }) {
     const [analysis, setAnalysis] = React.useState<AIAnalysis | null>(null);
     const [isConfigured, setIsConfigured] = React.useState<boolean | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -59,7 +59,7 @@ export function RepositoryAISummaryPanel({ repositoryId }: { repositoryId: strin
     };
 
     return (
-        <Card className="border-accent/30 bg-card shadow-none">
+        <Card className={embedded ? "min-w-0 break-words rounded-none border-0 bg-transparent shadow-none" : "border-accent/30 bg-card shadow-none"}>
             <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                     <BrainCircuit className="size-4 text-accent" aria-hidden="true" />
@@ -125,7 +125,7 @@ export function RepositoryAISummaryPanel({ repositoryId }: { repositoryId: strin
                             </div>
                         )}
                         <p className="text-xs text-muted-foreground">
-                            Generated {analysis.completed_at ? formatDate(analysis.completed_at) : formatDate(analysis.requested_at)}
+                            {analysis.completed_at ? "Completed" : "Requested"} {analysis.completed_at ? formatDate(analysis.completed_at) : formatDate(analysis.requested_at)}
                         </p>
                     </div>
                 ) : (

@@ -1,48 +1,36 @@
 import Link from "next/link";
-import { Layers3 } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-import { EmptyState } from "@/components/rm/empty-state";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import type { DashboardOverviewResponse } from "@/lib/types/overview";
+import { categoryCheck, displayValue, HEALTH_CATEGORIES } from "./presentation";
 
-const CATEGORY_LABELS: Record<string, string> = {
-    ci_cd: "CI/CD",
-    dependencies: "Dependencies",
-    security: "Security",
-    issues: "Issues",
-    pull_requests: "Pull Requests",
-    code_quality: "Code Quality",
-};
-
-export function CategoryIntelligenceCards({ counts }: { counts: Record<string, number> }) {
-    const entries = Object.entries(CATEGORY_LABELS)
-        .map(([category, label]) => ({ category, label, count: counts[category] ?? 0 }))
-        .filter((entry) => entry.count > 0);
-
-    if (!entries.length) {
-        return (
-            <EmptyState
-                icon={<Layers3 className="size-6" aria-hidden="true" />}
-                title="No category signals yet"
-                description="RepoMedic will surface category breakdowns as findings appear."
-            />
-        );
-    }
-
+export function CategoryIntelligenceCards({ overview }: { overview: DashboardOverviewResponse }) {
     return (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
-            {entries.map((entry) => (
-                <Link key={entry.category} href={`/overview/findings?category=${encodeURIComponent(entry.category)}`} className="block">
-                    <Card className="h-full transition-colors hover:bg-muted/50">
-                        <CardContent className="flex items-center justify-between gap-4 pt-5">
-                            <div>
-                                <p className="text-sm text-muted-foreground">{entry.label}</p>
-                                <p className="mt-1 text-2xl font-semibold tracking-tight text-foreground">{entry.count}</p>
-                            </div>
-                            <div className="rounded-full bg-accent/10 px-2 py-1 text-xs font-medium text-accent">Open</div>
-                        </CardContent>
-                    </Card>
-                </Link>
-            ))}
+        <div className="space-y-4"><div className="divide-y">
+            {(["code_quality", "security", "dependencies", "ci_cd"] as const).map((category) => {
+                const check = categoryCheck(overview, category);
+                const excluded = overview.health?.coverage?.excluded_categories[category];
+                const status = excluded?.status ?? check?.status;
+                const count = overview.finding_category_counts[category];
+                const assessed = !excluded && (check ? check.status === "success" : overview.health?.category_scores[category] != null);
+                return (
+                    <Link key={category} href={`/overview/findings?category=${encodeURIComponent(category)}`} className="group flex items-center justify-between gap-3 py-4 first:pt-0 last:pb-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                        <div className="min-w-0 space-y-1">
+                            <p className="text-sm font-medium group-hover:text-accent">{HEALTH_CATEGORIES[category]}</p>
+                            <p className="text-xs text-muted-foreground">
+                                {count != null && (count > 0 || assessed) ? `${count} open finding${count === 1 ? "" : "s"}` : "Findings unavailable"}
+                            </p>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                            <Badge variant="outline" className="capitalize">{displayValue(status ?? (assessed ? "assessed" : "not assessed"))}</Badge>
+                            <ArrowUpRight className="size-3.5 text-muted-foreground" aria-hidden="true" />
+                        </div>
+                    </Link>
+                );
+            })}
+        </div>
+            {(["issues", "pull_requests"] as const).some((category) => overview.finding_category_counts[category] > 0) && <div className="flex flex-wrap gap-3 border-t pt-3 text-xs text-muted-foreground">{(["issues", "pull_requests"] as const).filter((category) => overview.finding_category_counts[category] > 0).map((category) => <Link key={category} href={`/overview/findings?category=${category}`} className="underline underline-offset-4">{HEALTH_CATEGORIES[category]}: {overview.finding_category_counts[category]} open</Link>)}</div>}
         </div>
     );
 }

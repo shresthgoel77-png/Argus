@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { createFindingIssue, previewFindingIssue, type FindingIssuePreview, type GitHubWorkItem } from "@/lib/api/repository-work-items";
 
-export function FindingIssuePreviewPanel({ findingId }: { findingId: string }) {
+export function FindingIssuePreviewPanel({ findingId, triggerLabel = "Generate issue preview", actions }: { findingId: string; triggerLabel?: string; actions?: React.ReactNode }) {
     const [preview, setPreview] = React.useState<FindingIssuePreview | null>(null);
     const [created, setCreated] = React.useState<GitHubWorkItem | null>(null);
     const [pending, setPending] = React.useState(false);
@@ -28,13 +28,16 @@ export function FindingIssuePreviewPanel({ findingId }: { findingId: string }) {
         <h4 className="text-sm font-semibold">GitHub issue</h4>
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         {created ? <a className="text-sm text-primary underline" href={created.html_url} target="_blank" rel="noreferrer">View issue #{created.number} on GitHub</a> : <>
-            <Button variant="outline" onClick={generate} disabled={pending}>{pending ? "Working..." : "Generate issue preview"}</Button>
+            <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={generate} disabled={pending} className="h-auto min-h-10 whitespace-normal">{pending ? "Working..." : triggerLabel}</Button>
+                {actions}
+            </div>
             {preview && <>
                 <p className="text-sm">Repository: <strong>{preview.repository}</strong></p>
                 <p className="font-medium">{preview.title}</p>
                 <pre className="max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 text-xs">{preview.body}</pre>
                 <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={approved} disabled={pending} onChange={event => setApproved(event.target.checked)} />I approve creating this issue with the exact title and body above on GitHub.</label>
-                <Button onClick={publish} disabled={!approved || pending}>Create approved issue on GitHub</Button>
+                <Button onClick={publish} disabled={!approved || pending} className="h-auto min-h-10 whitespace-normal">Create approved issue on GitHub</Button>
             </>}
         </>}
     </section>;

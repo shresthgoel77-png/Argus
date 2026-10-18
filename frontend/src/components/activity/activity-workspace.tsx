@@ -1,0 +1,161 @@
+"use client";
+
+import * as React from "react";
+import { useSearchParams } from "next/navigation";
+import { Activity, AlertTriangle, CalendarDays, Check, Code2, ExternalLink, GitFork, Search } from "lucide-react";
+
+import { IssuesFeature } from "@/components/repositories/issues-feature";
+import { PullRequestsFeature } from "@/components/repositories/pull-requests-feature";
+import { EmptyState } from "@/components/rm/empty-state";
+import { SectionHeading } from "@/components/rm/section-heading";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getRepositories } from "@/lib/api/repositories";
+import type { Repository } from "@/lib/types/github";
+import { cn } from "@/lib/utils";
+import { githubRepositoryUrl, readWorkspaceSelection, workspaceUrl, workspaceViews, type WorkspaceView } from "./workspace-selection";
+
+export function ActivityWorkspace() {
+    const params = useSearchParams();
+    const [repositories, setRepositories] = React.useState<Repository[]>([]);
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [error, setError] = React.useState(false);
+    const [retryKey, setRetryKey] = React.useState(0);
+    const [existingId, setExistingId] = React.useState("");
+    const [search, setSearch] = React.useState("");
+    const { repository, view } = readWorkspaceSelection(params, repositories, existingId);
+
+    // Remember history selections for invalid URL fallback. React retries this guarded
+    // same-component update before rendering children, so it cannot start a stale fetch.
+    if (repository && repository.id !== existingId) setExistingId(repository.id);
+
+    React.useEffect(() => {
+        let active = true;
+        let generation = 0;
+        async function loadRepositories() {
+            const request = ++generation;
+            let response: Repository[] | null;
+            try { response = await getRepositories(); }
+            catch { response = null; }
+            if (!active || request !== generation) return;
+            setRepositories(response ?? []);
+            setError(response === null);
+            setIsLoading(false);
+        }
+        void loadRepositories();
+        // Recheck authorization when returning from GitHub or repository settings.
+        window.addEventListener("focus", loadRepositories);
+        return () => {
+            active = false;
+            window.removeEventListener("focus", loadRepositories);
+        };
+    }, [retryKey]);
+
+    React.useEffect(() => {
+        if (isLoading || error) return;
+        const next = workspaceUrl(window.location.href, repository?.id, view);
+        if (next !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+            window.history.replaceState(null, "", next);
+        }
+    }, [params, repository?.id, view, isLoading, error]);
+
+    function navigate(repositoryId: string, nextView: WorkspaceView) {
+        const next = workspaceUrl(window.location.href, repositoryId, nextView);
+        if (next !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+            window.history.pushState(null, "", next);
+        }
+    }
+
+    function refresh() {
+        setIsLoading(true);
+        setError(false);
+        setRetryKey((key) => key + 1);
+    }
+
+    const query = search.trim().toLocaleLowerCase();
+    const filtered = repositories.filter((candidate) => candidate.full_name.toLocaleLowerCase().includes(query));
+    const githubUrl = repository ? githubRepositoryUrl(repository.full_name) : null;
+
+    return (
+        <div className="min-w-0 space-y-8">
+            <SectionHeading eyebrow="Workspace" title="Activity" description="Your unified workspace for connected repositories, contributions, issues, and pull requests." />
+            <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Workspace summaries">
+                <section className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card p-5 shadow-soft xl:col-span-2" aria-labelledby="contribution-heatmap-title">
+                    <div className="flex items-center gap-2"><CalendarDays className="size-4 text-accent" aria-hidden="true" /><h2 id="contribution-heatmap-title" className="font-semibold">Your contribution heatmap</h2></div>
+                    <div className="my-auto space-y-2 pt-5">
+                        <p className="text-sm font-medium">Not available yet</p>
+                        <p className="max-w-xl text-sm text-muted-foreground">Your GitHub contribution calendar is not connected yet. No contribution data is available to display.</p>
+                    </div>
+                </section>
+                <section className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card p-5 shadow-soft" aria-labelledby="language-footprint-title">
+                    <div className="flex items-center gap-2"><Code2 className="size-4 text-accent" aria-hidden="true" /><h2 id="language-footprint-title" className="font-semibold">Language footprint</h2></div>
+                    <div className="my-auto space-y-2 pt-5"><p className="text-sm font-medium">Not available yet</p><p className="text-sm text-muted-foreground">Language usage is not available for your connected repositories yet.</p></div>
+                </section>
+            </div>
+            <section className="min-w-0 space-y-4" aria-labelledby="connected-repositories-title">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div><h2 id="connected-repositories-title" className="text-lg font-semibold">Connected repositories</h2><p className="text-sm text-muted-foreground">Choose a repository to open its workspace.</p></div>
+                    <Button variant="outline" size="sm" onClick={refresh} disabled={isLoading}>Refresh repositories</Button>
+                </div>
+                {isLoading ? (
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" role="status" aria-label="Loading repositories" aria-busy="true">
+                        {[0, 1, 2].map((index) => <Skeleton key={index} className="h-32 w-full" />)}<span className="sr-only">Loading connected repositories…</span>
+                    </div>
+                ) : error ? (
+                    <div role="alert"><EmptyState icon={<AlertTriangle className="size-6" aria-hidden="true" />} title="Repositories are temporarily unavailable" description="RepoMedic could not load your connected repositories. Try again in a moment." action={<Button variant="outline" onClick={refresh}>Try again</Button>} /></div>
+                ) : repositories.length === 0 ? (
+                    <EmptyState icon={<GitFork className="size-6" aria-hidden="true" />} title="No connected repositories" description="Connect a repository from Repositories to open its workspace." />
+                ) : (
+                    <>
+                        <label className="flex min-w-0 items-center gap-2 rounded-lg border bg-card px-3 focus-within:ring-2 focus-within:ring-ring">
+                            <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" /><span className="sr-only">Search connected repositories</span>
+                            <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by owner or repository name…" className="h-11 w-full min-w-0 bg-transparent text-sm outline-none" />
+                        </label>
+                        <p role="status" className="text-xs text-muted-foreground">{filtered.length} of {repositories.length} repositories shown</p>
+                        {filtered.length === 0 ? (
+                            <EmptyState title="No matching repositories" description="Try another owner or repository name. Your selected workspace stays open." action={<Button variant="outline" size="sm" onClick={() => setSearch("")}>Clear search</Button>} />
+                        ) : (
+                            <ul className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Connected repositories">
+                                {filtered.map((candidate) => {
+                                    const selected = candidate.id === repository?.id;
+                                    return <li key={candidate.id} className="min-w-0">
+                                        <button type="button" aria-label={`Select ${candidate.full_name}`} aria-pressed={selected} aria-controls="repository-workspace" onClick={() => navigate(candidate.id, view)} style={selected ? { borderColor: "hsl(var(--accent))" } : undefined} className={cn("h-full w-full min-w-0 space-y-3 rounded-xl border bg-card p-5 text-left shadow-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", selected ? "bg-accent/5" : "hover:bg-muted/50")}>
+                                            <span className="flex items-start justify-between gap-3"><span className={cn("min-w-0 break-words font-semibold [overflow-wrap:anywhere]", selected && "text-accent")}>{candidate.full_name}</span>{selected && <Check className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden="true" />}</span>
+                                            <span className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground"><span>{candidate.private ? "Private" : "Public"}</span><span className="break-all">{candidate.default_branch ? `Branch: ${candidate.default_branch}` : "Default branch unavailable"}</span></span>
+                                            <span className={cn("block text-xs font-medium", selected ? "text-accent" : "text-muted-foreground")}>{selected ? "Selected" : "Open workspace"}</span>
+                                        </button>
+                                    </li>;
+                                })}
+                            </ul>
+                        )}
+                    </>
+                )}
+            </section>
+            {!isLoading && !error && repository && (
+                <section id="repository-workspace" aria-labelledby="repository-workspace-title" className="min-w-0 space-y-6 rounded-xl border bg-card p-4 shadow-soft sm:p-6">
+                    <div className="flex min-w-0 flex-col gap-4 border-b pb-5 md:flex-row md:items-center md:justify-between">
+                        <div className="min-w-0 space-y-2">
+                            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Selected repository</p>
+                            <h2 id="repository-workspace-title" className="break-words text-xl font-semibold [overflow-wrap:anywhere]">{repository.full_name}</h2>
+                            {githubUrl ? <a href={githubUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open ${repository.full_name} on GitHub`} className="inline-flex items-center gap-1 text-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">View on GitHub <ExternalLink className="size-3.5" aria-hidden="true" /></a> : <p className="text-sm text-muted-foreground">GitHub repository link unavailable</p>}
+                        </div>
+                        <label className="flex min-w-0 flex-col gap-2 text-sm font-medium md:w-48 md:shrink-0">
+                            Workspace view
+                            <select value={view} onChange={(event) => {
+                                const next = workspaceViews.find((option) => option.value === event.target.value);
+                                if (next) navigate(repository.id, next.value);
+                            }} aria-controls="repository-workspace-detail" className="h-11 w-full min-w-0 rounded-md border bg-background px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                                {workspaceViews.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                            </select>
+                        </label>
+                    </div>
+                    <div id="repository-workspace-detail" className="min-w-0">
+                        {view === "contributions" ? <EmptyState icon={<Activity className="size-6" aria-hidden="true" />} title="Contributions are coming soon" description={`Repository contributions for ${repository.full_name} are not implemented yet. Choose Issues or Pull Requests to view connected GitHub data.`} />
+                            : view === "issues" ? <IssuesFeature key={`issues:${repository.id}`} selectedRepository={repository} />
+                                : <PullRequestsFeature key={`pull-requests:${repository.id}`} selectedRepository={repository} />}
+                    </div>
+                </section>
+            )}
+        </div>
+    );
+}

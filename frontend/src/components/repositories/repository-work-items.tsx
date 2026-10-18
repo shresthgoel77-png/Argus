@@ -9,72 +9,99 @@ import { getRepositories } from "@/lib/api/repositories";
 import { listRepositoryWorkItems, type GitHubWorkItem } from "@/lib/api/repository-work-items";
 import type { Repository } from "@/lib/types/github";
 
-export function RepositoryWorkItems({ kind }: { kind: "issues" | "pull-requests" }) {
+export function RepositoryWorkItems({ kind, selectedRepository: controlledRepository }: {
+    kind: "issues" | "pull-requests";
+    /** A repository supplied by an embedding workspace; undefined keeps the standalone selector. */
+    selectedRepository?: Repository | null;
+}) {
     const [repositories, setRepositories] = React.useState<Repository[]>([]);
     const [selectedId, setSelectedId] = React.useState("");
-    const [items, setItems] = React.useState<GitHubWorkItem[]>([]);
-    const [isLoading, setIsLoading] = React.useState(true);
-    const [error, setError] = React.useState<string | null>(null);
+    const [repositoriesLoading, setRepositoriesLoading] = React.useState(controlledRepository === undefined);
+    const [repositoriesError, setRepositoriesError] = React.useState<string | null>(null);
+    const [itemsResult, setItemsResult] = React.useState<{ scope: string; items: GitHubWorkItem[] } | null>(null);
+    const [requestState, setRequestState] = React.useState<{ scope: string; status: "loading" | "success" | "error"; error?: string }>({
+        scope: "",
+        status: "loading",
+    });
     const [refreshKey, setRefreshKey] = React.useState(0);
     const [repositoryRetryKey, setRepositoryRetryKey] = React.useState(0);
+    const selectedIdForRequest = controlledRepository === undefined ? selectedId : controlledRepository?.id ?? "";
+    const selectedRepository = controlledRepository === undefined
+        ? repositories.find((repository) => repository.id === selectedIdForRequest)
+        : controlledRepository ?? undefined;
+    const requestScope = `${kind}:${selectedIdForRequest}:${refreshKey}`;
 
     React.useEffect(() => {
+        if (controlledRepository !== undefined) return;
         let active = true;
         void getRepositories().then((result) => {
             if (!active) return;
             if (result === null) {
-                setError("Connected repositories could not be loaded.");
-                setIsLoading(false);
+                setRepositoriesError("Connected repositories could not be loaded.");
             } else {
                 setRepositories(result);
                 setSelectedId(result.find((repository) => repository.monitoring_enabled)?.id ?? result[0]?.id ?? "");
-                if (result.length === 0) setIsLoading(false);
             }
+            setRepositoriesLoading(false);
         });
         return () => { active = false; };
-    }, [repositoryRetryKey]);
+    }, [controlledRepository, repositoryRetryKey]);
 
     React.useEffect(() => {
-        if (!selectedId) return;
+        if (!selectedIdForRequest) return;
         let active = true;
         async function loadItems() {
-            setIsLoading(true);
-            setError(null);
+            setRequestState({ scope: requestScope, status: "loading" });
             try {
-                const result = await listRepositoryWorkItems(selectedId, kind);
-                if (active) setItems(result);
+                const result = await listRepositoryWorkItems(selectedIdForRequest, kind);
+                if (active) {
+                    setItemsResult({ scope: requestScope, items: result });
+                    setRequestState({ scope: requestScope, status: "success" });
+                }
             } catch (loadError: unknown) {
                 if (active) {
-                    setError(loadError instanceof Error ? loadError.message : "GitHub data could not be loaded.");
-                    setItems([]);
+                    setItemsResult({ scope: requestScope, items: [] });
+                    setRequestState({
+                        scope: requestScope,
+                        status: "error",
+                        error: loadError instanceof Error ? loadError.message : "GitHub data could not be loaded.",
+                    });
                 }
-            } finally {
-                if (active) setIsLoading(false);
             }
         }
         void loadItems();
         return () => { active = false; };
-    }, [selectedId, kind, refreshKey]);
+    }, [selectedIdForRequest, kind, refreshKey, requestScope]);
 
-    const selectedRepository = repositories.find((repository) => repository.id === selectedId);
     const noun = kind === "issues" ? "issues" : "pull requests";
+    const isLoading = (controlledRepository === undefined && repositoriesLoading)
+        || (!!selectedIdForRequest && (requestState.scope !== requestScope || requestState.status === "loading"));
+    const error = repositoriesError
+        ?? (requestState.scope === requestScope && requestState.status === "error"
+            ? requestState.error ?? "GitHub data could not be loaded."
+            : null);
+    const items = itemsResult?.scope === requestScope ? itemsResult.items : [];
 
-    if (isLoading && repositories.length === 0) {
+    if (isLoading && controlledRepository === undefined && repositoriesLoading) {
         return <div className="flex justify-center p-8"><Loader2 className="size-6 animate-spin text-muted-foreground" /></div>;
     }
-    if (repositories.length === 0 && !error) {
+    if (controlledRepository === undefined && repositories.length === 0 && !error && !repositoriesLoading) {
         return <EmptyState title="No repositories connected" description={`Connect a GitHub repository to load its real ${noun}.`} />;
+    }
+
+    if (controlledRepository === null) {
+        return <EmptyState title="Select a repository" description={`Select a connected repository to load its real ${noun}.`} />;
     }
 
     return (
         <section className="space-y-4">
-            {repositories.length > 0 && (
+            {controlledRepository === undefined && repositories.length > 0 && (
                 <label className="flex items-center gap-3 text-sm">
                     <span className="font-medium">Repository</span>
                     <select
                         aria-label="Select repository"
                         className="h-10 max-w-full rounded-md border bg-background px-3"
-                        value={selectedId}
+                        value={selectedIdForRequest}
                         onChange={(event) => setSelectedId(event.target.value)}
                     >
                         {repositories.map((repository) => (
@@ -86,7 +113,15 @@ export function RepositoryWorkItems({ kind }: { kind: "issues" | "pull-requests"
             {error ? (
                 <div role="alert" className="space-y-3 rounded-lg border border-destructive/40 p-4 text-sm">
                     <p>{error}</p>
-                    <Button variant="outline" size="sm" onClick={() => { setIsLoading(true); setError(null); if (selectedId) setRefreshKey((key) => key + 1); else setRepositoryRetryKey((key) => key + 1); }}>Try again</Button>
+                    <Button variant="outline" size="sm" onClick={() => {
+                        if (repositoriesError) {
+                            setRepositoriesLoading(true);
+                            setRepositoriesError(null);
+                            setRepositoryRetryKey((key) => key + 1);
+                        } else {
+                            setRefreshKey((key) => key + 1);
+                        }
+                    }}>Try again</Button>
                 </div>
             ) : isLoading ? (
                 <div className="flex justify-center p-8" aria-label={`Loading GitHub ${noun}`}>

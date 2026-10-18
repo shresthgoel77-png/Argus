@@ -1,129 +1,168 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { login } from '../helpers/auth';
 
-test.describe('Activity page', () => {
-    test.beforeEach(async ({ page }) => {
+const repositories = ['alpha', 'beta', 'a-very-long-repository-name-that-must-wrap-on-small-screens', 'delta'].map((name, index) => ({
+    id: `hub-${index}`, full_name: `acme/${name}`, private: index === 1,
+    default_branch: index === 2 ? null : 'main', monitoring_enabled: index === 1, created_at: '2026-10-18T00:00:00Z',
+}));
+const workItem = (kind: string, id: string) => ({
+    number: 42, title: `${id} ${kind} item`, state: 'open', draft: kind === 'pull-requests',
+    html_url: `https://github.com/acme/alpha/${kind === 'issues' ? 'issues' : 'pull'}/42`,
+    user: { login: 'octocat' }, labels: [{ name: 'review' }], updated_at: '2026-10-17T00:00:00Z', created_at: null,
+});
+
+async function mockWorkspace(page: Page) {
+    const requests: string[] = [];
+    // All app API traffic stays mocked, including the post-login Overview and bell.
+    await page.route('**/api/v1/**', async route => {
+        const path = new URL(route.request().url()).pathname;
+        requests.push(path);
+        if (path === '/api/v1/repositories') return route.fulfill({ json: repositories });
+        const match = path.match(/\/repositories\/([^/]+)\/(issues|pull-requests)$/);
+        if (match) return route.fulfill({ json: [workItem(match[2], match[1])] });
+        if (path.endsWith('/unread-count')) return route.fulfill({ json: { count: 0 } });
+        return route.fulfill({ json: null });
+    });
+    return requests;
+}
+
+test.describe('Activity workspace (mocked APIs)', () => {
+    test('supports keyboard selection, native detail parity, reload, and Back/Forward URL state', async ({ page }) => {
+        const requests = await mockWorkspace(page);
         await login(page);
+        await page.goto('/overview/activity');
+        await expect(page.getByText('Contributions are coming soon')).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Select acme/alpha', exact: true })).toHaveAttribute('aria-pressed', 'true');
+        const dropdown = page.getByRole('combobox', { name: 'Workspace view' });
+        await expect(dropdown.locator('option')).toHaveText(['Contributions', 'Issues', 'Pull Requests']);
+        expect(requests.filter(path => /\/(issues|pull-requests|activity)$/.test(path))).toHaveLength(0);
+        await expect(page.getByRole('group', { name: 'Filter activity by source' })).toHaveCount(0);
+        await expect(page.getByRole('link', { name: 'Issues', exact: true })).toHaveAttribute('href', '/overview/issues');
+        await expect(page.getByRole('link', { name: 'Pull Requests', exact: true })).toHaveAttribute('href', '/overview/pull-requests');
+        const beta = page.getByRole('button', { name: 'Select acme/beta', exact: true });
+        await beta.focus(); await page.keyboard.press('Enter');
+        await expect(beta).toHaveAttribute('aria-pressed', 'true');
+        await dropdown.focus(); await page.keyboard.press('Home'); await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
+        await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
+        await expect(page.getByText(/open .*opened by octocat.*updated/)).toBeVisible();
+        await expect(page.getByText('review', { exact: true })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Open acme/beta on GitHub' })).toHaveAttribute('href', 'https://github.com/acme/beta');
+        await expect(page.getByRole('combobox')).toHaveCount(1);
+        await dropdown.selectOption('pull-requests');
+        await expect(page.getByText('hub-1 pull-requests item', { exact: false })).toBeVisible();
+        await expect(page.getByText(/open .*draft .*opened by octocat/)).toBeVisible();
+        await expect(page).toHaveURL(/repo=hub-1&tab=pull-requests/);
+        await page.goBack();
+        await expect(dropdown).toHaveValue('issues');
+        await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
+        await page.goBack();
+        await expect(dropdown).toHaveValue('contributions');
+        await page.goBack();
+        await expect(page.getByRole('button', { name: 'Select acme/alpha', exact: true })).toHaveAttribute('aria-pressed', 'true');
+        await page.goForward(); await page.goForward();
+        await expect(dropdown).toHaveValue('issues');
+        await page.reload();
+        await expect(dropdown).toHaveValue('issues');
+        await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
+        expect(requests.filter(path => path.endsWith('/activity'))).toHaveLength(0);
     });
 
-    test('renders mixed-source activity and handles source filtering, pagination, and bot-interaction expansion', async ({ page }) => {
-        const repository = {
-            id: 'repo-1',
-            full_name: 'acme/service',
-            private: false,
-            default_branch: 'main',
-            monitoring_enabled: true,
-            created_at: '2024-01-01T00:00:00Z',
-        };
-
-        const page1 = {
-            items: [
-                {
-                    source: 'github_event',
-                    timestamp: '2024-05-03T10:00:00Z',
-                    title: 'Deployment completed',
-                    summary: 'Production deployment completed successfully.',
-                    reference_id: 'gh-1',
-                },
-                {
-                    source: 'bot_interaction',
-                    timestamp: '2024-05-03T09:00:00Z',
-                    title: 'Bot interaction: ci_status',
-                    summary: 'completed: Is CI passing?',
-                    reference_id: 'bot-1',
-                    details: {
-                        intent: 'ci_status',
-                        status: 'completed',
-                        skip_reason: null,
-                        response_text: 'Yes, CI is passing.',
-                        requester_github_login: 'tester',
-                        question_text: 'Is CI passing?',
-                    }
-                }
-            ],
-            next_before: '2024-05-03T09:00:00Z',
-        };
-
-        const page2 = {
-            items: [
-                {
-                    source: 'finding_detected',
-                    timestamp: '2024-05-02T09:00:00Z',
-                    title: 'Outdated dependency',
-                    summary: 'high finding detected',
-                    reference_id: 'finding-1',
-                }
-            ],
-            next_before: null,
-        };
-
-        const filteredPage = {
-            items: [
-                {
-                    source: 'bot_interaction',
-                    timestamp: '2024-05-03T09:00:00Z',
-                    title: 'Bot interaction: ci_status',
-                    summary: 'completed: Is CI passing?',
-                    reference_id: 'bot-1',
-                    details: {
-                        intent: 'ci_status',
-                        status: 'completed',
-                        skip_reason: null,
-                        response_text: 'Yes, CI is passing.',
-                        requester_github_login: 'tester',
-                        question_text: 'Is CI passing?',
-                    }
-                }
-            ],
-            next_before: null,
-        };
-
-        await page.route('**/api/v1/repositories', async (route) => {
-            await route.fulfill({ status: 200, json: [repository] });
-        });
-
-        await page.route('**/api/v1/repositories/repo-1/activity*', async (route) => {
-            const url = new URL(route.request().url());
-            const source = url.searchParams.get('source');
-            const before = url.searchParams.get('before');
-
-            if (source === 'bot_interaction') {
-                return route.fulfill({ status: 200, json: filteredPage });
+    test('uses three/two/one columns, keeps blue selection, and searches without losing the workspace', async ({ page }, testInfo) => {
+        await mockWorkspace(page); await login(page);
+        await page.goto('/overview/activity?repo=hub-2&tab=issues');
+        await expect(page.getByText('hub-2 issues item', { exact: false })).toBeVisible();
+        const list = page.getByRole('list', { name: 'Connected repositories' });
+        for (const [width, columns] of [[1440, 3], [1000, 2], [768, 2], [390, 1], [320, 1]]) {
+            await page.setViewportSize({ width, height: 1000 });
+            await expect.poll(() => list.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(columns);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+            expect(await page.locator('main').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+            const heatmap = await page.getByRole('region', { name: 'Your contribution heatmap' }).boundingBox();
+            const language = await page.getByRole('region', { name: 'Language footprint' }).boundingBox();
+            if (width >= 768) expect(heatmap!.y).toBe(language!.y);
+            else expect(language!.y).toBeGreaterThan(heatmap!.y);
+            if ([1440, 390, 320].includes(width)) {
+                await page.screenshot({ path: testInfo.outputPath(`activity-${width}.png`), fullPage: true });
+                await page.getByRole('combobox', { name: 'Workspace view' }).scrollIntoViewIfNeeded();
+                await page.screenshot({ path: testInfo.outputPath(`activity-detail-${width}.png`), fullPage: true });
+                await page.locator('main').evaluate(element => { element.scrollTop = 0; });
             }
+        }
+        const selected = list.getByRole('button', { pressed: true });
+        await expect(selected).toHaveClass(/bg-accent\/5/);
+        expect(await selected.evaluate(element => getComputedStyle(element).borderColor === getComputedStyle(element.querySelector('.font-semibold')!).color)).toBe(true);
+        await page.getByRole('searchbox', { name: 'Search connected repositories' }).fill('  BETA  ');
+        await expect(list.getByRole('button')).toHaveCount(1);
+        await expect(page.getByRole('heading', { name: repositories[2].full_name, exact: true })).toBeVisible();
+        await page.getByRole('searchbox').fill('missing');
+        await expect(page.getByText('No matching repositories')).toBeVisible();
+        await expect(page.getByText('hub-2 issues item', { exact: false })).toBeVisible();
+        await page.getByRole('button', { name: 'Clear search' }).click();
+        await expect(list.getByRole('button')).toHaveCount(4);
+    });
 
-            if (before === '2024-05-03T09:00:00Z') {
-                return route.fulfill({ status: 200, json: page2 });
-            }
-
-            return route.fulfill({ status: 200, json: page1 });
+    test('handles discovery loading/error/empty, invalid URL, revoked access, and detail retry', async ({ page }) => {
+        await mockWorkspace(page); await login(page);
+        let available = repositories;
+        let failed = true;
+        let releaseDiscovery!: () => void;
+        const discovery = new Promise<void>(resolve => { releaseDiscovery = resolve; });
+        await page.route('**/api/v1/repositories', async route => {
+            await discovery;
+            return failed ? route.fulfill({ status: 503, json: {} }) : route.fulfill({ json: available });
         });
+        await page.goto('/overview/activity?repo=not-authorized&tab=invalid');
+        await expect(page.getByRole('status', { name: 'Loading repositories' })).toBeVisible();
+        releaseDiscovery();
+        await expect(page.locator('main').getByRole('alert')).toContainText('Repositories are temporarily unavailable');
+        failed = false;
+        await page.getByRole('button', { name: 'Try again' }).click();
+        await expect(page.getByText('Contributions are coming soon')).toBeVisible();
+        await expect(page).toHaveURL(/repo=hub-0&tab=contributions/);
+        let itemFailed = true;
+        await page.route('**/api/v1/repositories/hub-0/issues*', route => itemFailed
+            ? route.fulfill({ status: 403, json: { error: { code: 'github_permission_error', message: 'Access revoked' } } })
+            : route.fulfill({ json: [] }));
+        await page.getByRole('combobox').selectOption('issues');
+        await expect(page.locator('main').getByRole('alert')).toContainText('Access revoked');
+        await expect(page.locator('main').getByRole('alert')).toContainText("GitHub App's repository permissions");
+        await expect(page.getByRole('heading', { name: 'No open issues', exact: true })).toHaveCount(0);
+        itemFailed = false; await page.getByRole('button', { name: 'Try again' }).click();
+        await expect(page.getByRole('heading', { name: 'No open issues', exact: true })).toBeVisible();
+        available = [repositories[1]];
+        await page.getByRole('button', { name: 'Refresh repositories' }).click();
+        await expect(page.getByRole('heading', { name: 'acme/beta', exact: true })).toBeVisible();
+        await expect(page).toHaveURL(/repo=hub-1&tab=issues/);
+        available = []; await page.getByRole('button', { name: 'Refresh repositories' }).click();
+        await expect(page.getByText('No connected repositories')).toBeVisible();
+        await expect(page.getByRole('combobox')).toHaveCount(0);
+        await expect(page).toHaveURL(/activity\?tab=issues$/);
+    });
 
-        await page.goto('/overview/activity');
-
-        // Verify mixed-source rendering
-        await expect(page.getByText('Deployment completed', { exact: true })).toBeVisible();
-        await expect(page.getByText('Production deployment completed successfully.')).toBeVisible();
-
-        // Verify expanding bot interaction
-        await page.getByLabel('Toggle details').click();
-
-        // Ensure expanded details are shown
-        await expect(page.getByText('Is CI passing?')).toBeVisible();
-        await expect(page.getByText('Question')).toBeVisible();
-        await expect(page.getByText('Response')).toBeVisible();
-        await expect(page.getByText('Yes, CI is passing.')).toBeVisible();
-
-        // Verify pagination
-        await page.getByRole('button', { name: 'Next', exact: true }).click();
-        await expect(page.getByText('Outdated dependency')).toBeVisible();
-        await expect(page.getByText('high finding detected')).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Previous', exact: true })).toBeEnabled();
-
-        // Verify source filtering
-        await page.getByRole('button', { name: 'Bot Interactions' }).click();
-
-        // Deployment completed should be hidden since we filtered
-        await expect(page.getByText('Deployment completed')).not.toBeVisible();
-        await expect(page.getByText('Bot interaction: ci_status')).toBeVisible();
+    test('ignores delayed responses across rapid repository/view changes and preserves legacy feature routes', async ({ page }) => {
+        await mockWorkspace(page); await login(page);
+        let release!: () => void;
+        const pending = new Promise<void>(resolve => { release = resolve; });
+        let started = false;
+        await page.route('**/api/v1/repositories/hub-0/issues*', async route => {
+            started = true; await pending;
+            await route.fulfill({ json: [workItem('issues', 'obsolete')] }).catch(() => {});
+        });
+        await page.goto('/overview/activity?repo=hub-0&tab=issues');
+        await expect(page.getByLabel('Loading GitHub issues')).toBeVisible();
+        await expect.poll(() => started).toBe(true);
+        await page.getByRole('button', { name: 'Select acme/beta', exact: true }).click();
+        await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
+        await page.getByRole('combobox').selectOption('pull-requests');
+        await expect(page.getByText('hub-1 pull-requests item', { exact: false })).toBeVisible();
+        const obsoleteResponse = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/hub-0/issues'));
+        release(); await obsoleteResponse;
+        await expect(page.getByText('obsolete issues item', { exact: false })).toHaveCount(0);
+        await page.goto('/overview/issues');
+        await expect(page.getByRole('combobox', { name: 'Select repository' })).toHaveValue('hub-1');
+        await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
+        await page.goto('/overview/pull-requests');
+        await expect(page.getByRole('combobox', { name: 'Select repository' })).toHaveValue('hub-1');
+        await expect(page.getByText('hub-1 pull-requests item', { exact: false })).toBeVisible();
     });
 });

@@ -34,6 +34,10 @@ class BaseAIProvider(ABC):
         """
         pass
 
+    def validate_model(self, api_key: str, model: str) -> None:
+        """Validate model generation support when the provider exposes metadata."""
+        return None
+
     @abstractmethod
     def generate_analysis(self, context: FindingContext) -> StructuredAnalysisResult:
         """Generate a structured explanation for a finding context."""

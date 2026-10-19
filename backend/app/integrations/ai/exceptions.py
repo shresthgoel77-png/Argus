@@ -10,6 +10,14 @@ class AIProviderUnavailableError(AIProviderError):
     """Raised when the AI Provider is unreachable or responds with 5xx."""
     pass
 
+class AIProviderNetworkError(AIProviderError):
+    """Raised when a provider request cannot reach the provider."""
+    pass
+
+class AIProviderInvalidRequestError(AIProviderError):
+    """Raised when a provider rejects an unsupported model or request."""
+    pass
+
 class AIProviderRateLimitedError(AIProviderError):
     """Raised when the AI Provider rate limits the request."""
     pass

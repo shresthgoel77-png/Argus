@@ -19,6 +19,9 @@ class MockProvider:
         if self.validation_error:
             raise self.validation_error
 
+    def validate_model(self, api_key, model):
+        return None
+
 
 def provider_class(provider):
     class Provider:
@@ -26,6 +29,9 @@ def provider_class(provider):
 
         def validate_api_key(self, api_key):
             return provider.validate_api_key(api_key)
+
+        def validate_model(self, api_key, model):
+            return provider.validate_model(api_key, model)
 
     return Provider
 

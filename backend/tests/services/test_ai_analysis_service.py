@@ -6,7 +6,9 @@ import pytest
 
 from app.core.exceptions import AppError
 from app.integrations.ai.exceptions import (
+    AIProviderInvalidRequestError,
     AIProviderInvalidResponseError,
+    AIProviderNetworkError,
     AIProviderRateLimitedError,
     AIProviderUnavailableError,
     InvalidAPIKeyError,
@@ -152,6 +154,16 @@ def test_success_persists_completed_analysis(
 @pytest.mark.parametrize(
     ("provider_error", "expected_code", "expected_message"),
     [
+        (
+            AIProviderInvalidRequestError(API_KEY),
+            "ai_provider_invalid_request",
+            "The selected AI model or request is unsupported. Check model generation and structured-output support.",
+        ),
+        (
+            AIProviderNetworkError(API_KEY),
+            "ai_provider_network_error",
+            "Could not reach the AI provider. Check the connection and retry.",
+        ),
         (
             InvalidAPIKeyError(API_KEY),
             "ai_provider_invalid_api_key",

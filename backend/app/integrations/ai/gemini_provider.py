@@ -15,6 +15,7 @@ from app.integrations.ai.provider_base import (
 from app.services.ai_context_builder import FindingContext
 from app.services.repository_summary_context_builder import RepositorySummaryContext
 from app.schemas.repository_summary_result import RepositorySummaryResult
+from app.services.ai_context_common import bounded_generation_content
 
 BOT_RESPONSE_SCHEMA = {
     "type": "OBJECT",
@@ -71,12 +72,15 @@ class GeminiProvider(BaseAIProvider):
     def validate_api_key(self, api_key: str) -> None:
         self._client.validate_api_key(api_key)
 
+    def validate_model(self, api_key: str, model: str) -> None:
+        self._client.validate_model(api_key, model)
+
     def generate_analysis(self, context: FindingContext) -> StructuredAnalysisResult:
         try:
             response = self._client.generate_content(
                 model=self._model,
                 system_instructions=context.system_instructions,
-                untrusted_content=context.untrusted_content,
+                untrusted_content=bounded_generation_content(context.untrusted_content),
             )
             generated_text = response["candidates"][0]["content"]["parts"][0]["text"]
             return StructuredAnalysisResult.model_validate_json(generated_text)
@@ -92,7 +96,7 @@ class GeminiProvider(BaseAIProvider):
             response = self._client.generate_content(
                 model=self._model,
                 system_instructions=context.system_instructions,
-                untrusted_content=context.untrusted_content,
+                untrusted_content=bounded_generation_content(context.untrusted_content),
                 response_schema=REPOSITORY_SUMMARY_SCHEMA,
             )
             generated_text = response["candidates"][0]["content"]["parts"][0]["text"]
@@ -113,7 +117,7 @@ class GeminiProvider(BaseAIProvider):
             response = self._client.generate_content(
                 model=self._model,
                 system_instructions=instructions,
-                untrusted_content=context.untrusted_content,
+                untrusted_content=bounded_generation_content(context.untrusted_content),
                 response_schema=BOT_RESPONSE_SCHEMA,
             )
             generated_text = response["candidates"][0]["content"]["parts"][0]["text"]

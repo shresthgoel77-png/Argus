@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from app.core.config import settings
 
 
 SYSTEM_INSTRUCTIONS_TEXT = """You are an AI assistant analyzing repository findings. Your tasks are:
@@ -80,3 +81,15 @@ def wrap_untrusted_content(content: str) -> str:
         f"{content}\n"
         "</untrusted_repository_content>"
     )
+
+
+def bounded_generation_content(content: str) -> str:
+    """Bound request context while retaining its opening and latest evidence."""
+    limit = settings.ai_max_input_chars
+    if len(content) <= limit:
+        return content
+    marker = "\n...[middle context omitted to fit configured AI input budget]...\n"
+    remaining = max(0, limit - len(marker))
+    head = remaining * 2 // 3
+    tail = remaining - head
+    return f"{content[:head]}{marker}{content[-tail:]}"

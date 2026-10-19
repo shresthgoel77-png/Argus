@@ -21,6 +21,15 @@ export const AI_PROVIDER_OPTIONS: Array<{ key: AIProviderKey; label: string; mod
             "gemini-2.5-flash-lite",
         ],
     },
+    {
+        key: "groq",
+        label: "Groq",
+        models: [
+            "openai/gpt-oss-20b",
+            "openai/gpt-oss-120b",
+            "qwen/qwen3.8-27b",
+        ],
+    },
 ];
 
 export class AIConnectionApiError extends Error {

@@ -24,6 +24,7 @@ from app.models.bot_interaction import BotInteraction
 from app.models.github_event import GitHubEvent
 from app.models.repository import Repository
 from app.services import ai_connection_service
+from app.services.ai_generation_controls import run_generation
 
 logger = get_logger(__name__)
 
@@ -68,10 +69,8 @@ def _is_pull_request(payload: dict) -> bool:
 
 
 def _sanitize_error(error: Exception) -> str:
-    msg = str(error)
-    if len(msg) > 500:
-        msg = msg[:497] + "..."
-    return msg
+    # Persist only a generic failure; provider exceptions can contain request data.
+    return "The bot response could not be generated or posted."
 
 
 def _persist_interaction(
@@ -190,7 +189,17 @@ async def handle_mention(
             raise RuntimeError("AI connection not found for authorized user")
         provider_cls = get_provider(ai_conn.provider)
         provider = provider_cls(api_key=api_key, model=ai_conn.model)
-        result = provider.generate_bot_response(context)
+        result = run_generation(
+            user_id=auth_result.owner.id,
+            repository_id=repository.id,
+            connection=ai_conn,
+            feature="github-bot-response-v1",
+            system_instructions=context.system_instructions,
+            content=context.untrusted_content,
+            parameters={"schema": "BotResponseResult-v1", "model": ai_conn.model,
+                        "intent": intent.value},
+            generate=lambda: provider.generate_bot_response(context),
+        )
         # api_key goes out of scope here — never stored, never logged
 
         # 9. Post comment to GitHub

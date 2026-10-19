@@ -1,4 +1,4 @@
-export type AIProviderKey = "gemini" | (string & {});
+export type AIProviderKey = "gemini" | "groq" | (string & {});
 
 export type AIConnectionStatus = {
     configured: boolean;

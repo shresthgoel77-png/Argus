@@ -22,7 +22,9 @@ def create_or_replace_connection(
             f"Model '{model}' is not supported by AI provider '{provider_key}'."
         )
 
-    provider_class().validate_api_key(api_key)
+    provider = provider_class()
+    provider.validate_api_key(api_key)
+    provider.validate_model(api_key, model)
     encrypted_api_key = encrypt_secret(api_key)
     validated_at = datetime.now(timezone.utc)
 

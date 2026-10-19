@@ -13,6 +13,18 @@ class Settings(BaseSettings):
     cors_origins: Union[List[str], str] = ["http://localhost:3000"]
     api_rate_limit_requests: int = Field(default=120, gt=0)
     api_rate_limit_window_seconds: int = Field(default=60, gt=0)
+    ai_user_requests_per_minute: int = Field(default=8, gt=0)
+    ai_global_requests_per_minute: int = Field(default=60, gt=0)
+    ai_provider_model_requests_per_minute: int = Field(default=30, gt=0)
+    ai_global_concurrency: int = Field(default=8, gt=0)
+    ai_user_concurrency: int = Field(default=2, gt=0)
+    ai_request_timeout_seconds: float = Field(default=20.0, gt=0, le=120)
+    ai_max_input_chars: int = Field(default=24000, gt=1000)
+    ai_max_output_tokens: int = Field(default=900, gt=0, le=8192)
+    ai_cache_ttl_seconds: int = Field(default=120, ge=0, le=3600)
+    ai_cache_max_entries: int = Field(default=256, gt=0, le=10000)
+    ai_retry_base_delay_seconds: float = Field(default=0.25, ge=0, le=10)
+    ai_retry_max_delay_seconds: float = Field(default=2.0, ge=0, le=30)
 
     github_app_id: str
     github_app_slug: str

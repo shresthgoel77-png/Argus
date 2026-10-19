@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 from app.auth.dependencies import get_current_user
 from app.db.session import get_db
 from app.integrations.ai.exceptions import (
+    AIProviderInvalidResponseError,
+    AIProviderInvalidRequestError,
+    AIProviderNetworkError,
     AIProviderRateLimitedError,
     AIProviderUnavailableError,
     InvalidAPIKeyError,
@@ -42,6 +45,21 @@ def create_connection(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="The provided API key could not be validated.",
+        )
+    except AIProviderInvalidRequestError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The selected AI model is unavailable or does not support content generation.",
+        )
+    except AIProviderNetworkError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Could not reach the AI provider. Check the connection and retry.",
+        )
+    except AIProviderInvalidResponseError:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="The AI provider returned invalid model metadata. Please retry later.",
         )
     except AIProviderRateLimitedError:
         raise HTTPException(

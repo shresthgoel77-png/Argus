@@ -111,7 +111,7 @@ export function AIConnectionSettings() {
             <Card id="ai-connection">
             <CardHeader>
                 <CardTitle>AI provider and BYOK</CardTitle>
-                <CardDescription>Validate a provider key for AI-powered workspace features.</CardDescription>
+                <CardDescription>Validate the key and confirm the selected model is available for it. This checks provider metadata; it does not run a generation request.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 {errorMessage ? <p className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">{errorMessage}</p> : null}

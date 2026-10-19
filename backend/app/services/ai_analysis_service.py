@@ -13,6 +13,8 @@ from app.core.exceptions import AppError
 from app.integrations.ai import get_provider
 from app.integrations.ai.exceptions import (
     AIProviderInvalidResponseError,
+    AIProviderInvalidRequestError,
+    AIProviderNetworkError,
     AIProviderRateLimitedError,
     AIProviderUnavailableError,
     InvalidAPIKeyError,
@@ -26,6 +28,8 @@ from app.services import (
     ai_context_builder,
     repository_summary_context_builder,
 )
+from app.services.ai_generation_controls import run_generation
+from app.services.repository_service import get_repository_or_404
 
 
 class AINotConfiguredError(AppError):
@@ -43,6 +47,16 @@ class AIAnalysisFailedError(AppError):
 
 
 _PROVIDER_FAILURES: dict[type[Exception], tuple[str, str, int]] = {
+    AIProviderInvalidRequestError: (
+        "ai_provider_invalid_request",
+        "The selected AI model or request is unsupported. Check model generation and structured-output support.",
+        422,
+    ),
+    AIProviderNetworkError: (
+        "ai_provider_network_error",
+        "Could not reach the AI provider. Check the connection and retry.",
+        503,
+    ),
     InvalidAPIKeyError: (
         "ai_provider_invalid_api_key",
         "The configured AI provider rejected the API key.",
@@ -101,6 +115,7 @@ def _persist_failure(db: Session, analysis: AIAnalysis, exception: Exception) ->
 def request_finding_analysis(finding: Finding, user: User) -> AIAnalysis:
     """Run one observable, on-demand analysis for *finding*."""
     db = _session_for(finding, user)
+    get_repository_or_404(db, user.id, finding.repository_id)
     connection = (
         db.query(AIConnection)
         .filter(AIConnection.user_id == user.id)
@@ -127,7 +142,16 @@ def request_finding_analysis(finding: Finding, user: User) -> AIAnalysis:
             api_key=ai_connection_service.get_decrypted_api_key(db, user.id),
             model=connection.model,
         )
-        result = provider.generate_analysis(context)
+        result = run_generation(
+            user_id=user.id,
+            repository_id=finding.repository_id,
+            connection=connection,
+            feature="finding-explanation-v1",
+            system_instructions=context.system_instructions,
+            content=context.untrusted_content,
+            parameters={"schema": "StructuredAnalysisResult-v1", "model": connection.model},
+            generate=lambda: provider.generate_analysis(context),
+        )
         analysis.status = "completed"
         analysis.summary = result.summary
         analysis.severity_assessment = result.severity
@@ -147,6 +171,7 @@ def request_repository_summary(
     db: Session, repository_id: uuid.UUID, user: User
 ) -> AIAnalysis:
     """Run one observable, on-demand summary for *repository_id*."""
+    get_repository_or_404(db, user.id, repository_id)
     connection = (
         db.query(AIConnection)
         .filter(AIConnection.user_id == user.id)
@@ -176,7 +201,16 @@ def request_repository_summary(
             api_key=ai_connection_service.get_decrypted_api_key(db, user.id),
             model=connection.model,
         )
-        result = provider.generate_repository_summary(context)
+        result = run_generation(
+            user_id=user.id,
+            repository_id=repository_id,
+            connection=connection,
+            feature="repository-summary-v1",
+            system_instructions=context.system_instructions,
+            content=context.untrusted_content,
+            parameters={"schema": "RepositorySummaryResult-v1", "model": connection.model},
+            generate=lambda: provider.generate_repository_summary(context),
+        )
         analysis.status = "completed"
         analysis.summary = result.summary
         analysis.key_insights = result.key_insights

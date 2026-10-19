@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import { Activity, AlertTriangle, ExternalLink, GitFork, Search } from "lucide-react";
+import { AlertTriangle, ExternalLink, GitFork, Search } from "lucide-react";
 
 import { IssuesFeature } from "@/components/repositories/issues-feature";
 import { PullRequestsFeature } from "@/components/repositories/pull-requests-feature";
@@ -15,6 +15,7 @@ import type { Repository } from "@/lib/types/github";
 import { ActivityRepositoryCard } from "./activity-repository-card";
 import { LanguageFootprint } from "./language-footprint";
 import { ContributionHeatmap } from "./contribution-heatmap";
+import { RepositoryContributionsView } from "./repository-contributions";
 import { useActivityMetadata } from "./use-activity-metadata";
 import { githubRepositoryUrl, readWorkspaceSelection, workspaceUrl, workspaceViews, type WorkspaceView } from "./workspace-selection";
 
@@ -141,7 +142,7 @@ export function ActivityWorkspace() {
                         </label>
                     </div>
                     <div id="repository-workspace-detail" className="min-w-0">
-                        {view === "contributions" ? <EmptyState icon={<Activity className="size-6" aria-hidden="true" />} title="Contributions are coming soon" description={`Repository contributions for ${repository.full_name} are not implemented yet. Choose Issues or Pull Requests to view connected GitHub data.`} />
+                        {view === "contributions" ? <RepositoryContributionsView key={`contributions:${repository.id}`} repositoryId={repository.id} />
                             : view === "issues" ? <IssuesFeature key={`issues:${repository.id}`} selectedRepository={repository} />
                                 : <PullRequestsFeature key={`pull-requests:${repository.id}`} selectedRepository={repository} />}
                     </div>

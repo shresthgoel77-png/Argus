@@ -8,6 +8,8 @@ import { getRepositories } from "@/lib/api/repositories";
 import { listRepositoryWorkItems } from "@/lib/api/repository-work-items";
 import { listRepositoryActivity } from "@/lib/api/activity";
 import type { Repository } from "@/lib/types/github";
+import { fetchRepositoryContributions } from "@/lib/api/repository-contributions";
+import { contributionSnapshot } from "../fixtures/repository-contributions";
 
 // Model Next's documented native-history integration without a router/server.
 vi.mock("next/navigation", () => ({
@@ -22,6 +24,8 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/api/repositories", () => ({ getRepositories: vi.fn() }));
 vi.mock("@/lib/api/repository-work-items", () => ({ listRepositoryWorkItems: vi.fn() }));
 vi.mock("@/lib/api/activity", () => ({ listRepositoryActivity: vi.fn() }));
+vi.mock("@/lib/auth/use-auth", () => ({ useAuth: () => ({ isAuthenticated: true, user: { id: "workspace-user" } }) }));
+vi.mock("@/lib/api/repository-contributions", async (original) => ({ ...await original<typeof import("@/lib/api/repository-contributions")>(), fetchRepositoryContributions: vi.fn() }));
 vi.mock("@/components/activity/use-activity-metadata", () => ({ useActivityMetadata: () => ({}) }));
 vi.mock("@/components/activity/contribution-heatmap", () => ({ ContributionHeatmap: () => <section><h2>Your contribution heatmap</h2><p>Personal calendar unavailable</p></section> }));
 
@@ -46,12 +50,14 @@ beforeEach(() => {
     }
     vi.mocked(getRepositories).mockResolvedValue(repositories);
     vi.mocked(listRepositoryWorkItems).mockResolvedValue([]);
+    vi.mocked(fetchRepositoryContributions).mockImplementation(async (id) => contributionSnapshot(id));
 });
 
-it("defaults to the first authorized repo and Contributions without detail/event requests; searches without changing selection", async () => {
+it("defaults to the first authorized repo and Contributions without work-item/event requests; searches without changing selection", async () => {
     render(<ActivityPage />);
     expect(screen.getByRole("status", { name: "Loading repositories" })).toBeInTheDocument();
-    expect(await screen.findByRole("heading", { name: "Contributions are coming soon" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Repository contributions" })).toBeInTheDocument();
+    await waitFor(() => expect(fetchRepositoryContributions).toHaveBeenCalledWith("repo-a", expect.anything(), expect.any(AbortSignal)));
     expect(screen.getByRole("button", { name: "Select acme/alpha" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("combobox", { name: "Workspace view" })).toHaveValue("contributions");
     expect(screen.getAllByRole("option").map((option) => option.textContent)).toEqual(["Contributions", "Issues", "Pull Requests"]);
@@ -83,6 +89,7 @@ it("prefers URL scope, embeds complete Issues/PR rows, and fetches only the moun
     expect(screen.getByRole("link", { name: "Open acme/beta on GitHub" })).toHaveAttribute("rel", "noopener noreferrer");
     expect(listRepositoryWorkItems).toHaveBeenCalledExactlyOnceWith("repo-b", "issues");
     expect(getRepositories).toHaveBeenCalledTimes(1);
+    expect(fetchRepositoryContributions).not.toHaveBeenCalled();
     expect(screen.getAllByRole("combobox")).toHaveLength(1);
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "pull-requests" } });
     expect(await screen.findByText("Review draft")).toBeInTheDocument();
@@ -92,6 +99,7 @@ it("prefers URL scope, embeds complete Issues/PR rows, and fetches only the moun
     expect(window.location.href).toContain("keep=1");
     expect(window.location.hash).toBe("#workspace");
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "contributions" } });
+    await screen.findByText("Complete history for this window.");
     expect(listRepositoryWorkItems).toHaveBeenCalledTimes(2);
 });
 

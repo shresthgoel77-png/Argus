@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { login } from '../helpers/auth';
+import { contributionSnapshot } from '../../src/__tests__/fixtures/repository-contributions';
 
 const repositories = ['alpha', 'beta', 'a-very-long-repository-name-that-must-wrap-on-small-screens', 'delta'].map((name, index) => ({
     id: `hub-${index}`, full_name: `acme/${name}`, private: index === 1,
@@ -18,6 +19,8 @@ async function mockWorkspace(page: Page) {
         const path = new URL(route.request().url()).pathname;
         requests.push(path);
         if (path === '/api/v1/repositories') return route.fulfill({ json: repositories });
+        const contributions = path.match(/\/repositories\/([^/]+)\/contributions$/);
+        if (contributions) return route.fulfill({ json: contributionSnapshot(contributions[1], { next_cursor: null }) });
         const match = path.match(/\/repositories\/([^/]+)\/(issues|pull-requests)$/);
         if (match) return route.fulfill({ json: [workItem(match[2], match[1])] });
         if (path.endsWith('/unread-count')) return route.fulfill({ json: { count: 0 } });
@@ -31,7 +34,7 @@ test.describe('Activity workspace (mocked APIs)', () => {
         const requests = await mockWorkspace(page);
         await login(page);
         await page.goto('/overview/activity');
-        await expect(page.getByText('Contributions are coming soon')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Repository contributions', exact: true })).toBeVisible();
         await expect(page.getByRole('button', { name: 'Select acme/alpha', exact: true })).toHaveAttribute('aria-pressed', 'true');
         const dropdown = page.getByRole('combobox', { name: 'Workspace view' });
         await expect(dropdown.locator('option')).toHaveText(['Contributions', 'Issues', 'Pull Requests']);
@@ -117,7 +120,7 @@ test.describe('Activity workspace (mocked APIs)', () => {
         await expect(page.locator('main').getByRole('alert')).toContainText('Repositories are temporarily unavailable');
         failed = false;
         await page.getByRole('button', { name: 'Try again' }).click();
-        await expect(page.getByText('Contributions are coming soon')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Repository contributions', exact: true })).toBeVisible();
         await expect(page).toHaveURL(/repo=hub-0&tab=contributions/);
         let itemFailed = true;
         await page.route('**/api/v1/repositories/hub-0/issues*', route => itemFailed

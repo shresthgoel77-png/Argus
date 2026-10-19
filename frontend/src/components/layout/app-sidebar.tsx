@@ -4,9 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
     Activity,
-    CircleDot,
     GitFork,
-    GitPullRequest,
     LayoutDashboard,
     Search,
     Settings,
@@ -25,8 +23,6 @@ const mainNavItems: NavItem[] = [
     { label: "Overview", href: "/overview", icon: LayoutDashboard },
     { label: "Repositories", href: "/overview/repositories", icon: GitFork },
     { label: "Findings", href: "/overview/findings", icon: Search },
-    { label: "Pull Requests", href: "/overview/pull-requests", icon: GitPullRequest },
-    { label: "Issues", href: "/overview/issues", icon: CircleDot },
     { label: "Activity", href: "/overview/activity", icon: Activity },
 ];
 
@@ -35,10 +31,7 @@ const bottomNavItems: NavItem[] = [
 ];
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
-    const isActive =
-        item.href === "/overview"
-            ? pathname === "/overview"
-            : pathname.startsWith(item.href);
+    const isActive = isAppNavActive(item.href, pathname);
 
     return (
         <Link
@@ -91,3 +84,9 @@ export function AppSidebar() {
 }
 
 export { mainNavItems, bottomNavItems, type NavItem };
+
+/** Legacy entrypoints belong to Activity even while their adapter is opening. */
+export function isAppNavActive(href: string, pathname: string) {
+    const paths = href === "/overview/activity" ? [href, "/overview/issues", "/overview/pull-requests"] : [href];
+    return paths.some((path) => pathname === path || (path !== "/overview" && pathname.startsWith(`${path}/`)));
+}

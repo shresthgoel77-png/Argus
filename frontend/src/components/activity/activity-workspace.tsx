@@ -17,7 +17,7 @@ import { LanguageFootprint } from "./language-footprint";
 import { ContributionHeatmap } from "./contribution-heatmap";
 import { RepositoryContributionsView } from "./repository-contributions";
 import { useActivityMetadata } from "./use-activity-metadata";
-import { githubRepositoryUrl, readWorkspaceSelection, workspaceUrl, workspaceViews, type WorkspaceView } from "./workspace-selection";
+import { githubRepositoryUrl, readWorkspaceSelection, workspaceUrl, workspaceViews, workItemDetailUrl, type WorkspaceView } from "./workspace-selection";
 
 export function ActivityWorkspace() {
     const params = useSearchParams();
@@ -29,6 +29,9 @@ export function ActivityWorkspace() {
     const [search, setSearch] = React.useState("");
     const metadata = useActivityMetadata(repositories, retryKey);
     const { repository, view } = readWorkspaceSelection(params, repositories, existingId);
+
+    const hasDetail = params.getAll("item").length > 0;
+    const detailUrl = workItemDetailUrl(params, repository, view);
 
     // Remember history selections for invalid URL fallback. React retries this guarded
     // same-component update before rendering children, so it cannot start a stale fetch.
@@ -57,15 +60,17 @@ export function ActivityWorkspace() {
     }, [retryKey]);
 
     React.useEffect(() => {
-        if (isLoading || error) return;
+        if (isLoading || error || hasDetail) return;
         const next = workspaceUrl(window.location.href, repository?.id, view);
         if (next !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
             window.history.replaceState(null, "", next);
         }
-    }, [params, repository?.id, view, isLoading, error]);
+    }, [params, repository?.id, view, isLoading, error, hasDetail]);
 
     function navigate(repositoryId: string, nextView: WorkspaceView) {
-        const next = workspaceUrl(window.location.href, repositoryId, nextView);
+        const url = new URL(window.location.href);
+        url.searchParams.delete("item");
+        const next = workspaceUrl(url.href, repositoryId, nextView);
         if (next !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
             window.history.pushState(null, "", next);
         }
@@ -123,7 +128,14 @@ export function ActivityWorkspace() {
                     </>
                 )}
             </section>
-            {!isLoading && !error && repository && (
+            {!isLoading && !error && hasDetail && (
+                <div role={detailUrl ? "status" : "alert"} className="space-y-3 rounded-lg border bg-card p-4">
+                    {detailUrl ? <><p>Item #{params.getAll("item")[0]} details open on GitHub.</p><a className="text-accent underline" href={detailUrl} target="_blank" rel="noopener noreferrer">Open item details on GitHub</a></>
+                        : <p>This item link is invalid or its repository is unavailable. Choose a connected repository to view its list.</p>}
+                    {repository && <Button variant="outline" onClick={() => navigate(repository.id, view)}>Back to {view === "issues" ? "Issues" : "Pull Requests"}</Button>}
+                </div>
+            )}
+            {!isLoading && !error && repository && (!hasDetail || detailUrl) && (
                 <section id="repository-workspace" aria-labelledby="repository-workspace-title" className="min-w-0 space-y-6 rounded-xl border bg-card p-4 shadow-soft sm:p-6">
                     <div className="flex min-w-0 flex-col gap-4 border-b pb-5 md:flex-row md:items-center md:justify-between">
                         <div className="min-w-0 space-y-2">

@@ -192,3 +192,24 @@ it("validates selections and constructs safe GitHub links", () => {
     expect(githubRepositoryUrl("acme/repo.name_1")).toBe("https://github.com/acme/repo.name_1");
     for (const name of ["https://evil.test/a", "acme/..", "acme/.", "acme/a?redirect=evil", "acme/a#fragment", "acme/a/b", "acme\\evil/a", "//evil.test"]) expect(githubRepositoryUrl(name)).toBeNull();
 });
+
+
+it("never resolves detail links against a fallback repository and preserves invalid context", async () => {
+    visit("?repo=missing&tab=issues&item=17");
+    render(<ActivityPage />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("invalid or its repository is unavailable");
+    expect(window.location.search).toBe("?repo=missing&tab=issues&item=17");
+    expect(listRepositoryWorkItems).not.toHaveBeenCalled();
+    expect(fetchRepositoryContributions).not.toHaveBeenCalled();
+    visit("?repo=repo-b&tab=issues&item=17");
+    expect(await screen.findByRole("link", { name: "Open item details on GitHub" })).toHaveAttribute("href", "https://github.com/acme/beta/issues/17");
+    await screen.findByText("No open issues");
+    vi.mocked(getRepositories).mockResolvedValueOnce([repositories[0]]);
+    fireEvent(window, new Event("focus"));
+    expect(await screen.findByRole("alert")).toHaveTextContent("invalid or its repository is unavailable");
+    expect(screen.queryByRole("link", { name: "Open item details on GitHub" })).not.toBeInTheDocument();
+    expect(listRepositoryWorkItems).toHaveBeenCalledExactlyOnceWith("repo-b", "issues");
+    fireEvent.click(screen.getByRole("button", { name: "Select acme/alpha" }));
+    expect(await screen.findByText("No open issues")).toBeInTheDocument();
+    expect(window.location.search).toBe("?repo=repo-a&tab=issues");
+});

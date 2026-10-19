@@ -1,8 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
-import { IssuesFeature } from "@/components/repositories/issues-feature";
+import { LegacyWorkItemsEntry } from "@/components/activity/legacy-work-items-entry";
 
 export default async function IssuesPage() {
     await auth.protect();
-
-    return <IssuesFeature />;
+    return <LegacyWorkItemsEntry view="issues" />;
 }

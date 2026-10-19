@@ -40,8 +40,8 @@ test.describe('Activity workspace (mocked APIs)', () => {
         await expect(dropdown.locator('option')).toHaveText(['Contributions', 'Issues', 'Pull Requests']);
         expect(requests.filter(path => /\/(issues|pull-requests|activity)$/.test(path))).toHaveLength(0);
         await expect(page.getByRole('group', { name: 'Filter activity by source' })).toHaveCount(0);
-        await expect(page.getByRole('link', { name: 'Issues', exact: true })).toHaveAttribute('href', '/overview/issues');
-        await expect(page.getByRole('link', { name: 'Pull Requests', exact: true })).toHaveAttribute('href', '/overview/pull-requests');
+        await expect(page.getByRole('link', { name: 'Issues', exact: true })).toHaveCount(0);
+        await expect(page.getByRole('link', { name: 'Pull Requests', exact: true })).toHaveCount(0);
         const beta = page.getByRole('button', { name: 'Select acme/beta', exact: true });
         await beta.focus(); await page.keyboard.press('Enter');
         await expect(beta).toHaveAttribute('aria-pressed', 'true');
@@ -162,10 +162,41 @@ test.describe('Activity workspace (mocked APIs)', () => {
         release(); await obsoleteResponse;
         await expect(page.getByText('obsolete issues item', { exact: false })).toHaveCount(0);
         await page.goto('/overview/issues');
-        await expect(page.getByRole('combobox', { name: 'Select repository' })).toHaveValue('hub-1');
+        await expect(page).toHaveURL(/overview\/activity\?tab=(issues|pull-requests)&repo=hub-1/);
         await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
         await page.goto('/overview/pull-requests');
-        await expect(page.getByRole('combobox', { name: 'Select repository' })).toHaveValue('hub-1');
+        await expect(page).toHaveURL(/overview\/activity\?tab=(issues|pull-requests)&repo=hub-1/);
         await expect(page.getByText('hub-1 pull-requests item', { exact: false })).toBeVisible();
     });
+});
+
+
+test('legacy detail links preserve scope/context, replace history, and reject ambiguous identity', async ({ page }) => {
+    const requests = await mockWorkspace(page); await login(page);
+    await page.goto('/overview/repositories');
+    await page.goto('/overview/issues/42?repo=hub-1&sort=updated&page=3&label=bug&label=help#details');
+    await expect(page).toHaveURL(/overview\/activity\?.*tab=issues.*item=42#details/);
+    const link = page.getByRole('link', { name: 'Open item details on GitHub' });
+    await expect(link).toHaveAttribute('href', 'https://github.com/acme/beta/issues/42');
+    expect(new URL(page.url()).searchParams.getAll('label')).toEqual(['bug', 'help']);
+    expect(new URL(page.url()).searchParams.get('page')).toBe('3');
+    await expect(page.getByRole('link', { name: 'Activity', exact: true })).toHaveAttribute('aria-current', 'page');
+    await page.reload(); await expect(link).toBeVisible();
+    await page.goBack(); await expect(page).toHaveURL(/overview\/repositories$/);
+    await page.goForward(); await expect(link).toBeVisible();
+    await page.goto('/overview/pull-requests/42?repo=hub-1');
+    await expect(link).toHaveAttribute('href', 'https://github.com/acme/beta/pull/42');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole('button', { name: /navigation/i }).click();
+    const nav = page.getByRole('navigation', { name: 'Mobile app navigation' });
+    await expect(nav.getByRole('link')).toHaveText(['Overview', 'Repositories', 'Findings', 'Activity', 'Settings']);
+    await expect(nav.getByRole('link', { name: 'Activity', exact: true })).toHaveAttribute('aria-current', 'page');
+    await page.keyboard.press('Escape');
+    const count = requests.filter(path => /\/(issues|pull-requests)$/.test(path)).length;
+    for (const query of ['repo=denied', 'repo=hub-0&repo=hub-1', '']) {
+        await page.goto(`/overview/issues/42?${query}`);
+        await expect(page.locator('main').getByRole('alert')).toContainText('invalid or its repository is unavailable');
+        await expect(link).toHaveCount(0);
+    }
+    expect(requests.filter(path => /\/(issues|pull-requests)$/.test(path))).toHaveLength(count);
 });

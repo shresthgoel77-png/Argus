@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
     mainNavItems,
+    isAppNavActive,
     bottomNavItems,
     type NavItem,
 } from "@/components/layout/app-sidebar";
@@ -24,10 +25,7 @@ type AppMobileNavProps = {
 };
 
 function MobileNavLink({ item, pathname }: { item: NavItem; pathname: string }) {
-    const isActive =
-        item.href === "/overview"
-            ? pathname === "/overview"
-            : pathname.startsWith(item.href);
+    const isActive = isAppNavActive(item.href, pathname);
 
     return (
         <Link

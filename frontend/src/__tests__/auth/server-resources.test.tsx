@@ -4,6 +4,8 @@ import AppLayout from "@/app/(app)/layout";
 import DashboardPage from "@/app/(app)/dashboard/page";
 import IssuesPage from "@/app/(app)/overview/issues/page";
 import PullRequestsPage from "@/app/(app)/overview/pull-requests/page";
+import IssuesDetailPage from "@/app/(app)/overview/issues/[...detail]/page";
+import PullRequestsDetailPage from "@/app/(app)/overview/pull-requests/[...detail]/page";
 import SettingsPage from "@/app/(app)/overview/settings/page";
 
 vi.mock("@clerk/nextjs/server", () => ({
@@ -17,6 +19,8 @@ const resources = [
     ["issues", IssuesPage],
     ["pull requests", PullRequestsPage],
     ["settings", SettingsPage],
+    ["issue detail adapter", () => IssuesDetailPage({ params: Promise.resolve({ detail: ["17"] }) })],
+    ["PR detail adapter", () => PullRequestsDetailPage({ params: Promise.resolve({ detail: ["17"] }) })],
 ] as const;
 
 describe.each(resources)("%s resource authentication", (_name, resource) => {

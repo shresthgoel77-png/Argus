@@ -24,7 +24,8 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/api/repositories", () => ({ getRepositories: vi.fn() }));
 vi.mock("@/lib/api/repository-work-items", () => ({ listRepositoryWorkItems: vi.fn() }));
 vi.mock("@/lib/api/activity", () => ({ listRepositoryActivity: vi.fn() }));
-vi.mock("@/lib/auth/use-auth", () => ({ useAuth: () => ({ isAuthenticated: true, user: { id: "workspace-user" } }) }));
+let currentUser: string | undefined = "workspace-user";
+vi.mock("@/lib/auth/use-auth", () => ({ useAuth: () => ({ isAuthenticated: !!currentUser, user: currentUser ? { id: currentUser } : null }) }));
 vi.mock("@/lib/api/repository-contributions", async (original) => ({ ...await original<typeof import("@/lib/api/repository-contributions")>(), fetchRepositoryContributions: vi.fn() }));
 vi.mock("@/components/activity/use-activity-metadata", () => ({ useActivityMetadata: () => ({}) }));
 vi.mock("@/components/activity/contribution-heatmap", () => ({ ContributionHeatmap: () => <section><h2>Your contribution heatmap</h2><p>Personal calendar unavailable</p></section> }));
@@ -40,6 +41,7 @@ function visit(query: string) { act(() => window.history.pushState(null, "", `/o
 beforeEach(() => {
     vi.restoreAllMocks();
     vi.resetAllMocks();
+    currentUser = "workspace-user";
     window.history.replaceState(null, "", "/overview/activity");
     for (const method of ["pushState", "replaceState"] as const) {
         const original = window.history[method].bind(window.history);
@@ -212,4 +214,44 @@ it("never resolves detail links against a fallback repository and preserves inva
     fireEvent.click(screen.getByRole("button", { name: "Select acme/alpha" }));
     expect(await screen.findByText("No open issues")).toBeInTheDocument();
     expect(window.location.search).toBe("?repo=repo-a&tab=issues");
+});
+
+
+it("clears workspace scope immediately across account changes and ignores the previous user's discovery", async () => {
+    visit("?repo=repo-b&tab=issues&item=17");
+    vi.mocked(listRepositoryWorkItems).mockResolvedValue([item("Private issue from first user")]);
+    const page = render(<ActivityPage />);
+    await screen.findByText("Private issue from first user");
+    let resolveOld!: (repos: Repository[]) => void;
+    vi.mocked(getRepositories).mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve; }));
+    fireEvent(window, new Event("focus"));
+    let resolveNew!: (repos: Repository[]) => void;
+    vi.mocked(getRepositories).mockImplementationOnce(() => new Promise(resolve => { resolveNew = resolve; }));
+    currentUser = "second-user";
+    page.rerender(<ActivityPage />);
+    expect(screen.queryByText("Private issue from first user")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Select acme/beta" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Open item details on GitHub" })).not.toBeInTheDocument();
+    await waitFor(() => expect(getRepositories).toHaveBeenCalledTimes(3));
+    await act(async () => resolveOld(repositories));
+    expect(screen.queryByRole("button", { name: "Select acme/beta" })).not.toBeInTheDocument();
+    await act(async () => resolveNew([repositories[2]]));
+    expect(await screen.findByRole("alert")).toHaveTextContent("invalid or its repository is unavailable");
+    expect(listRepositoryWorkItems).toHaveBeenCalledExactlyOnceWith("repo-b", "issues");
+    currentUser = undefined;
+    page.rerender(<ActivityPage />);
+    expect(screen.queryByRole("button", { name: "Select other/charlie" })).not.toBeInTheDocument();
+    expect(getRepositories).toHaveBeenCalledTimes(3);
+});
+
+
+it("labels invalid detail recovery with the actual destination view", async () => {
+    visit("?repo=repo-b&tab=invalid&item=17");
+    render(<ActivityPage />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("invalid or its repository is unavailable");
+    expect(listRepositoryWorkItems).not.toHaveBeenCalled();
+    expect(fetchRepositoryContributions).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Back to Contributions" }));
+    expect(await screen.findByRole("heading", { name: "Repository contributions" })).toBeInTheDocument();
+    expect(window.location.search).toBe("?repo=repo-b&tab=contributions");
 });

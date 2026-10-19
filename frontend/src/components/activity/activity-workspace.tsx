@@ -11,6 +11,7 @@ import { SectionHeading } from "@/components/rm/section-heading";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRepositories } from "@/lib/api/repositories";
+import { useAuth } from "@/lib/auth/use-auth";
 import type { Repository } from "@/lib/types/github";
 import { ActivityRepositoryCard } from "./activity-repository-card";
 import { LanguageFootprint } from "./language-footprint";
@@ -20,6 +21,13 @@ import { useActivityMetadata } from "./use-activity-metadata";
 import { githubRepositoryUrl, readWorkspaceSelection, workspaceUrl, workspaceViews, workItemDetailUrl, type WorkspaceView } from "./workspace-selection";
 
 export function ActivityWorkspace() {
+    const { user, isAuthenticated } = useAuth();
+    // Scope all local repositories, metadata, list rows and pending reads to this user.
+    // Remount before rendering a new identity so old data cannot flash under it.
+    return isAuthenticated && user?.id ? <UserActivityWorkspace key={user.id} /> : null;
+}
+
+function UserActivityWorkspace() {
     const params = useSearchParams();
     const [repositories, setRepositories] = React.useState<Repository[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
@@ -132,7 +140,7 @@ export function ActivityWorkspace() {
                 <div role={detailUrl ? "status" : "alert"} className="space-y-3 rounded-lg border bg-card p-4">
                     {detailUrl ? <><p>Item #{params.getAll("item")[0]} details open on GitHub.</p><a className="text-accent underline" href={detailUrl} target="_blank" rel="noopener noreferrer">Open item details on GitHub</a></>
                         : <p>This item link is invalid or its repository is unavailable. Choose a connected repository to view its list.</p>}
-                    {repository && <Button variant="outline" onClick={() => navigate(repository.id, view)}>Back to {view === "issues" ? "Issues" : "Pull Requests"}</Button>}
+                    {repository && <Button variant="outline" onClick={() => navigate(repository.id, view)}>Back to {workspaceViews.find((option) => option.value === view)?.label}</Button>}
                 </div>
             )}
             {!isLoading && !error && repository && (!hasDetail || detailUrl) && (

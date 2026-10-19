@@ -200,3 +200,46 @@ test('legacy detail links preserve scope/context, replace history, and reject am
     }
     expect(requests.filter(path => /\/(issues|pull-requests)$/.test(path))).toHaveLength(count);
 });
+
+
+test('keeps the light Activity workspace readable without runtime failures or repeated list reads', async ({ page }, testInfo) => {
+    const failures: string[] = [];
+    page.on('pageerror', error => failures.push(error.message));
+    page.on('console', message => { if (message.type() === 'error') failures.push(message.text()); });
+    const requests = await mockWorkspace(page); await login(page);
+    await page.goto('/overview/activity?repo=hub-1&tab=issues');
+    await expect(page.getByText('hub-1 issues item', { exact: false })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Workspace view' }).locator('option')).toHaveText(['Contributions', 'Issues', 'Pull Requests']);
+    await expect(page.getByRole('group', { name: 'Filter activity by source' })).toHaveCount(0);
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        expect(await page.locator('main').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+        const calendar = page.getByRole('region', { name: 'Your contribution heatmap', exact: true });
+        await calendar.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: testInfo.outputPath(`activity-audit-summary-${width}.png`) });
+        const workspace = page.getByRole('region', { name: 'acme/beta', exact: true });
+        await workspace.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: testInfo.outputPath(`activity-audit-workspace-${width}.png`) });
+    }
+    await expect(page.locator('html')).not.toHaveClass(/dark/);
+    expect(requests.filter(path => path.endsWith('/hub-1/issues'))).toHaveLength(1);
+    expect(requests.filter(path => path.endsWith('/pull-requests'))).toHaveLength(0);
+    expect(requests.filter(path => /\/repositories\/[^/]+\/contributions$/.test(path))).toHaveLength(0);
+    expect(requests.filter(path => path === '/api/v1/github/contributions')).toHaveLength(1);
+    const priorYear = String(new Date().getUTCFullYear() - 1);
+    await page.getByLabel('Calendar year').selectOption(priorYear);
+    await page.getByRole('combobox', { name: 'Workspace view' }).selectOption('pull-requests');
+    await expect(page.getByText('hub-1 pull-requests item', { exact: false })).toBeVisible();
+    await page.getByRole('button', { name: 'Select acme/alpha', exact: true }).click();
+    await expect(page.getByText('hub-0 pull-requests item', { exact: false })).toBeVisible();
+    await expect(page.getByLabel('Calendar year')).toHaveValue(priorYear);
+    await page.reload();
+    await expect(page.getByText('hub-0 pull-requests item', { exact: false })).toBeVisible();
+    await expect(page.getByLabel('Calendar year')).toHaveValue(String(new Date().getUTCFullYear()));
+    await page.goto('/overview/activity?repo=hub-1&tab=invalid&item=42');
+    await expect(page.locator('main').getByRole('alert')).toContainText('invalid or its repository is unavailable');
+    await page.getByRole('button', { name: 'Back to Contributions', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Repository contributions', exact: true })).toBeVisible();
+    expect(failures).toEqual([]);
+});

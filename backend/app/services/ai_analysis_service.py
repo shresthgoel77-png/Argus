@@ -33,10 +33,13 @@ from app.services.repository_service import get_repository_or_404
 
 
 class AINotConfiguredError(AppError):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        message: str = "No valid AI connection is configured.",
+    ) -> None:
         super().__init__(
             code="ai_not_configured",
-            message="No valid AI connection is configured.",
+            message=message,
             status_code=400,
         )
 
@@ -121,8 +124,14 @@ def request_finding_analysis(finding: Finding, user: User) -> AIAnalysis:
         .filter(AIConnection.user_id == user.id)
         .first()
     )
-    if connection is None or connection.status != "valid":
-        raise AINotConfiguredError()
+    if (
+        connection is None
+        or connection.status != "valid"
+        or connection.provider != "groq"
+    ):
+        raise AINotConfiguredError(
+            "No valid Groq AI connection is configured. Please select and validate Groq in the Settings AI/BYOK section."
+        )
 
     analysis = AIAnalysis(
         finding_id=finding.id,
@@ -137,7 +146,7 @@ def request_finding_analysis(finding: Finding, user: User) -> AIAnalysis:
 
     try:
         context = ai_context_builder.build_context(finding)
-        provider_class = get_provider(connection.provider)
+        provider_class = get_provider("groq")
         provider = provider_class(
             api_key=ai_connection_service.get_decrypted_api_key(db, user.id),
             model=connection.model,

@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pytest
 
@@ -41,11 +42,18 @@ def make_finding(db_session, test_user_repository):
     return finding
 
 
-def add_connection(db_session, test_user, *, status="valid"):
+def add_connection(
+    db_session,
+    test_user,
+    *,
+    provider="groq",
+    model="openai/gpt-oss-20b",
+    status="valid",
+):
     connection = AIConnection(
         user_id=test_user.id,
-        provider="mock",
-        model="mock-model",
+        provider=provider,
+        model=model,
         encrypted_api_key="encrypted-key",
         status=status,
     )
@@ -58,7 +66,7 @@ def add_connection(db_session, test_user, *, status="valid"):
 class StubProvider:
     def __init__(self, *, api_key, model, db_session, result=None, error=None):
         assert api_key == API_KEY
-        assert model == "mock-model"
+        self.model = model
         self.db_session = db_session
         self.result = result
         self.error = error
@@ -80,21 +88,28 @@ class StubProvider:
 
 
 def patch_provider(monkeypatch, db_session, *, result=None, error=None):
-    monkeypatch.setattr(
-        ai_analysis_service,
-        "get_provider",
-        lambda provider_key: lambda **kwargs: StubProvider(
+    provider_keys = []
+
+    def resolve_provider(provider_key):
+        provider_keys.append(provider_key)
+        return lambda **kwargs: StubProvider(
             db_session=db_session,
             result=result,
             error=error,
             **kwargs,
-        ),
+        )
+
+    monkeypatch.setattr(
+        ai_analysis_service,
+        "get_provider",
+        resolve_provider,
     )
     monkeypatch.setattr(
         ai_analysis_service.ai_connection_service,
         "get_decrypted_api_key",
         lambda db, user_id: API_KEY,
     )
+    return provider_keys
 
 
 def test_not_configured_raises_without_persisting_row(
@@ -120,6 +135,24 @@ def test_invalid_connection_status_raises_without_persisting_row(
     assert db_session.query(AIAnalysis).count() == 0
 
 
+def test_non_groq_connection_is_rejected_for_finding_analysis(
+    db_session, test_user, test_user_repository
+):
+    finding = make_finding(db_session, test_user_repository)
+    add_connection(
+        db_session,
+        test_user,
+        provider="gemini",
+        model="gemini-3.6-flash",
+    )
+
+    with pytest.raises(ai_analysis_service.AINotConfiguredError) as caught:
+        ai_analysis_service.request_finding_analysis(finding, test_user)
+
+    assert "Groq" in caught.value.message
+    assert db_session.query(AIAnalysis).count() == 0
+
+
 def test_success_persists_completed_analysis(
     db_session, test_user, test_user_repository, monkeypatch
 ):
@@ -132,16 +165,22 @@ def test_success_persists_completed_analysis(
         reasoning_summary="Evidence supports the assessment.",
         recommendations=["Patch the issue"],
     )
-    patch_provider(monkeypatch, db_session, result=result)
+    provider_keys = patch_provider(monkeypatch, db_session, result=result)
     monkeypatch.setattr(
         ai_analysis_service.ai_context_builder,
         "build_context",
-        lambda current_finding: object(),
+        lambda current_finding: SimpleNamespace(
+            system_instructions="instructions",
+            untrusted_content="finding content",
+        ),
     )
 
     analysis = ai_analysis_service.request_finding_analysis(finding, test_user)
 
     assert analysis.status == "completed"
+    assert analysis.provider == "groq"
+    assert analysis.model == "openai/gpt-oss-20b"
+    assert provider_keys == ["groq"]
     assert analysis.summary == result.summary
     assert analysis.severity_assessment == result.severity
     assert analysis.confidence == result.confidence
@@ -197,11 +236,14 @@ def test_provider_failure_persists_sanitized_failed_analysis(
 ):
     finding = make_finding(db_session, test_user_repository)
     add_connection(db_session, test_user)
-    patch_provider(monkeypatch, db_session, error=provider_error)
+    provider_keys = patch_provider(monkeypatch, db_session, error=provider_error)
     monkeypatch.setattr(
         ai_analysis_service.ai_context_builder,
         "build_context",
-        lambda current_finding: object(),
+        lambda current_finding: SimpleNamespace(
+            system_instructions="instructions",
+            untrusted_content="finding content",
+        ),
     )
 
     with pytest.raises(AppError) as caught:
@@ -215,6 +257,7 @@ def test_provider_failure_persists_sanitized_failed_analysis(
     assert caught.value.code == expected_code
     assert caught.value.message == expected_message
     assert API_KEY not in str(caught.value)
+    assert provider_keys == ["groq"]
 
 
 def test_unexpected_failure_is_sanitized_and_persisted(
@@ -223,11 +266,14 @@ def test_unexpected_failure_is_sanitized_and_persisted(
     finding = make_finding(db_session, test_user_repository)
     add_connection(db_session, test_user)
     unexpected = RuntimeError(API_KEY)
-    patch_provider(monkeypatch, db_session, error=unexpected)
+    provider_keys = patch_provider(monkeypatch, db_session, error=unexpected)
     monkeypatch.setattr(
         ai_analysis_service.ai_context_builder,
         "build_context",
-        lambda current_finding: object(),
+        lambda current_finding: SimpleNamespace(
+            system_instructions="instructions",
+            untrusted_content="finding content",
+        ),
     )
 
     with pytest.raises(ai_analysis_service.AIAnalysisFailedError) as caught:
@@ -238,12 +284,18 @@ def test_unexpected_failure_is_sanitized_and_persisted(
     assert analysis.error_message == "The AI analysis could not be completed."
     assert API_KEY not in analysis.error_message
     assert API_KEY not in str(caught.value)
+    assert provider_keys == ["groq"]
 
 
 def test_repository_summary_success_persists_repository_scoped_analysis(
     db_session, test_user, test_user_repository, monkeypatch
 ):
-    add_connection(db_session, test_user)
+    add_connection(
+        db_session,
+        test_user,
+        provider="mock",
+        model="mock-model",
+    )
     result = type(
         "RepositorySummaryResult",
         (),
@@ -254,11 +306,14 @@ def test_repository_summary_success_persists_repository_scoped_analysis(
             "recommendations": ["Address the critical finding"],
         },
     )()
-    patch_provider(monkeypatch, db_session, result=result)
+    provider_keys = patch_provider(monkeypatch, db_session, result=result)
     monkeypatch.setattr(
         ai_analysis_service.repository_summary_context_builder,
         "build_repository_summary_context",
-        lambda db, repository_id: object(),
+        lambda db, repository_id: SimpleNamespace(
+            system_instructions="instructions",
+            untrusted_content="repository content",
+        ),
     )
 
     analysis = ai_analysis_service.request_repository_summary(
@@ -269,6 +324,9 @@ def test_repository_summary_success_persists_repository_scoped_analysis(
     assert analysis.analysis_type == "repository_summary"
     assert analysis.repository_id == test_user_repository.id
     assert analysis.finding_id is None
+    assert analysis.provider == "mock"
+    assert analysis.model == "mock-model"
+    assert provider_keys == ["mock"]
     assert analysis.summary == result.summary
     assert analysis.confidence == result.confidence
     assert analysis.recommendations == result.recommendations
@@ -302,12 +360,20 @@ def test_repository_summary_provider_failure_is_sanitized_and_repository_scoped(
     provider_error,
     expected_message,
 ):
-    add_connection(db_session, test_user)
-    patch_provider(monkeypatch, db_session, error=provider_error)
+    add_connection(
+        db_session,
+        test_user,
+        provider="mock",
+        model="mock-model",
+    )
+    provider_keys = patch_provider(monkeypatch, db_session, error=provider_error)
     monkeypatch.setattr(
         ai_analysis_service.repository_summary_context_builder,
         "build_repository_summary_context",
-        lambda db, repository_id: object(),
+        lambda db, repository_id: SimpleNamespace(
+            system_instructions="instructions",
+            untrusted_content="repository content",
+        ),
     )
 
     with pytest.raises(AppError) as caught:
@@ -323,6 +389,7 @@ def test_repository_summary_provider_failure_is_sanitized_and_repository_scoped(
     assert analysis.error_message == expected_message
     assert API_KEY not in analysis.error_message
     assert API_KEY not in str(caught.value)
+    assert provider_keys == ["mock"]
 
 
 def test_latest_and_list_analysis_are_ordered_and_paginated(

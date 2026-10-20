@@ -105,7 +105,15 @@ export function AIAnalysisPanel({ findingId }: { findingId: string }) {
                         <Link href="/overview/settings#ai-connection" className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Open Settings AI/BYOK</Link>
                     </div>
                 ) : error ? (
-                    <div className="space-y-3" role="alert"><div className="flex items-start gap-2 text-sm text-destructive"><AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><p>{error}</p></div><Button variant="outline" size="sm" onClick={() => void loadAnalysis()}>Try again</Button></div>
+                    <div className="space-y-3" role="alert"><div className="flex items-start gap-2 text-sm text-destructive"><AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><p>{error}</p></div><Button variant="outline" size="sm" onClick={() => void handleAnalyze()} loading={isPending}>Try again</Button></div>
+                ) : analysis?.status === "failed" ? (
+                    <div className="space-y-3" role="alert">
+                        <div className="flex items-start gap-2 text-sm text-destructive">
+                            <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                            <p>{analysis.error_message ?? "The AI analysis could not be completed."}</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={() => void handleAnalyze()} loading={isPending}>Try again</Button>
+                    </div>
                 ) : analysis ? <AnalysisContent analysis={analysis} /> : (
                     <div className="space-y-3 text-sm"><p className="text-muted-foreground">Generate a focused explanation, severity assessment, and remediation guidance for this finding.</p><Button onClick={() => void handleAnalyze()} loading={isPending}><Sparkles className="size-4" aria-hidden="true" />Explain with AI</Button></div>
                 )}

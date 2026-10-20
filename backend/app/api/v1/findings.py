@@ -150,7 +150,7 @@ def create_finding_ai_analysis(
     except ai_analysis_service.AINotConfiguredError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No valid AI connection is configured. Please complete setup in the Settings AI/BYOK section."
+            detail=e.message
         ) from e
     except ai_analysis_service.AIAnalysisFailedError as e:
         raise HTTPException(

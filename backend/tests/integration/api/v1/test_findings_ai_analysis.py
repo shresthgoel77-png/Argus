@@ -130,6 +130,23 @@ async def test_trigger_analysis_not_configured(mock_request, authorized_client, 
 
 @pytest.mark.asyncio
 @patch("app.api.v1.findings.ai_analysis_service.request_finding_analysis")
+async def test_trigger_analysis_requires_groq_connection(
+    mock_request, authorized_client, test_finding
+):
+    mock_request.side_effect = AINotConfiguredError(
+        "No valid Groq AI connection is configured. Please select and validate Groq in the Settings AI/BYOK section."
+    )
+
+    response = await authorized_client.post(
+        f"/api/v1/findings/{test_finding.id}/ai-analysis"
+    )
+
+    assert response.status_code == 400
+    assert "valid Groq AI connection" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+@patch("app.api.v1.findings.ai_analysis_service.request_finding_analysis")
 async def test_trigger_analysis_failed_provider(mock_request, authorized_client, test_finding):
     mock_request.side_effect = AIAnalysisFailedError(
         code="ai_provider_rate_limited",

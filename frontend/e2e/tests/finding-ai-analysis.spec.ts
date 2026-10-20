@@ -83,20 +83,48 @@ test.describe('Finding AI analysis', () => {
         await expect(page.getByText(/^Generated /)).toBeVisible();
     });
 
-    test('shows the sanitized API error and allows retry', async ({ page }) => {
+    test('shows a saved failed analysis and retries with a new POST', async ({ page }) => {
         await openFinding(page, { configured: true });
+        await expect(page.getByRole('button', { name: 'Explain with AI' })).toBeVisible();
+
         await page.unroute('**/api/v1/findings/finding-1/ai-analysis');
+        let postCount = 0;
+        let getCount = 0;
+        let releaseRetry: (() => void) | undefined;
         await page.route('**/api/v1/findings/finding-1/ai-analysis', async (route) => {
             if (route.request().method() === 'POST') {
-                await route.fulfill({ status: 400, json: { detail: 'No valid AI connection is configured. Please complete setup in the Settings AI/BYOK section.' } });
+                postCount += 1;
+                if (postCount === 1) {
+                    await route.fulfill({ status: 503, json: { detail: 'The AI provider is unavailable.' } });
+                    return;
+                }
+                await new Promise<void>((resolve) => { releaseRetry = resolve; });
+                await route.fulfill({ status: 200, json: { id: 'analysis-2', finding_id: 'finding-1', status: 'completed', requested_at: '2026-09-17T10:00:00Z', completed_at: '2026-09-17T10:01:00Z', provider: 'gemini', model: 'test', summary: 'Retry succeeded.', severity_assessment: 'medium', confidence: 0.9, recommendations: ['Upgrade it'] } });
             } else {
-                await route.fulfill({ status: 200, json: { exists: false } });
+                getCount += 1;
+                await route.fulfill({ status: 200, json: { id: 'analysis-1', finding_id: 'finding-1', status: 'failed', requested_at: '2026-09-17T09:00:00Z', completed_at: '2026-09-17T09:01:00Z', provider: 'gemini', model: 'test', error_message: 'The saved AI analysis failed.' } });
             }
         });
 
         await page.getByRole('button', { name: 'Explain with AI' }).click();
-        await expect(page.getByText('No valid AI connection is configured. Please complete setup in the Settings AI/BYOK section.')).toBeVisible();
+        await expect(page.getByText('The AI provider is unavailable.')).toBeVisible();
+        await expect.poll(() => postCount).toBe(1);
+
+        await page.reload();
+        await page.getByRole('button', { name: 'Unsafe dependency' }).click();
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await expect(page.getByText('The saved AI analysis failed.')).toBeVisible();
         await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible();
+        await expect.poll(() => getCount).toBeGreaterThan(0);
+
+        const getsBeforeRetry = getCount;
+        await page.getByRole('button', { name: 'Try again' }).click();
+        await expect.poll(() => postCount).toBe(2);
+        await expect(page.getByRole('button', { name: 'Try again' })).toHaveAttribute('aria-busy', 'true');
+        expect(getCount).toBe(getsBeforeRetry);
+
+        releaseRetry?.();
+        await expect(page.getByText('Retry succeeded.')).toBeVisible();
     });
 
     test('loads a prior analysis on mount', async ({ page }) => {

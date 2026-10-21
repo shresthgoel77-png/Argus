@@ -22,7 +22,7 @@ const interactions = [
 
 export function GitHubBotSection() {
     return (
-        <section className="border-y bg-card px-6 py-20 lg:px-8">
+        <section id="features" className="border-y bg-card px-6 py-20 lg:px-8">
             <div className="mx-auto max-w-3xl">
                 <SectionHeading
                     eyebrow="GitHub bot"

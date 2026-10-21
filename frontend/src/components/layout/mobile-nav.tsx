@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, type MouseEventHandler } from "react";
 import { Menu } from "lucide-react";
 
 import {
@@ -20,11 +21,14 @@ export type SiteNavItem = {
 
 type MobileNavProps = {
   items: SiteNavItem[];
+  onSectionClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
-export function MobileNav({ items }: MobileNavProps) {
+export function MobileNav({ items, onSectionClick }: MobileNavProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="md:hidden" aria-label="Open navigation menu">
           <Menu className="size-5" aria-hidden="true" />
@@ -42,6 +46,10 @@ export function MobileNav({ items }: MobileNavProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={(event) => {
+                onSectionClick?.(event);
+                if (event.defaultPrevented) setOpen(false);
+              }}
               className="rounded-md px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {item.label}

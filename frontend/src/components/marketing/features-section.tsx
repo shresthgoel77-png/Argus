@@ -50,7 +50,7 @@ const categories = [
 
 export function FeaturesSection() {
     return (
-        <section className="mx-auto w-full max-w-5xl px-6 py-20 lg:px-8">
+        <section id="categories" className="mx-auto w-full max-w-5xl px-6 py-20 lg:px-8">
             <SectionHeading
                 eyebrow="Monitoring categories"
                 title="Six dimensions of repository health, always up to date"

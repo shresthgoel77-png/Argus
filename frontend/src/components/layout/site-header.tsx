@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { MobileNav, type SiteNavItem } from "@/components/layout/mobile-nav";
@@ -9,10 +9,27 @@ import { getAuthLoginPath } from "@/lib/auth/config";
 import { cn } from "@/lib/utils";
 
 const navItems: SiteNavItem[] = [
-  { label: "Platform", href: "#platform" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Resources", href: "#resources" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Categories", href: "#categories" },
+  { label: "Features", href: "#features" },
 ];
+
+function handleSectionClick(event: MouseEvent<HTMLAnchorElement>) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+  const hash = event.currentTarget.hash;
+  const section = document.getElementById(hash.slice(1));
+  if (!section) return;
+
+  event.preventDefault();
+  if (window.location.hash !== hash) window.history.pushState(null, "", hash);
+  requestAnimationFrame(() => {
+    window.scrollTo({
+      top: section.getBoundingClientRect().top + window.scrollY - 88,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
+  });
+}
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -46,6 +63,7 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={handleSectionClick}
               className={cn("rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2", scrolled ? "text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-blue-600" : "text-white hover:bg-white/10 hover:text-white/80 focus-visible:ring-white")}
             >
               {item.label}
@@ -57,7 +75,7 @@ export function SiteHeader() {
           <Link href={getAuthLoginPath()} className={cn(buttonVariants({ variant: "ghost" }), scrolled ? "text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-blue-600 focus-visible:ring-offset-white" : "text-white hover:bg-white/10 hover:text-white/80 focus-visible:ring-white focus-visible:ring-offset-blue-950")}>Sign in</Link>
           <Link href={getAuthLoginPath()} className={cn(buttonVariants(), "border-0 bg-blue-600 text-white hover:bg-blue-500", scrolled ? "rounded-full px-5 py-2 focus-visible:ring-blue-600 focus-visible:ring-offset-white" : "shadow-sm shadow-blue-300/30 backdrop-blur-sm focus-visible:ring-white focus-visible:ring-offset-blue-950")}>Get started</Link>
         </div>
-        <MobileNav items={navItems} />
+        <MobileNav items={navItems} onSectionClick={handleSectionClick} />
       </div>
     </header>
   );

@@ -1,9 +1,8 @@
 import Link from "next/link";
 
 const footerGroups = [
-  { title: "Product", links: ["Platform", "Changelog", "Roadmap"] },
-  { title: "Company", links: ["About", "Careers", "Contact"] },
-  { title: "Resources", links: ["Documentation", "Guides", "Support"] },
+  { title: "Product", links: ["Solutions"] },
+  { title: "Legal", links: ["Privacy Policy", "Terms of Service"] },
 ];
 
 export function SiteFooter() {
@@ -19,7 +18,7 @@ export function SiteFooter() {
             Clearer signals for healthier repositories and more confident engineering teams.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-8">
           {footerGroups.map((group) => (
             <div key={group.title} className="space-y-4">
               <h2 className="text-sm font-semibold text-card-foreground">{group.title}</h2>

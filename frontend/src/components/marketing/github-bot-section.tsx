@@ -4,17 +4,17 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const interactions = [
     {
-        prompt: "@RepoMedic what's the health of our CI pipelines this week?",
+        prompt: "@Argus what's the health of our CI pipelines this week?",
         response:
             "Your main branch workflow has a 94% success rate over the past 7 days (47/50 runs). Two failures were caused by a flaky integration test in `tests/api/test_auth.py` — it has failed 5 times in the last 30 days. One failure was a timeout in the Docker build step. I'd recommend investigating the flaky test first.",
     },
     {
-        prompt: "@RepoMedic are there any critical dependency updates we're missing?",
+        prompt: "@Argus are there any critical dependency updates we're missing?",
         response:
             'You have 3 outdated dependencies with known vulnerabilities: `lodash@4.17.20` (prototype pollution, critical), `express@4.17.1` (open redirect, high), and `jsonwebtoken@8.5.1` (algorithm confusion, medium). I recommend prioritizing `lodash` — the fix is a minor version bump to 4.17.21.',
     },
     {
-        prompt: "@RepoMedic summarize open PRs older than 5 days",
+        prompt: "@Argus summarize open PRs older than 5 days",
         response:
             'There are 4 PRs open longer than 5 days. #312 "Refactor auth middleware" (8 days, 0 reviews — assigned to @alice) is the most critical as it blocks two downstream PRs. #298 has approval but is waiting on a CI fix. The other two are draft PRs with no recent activity.',
     },
@@ -26,8 +26,8 @@ export function GitHubBotSection() {
             <div className="mx-auto max-w-3xl">
                 <SectionHeading
                     eyebrow="GitHub bot"
-                    title="Ask @RepoMedic anything about your repository"
-                    description="Mention @RepoMedic in any issue or PR comment to get instant, context-aware answers about your repository's health."
+                    title="Ask @Argus anything about your repository"
+                    description="Mention @Argus in any issue or PR comment to get instant, context-aware answers about your repository's health."
                 />
 
                 <div className="mt-10 space-y-6">

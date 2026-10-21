@@ -1,20 +1,38 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function HeroSection() {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const updateScrolled = () => setScrolled(window.scrollY > 20);
+        updateScrolled();
+        window.addEventListener("scroll", updateScrolled, { passive: true });
+        return () => window.removeEventListener("scroll", updateScrolled);
+    }, []);
+
     return (
         <section
-            className="relative z-0 flex min-h-screen w-full flex-col items-center gap-6 bg-transparent px-6 pb-24 pt-[max(6rem,14vh)] text-center lg:px-8"
-            style={{
-                backgroundImage: "url('/Herobg.png')",
-                backgroundSize: "cover",
-                backgroundPosition: "center bottom",
-                backgroundRepeat: "no-repeat",
-                minHeight: "100vh",
-            }}
+            className="relative z-0 flex min-h-screen w-full flex-col items-center gap-6 bg-white px-6 pb-24 pt-[max(6rem,14vh)] text-center lg:px-8"
         >
+            <div
+                aria-hidden="true"
+                className={cn(
+                    "pointer-events-none absolute inset-x-0 top-0 z-0 overflow-hidden transition-all duration-300 ease-out motion-reduce:transition-none",
+                    scrolled ? "bottom-2.5 mx-2.5 rounded-b-2xl md:bottom-4 md:mx-4 md:rounded-b-3xl" : "bottom-0 mx-0 rounded-none",
+                )}
+                style={{
+                    backgroundImage: "url('/Herobg.png')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center bottom",
+                    backgroundRepeat: "no-repeat",
+                }}
+            />
             <h1 className="relative z-10 max-w-4xl text-3xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.18)] sm:text-5xl md:text-6xl">
                 GitHub has the data.{" "}
                 <span className="text-sky-200">RepoMedic</span> turns it into

@@ -5,7 +5,6 @@ import { FeaturesSection } from "@/components/marketing/features-section";
 import { GitHubBotSection } from "@/components/marketing/github-bot-section";
 import { ByokSection } from "@/components/marketing/byok-section";
 import { FindingPreviewSection } from "@/components/marketing/finding-preview-section";
-import { DashboardPreviewSection } from "@/components/marketing/dashboard-preview-section";
 import { CtaSection } from "@/components/marketing/cta-section";
 
 export default function Home() {
@@ -18,7 +17,6 @@ export default function Home() {
       <GitHubBotSection />
       <ByokSection />
       <FindingPreviewSection />
-      <DashboardPreviewSection />
       <CtaSection />
     </>
   );

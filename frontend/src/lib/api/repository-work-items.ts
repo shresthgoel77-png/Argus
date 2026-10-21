@@ -34,11 +34,11 @@ export async function listRepositoryWorkItems(
         } catch {
             detail = "";
         }
-        if (response.status === 401) detail += ". Sign in to RepoMedic again; your Clerk session could not be authenticated.";
+        if (response.status === 401) detail += ". Sign in to Argus again; your Clerk session could not be authenticated.";
         else if (code === "github_permission_error") detail += ". Review the GitHub App's repository permissions in GitHub settings.";
         else if (code === "github_auth_error") detail += ". The server's GitHub App credentials were rejected; contact the administrator.";
         else if (code === "github_not_found") detail += ". Verify this repository is included in the GitHub installation.";
-        else if (response.status === 404) detail += ". This repository is unavailable to your RepoMedic account. Check the selected repository and account.";
+        else if (response.status === 404) detail += ". This repository is unavailable to your Argus account. Check the selected repository and account.";
         throw new Error(`GitHub ${kind === "issues" ? "issues" : "pull requests"} could not be loaded (HTTP ${response.status})${detail}`);
     }
     return await response.json() as GitHubWorkItem[];

@@ -17,7 +17,7 @@ from app.services.scheduled_monitoring_service import resume_queued_initial_asse
 
 logger = get_logger(__name__)
 
-app = FastAPI(title="RepoMedic Backend")
+app = FastAPI(title="Argus Backend")
 
 app.add_middleware(
     SessionMiddleware,

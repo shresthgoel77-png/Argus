@@ -35,10 +35,10 @@ export function SiteHeader() {
         <Link
           href="/"
           className={cn("flex shrink-0 items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2", scrolled ? "text-slate-900 hover:text-slate-700 focus-visible:ring-blue-600 focus-visible:ring-offset-white" : "text-white hover:text-white/80 focus-visible:ring-white focus-visible:ring-offset-blue-950")}
-          aria-label="RepoMedic home"
+          aria-label="Argus home"
         >
-          <span className="flex size-8 items-center justify-center rounded-md bg-accent text-sm font-bold text-accent-foreground">R</span>
-          <span className="text-lg font-semibold tracking-tight">RepoMedic</span>
+          <span className="flex size-8 items-center justify-center rounded-md bg-accent text-sm font-bold text-accent-foreground">A</span>
+          <span className="text-lg font-semibold tracking-tight">Argus</span>
         </Link>
 
         <nav aria-label="Primary navigation" className="hidden items-center gap-1 md:flex">

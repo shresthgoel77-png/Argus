@@ -6,13 +6,13 @@ const steps = [
         icon: GitBranch,
         title: "Connect GitHub",
         description:
-            "Install the RepoMedic GitHub App on your organization or repositories. No code changes required.",
+            "Install the Argus GitHub App on your organization or repositories. No code changes required.",
     },
     {
         icon: Activity,
         title: "Continuous monitoring",
         description:
-            "RepoMedic watches workflows, dependencies, advisories, issues, and pull requests around the clock.",
+            "Argus watches workflows, dependencies, advisories, issues, and pull requests around the clock.",
     },
     {
         icon: Search,

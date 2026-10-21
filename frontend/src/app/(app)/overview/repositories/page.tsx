@@ -55,7 +55,7 @@ export default function RepositoriesPage() {
             <SectionHeading
                 eyebrow="Workspace"
                 title="Repositories"
-                description="Manage the repositories that RepoMedic will monitor."
+                description="Manage the repositories that Argus will monitor."
             />
             {isLoading ? (
                 <div className="flex justify-center p-8">

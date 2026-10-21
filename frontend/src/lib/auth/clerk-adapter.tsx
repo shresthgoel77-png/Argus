@@ -70,7 +70,7 @@ export function ClerkAuthProvider({ children }: { children: ReactNode }) {
     const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
     if (!publishableKey) {
         throw new Error(
-            "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required to use RepoMedic.",
+            "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required to use Argus.",
         );
     }
 

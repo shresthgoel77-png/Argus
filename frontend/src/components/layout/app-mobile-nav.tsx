@@ -55,9 +55,9 @@ export function AppMobileNav({ trigger }: AppMobileNavProps) {
                 <DialogHeader className="px-4 pt-4">
                     <DialogTitle className="flex items-center gap-2 text-left">
                         <span className="flex size-7 items-center justify-center rounded-md bg-accent text-xs font-bold text-accent-foreground">
-                            R
+                            A
                         </span>
-                        RepoMedic
+                        Argus
                     </DialogTitle>
                     <DialogDescription className="text-left">
                         Navigation

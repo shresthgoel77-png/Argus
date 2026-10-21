@@ -116,7 +116,7 @@ export function BotInteractionList({ repositoryId }: { repositoryId: string }) {
             <EmptyState
                 icon={<AlertTriangle className="size-6" aria-hidden="true" />}
                 title="Bot activity is temporarily unavailable"
-                description="RepoMedic could not load this repository's bot interactions. Try again in a moment."
+                description="Argus could not load this repository's bot interactions. Try again in a moment."
                 action={<Button variant="outline" onClick={() => setRetryKey((key) => key + 1)}>Try again</Button>}
             />
         );

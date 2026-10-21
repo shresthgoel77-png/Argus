@@ -71,7 +71,7 @@ def send_issue_created_email(
         text_body = "\n\n".join(f"{label}: {value}" for label, value in fields if value)
         text_body += f"\n\nGitHub issue: {issue_url}"
         result = get_provider("smtp")().send(
-            to=recipient, subject=f"RepoMedic issue created: {issue_title}",
+            to=recipient, subject=f"Argus issue created: {issue_title}",
             html_body=html_body, text_body=text_body,
         )
         if not result.success:

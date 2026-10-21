@@ -53,7 +53,7 @@ def test_smtp_delivery_has_verified_initiator_escaped_content_and_link(mail, pay
     message = smtp.send_message.call_args.args[0]
     assert message["To"] == "initiator@example.com"
     assert message["From"] == "bot@example.com"
-    assert message["Subject"] == 'RepoMedic issue created: Issue <&"'
+    assert message["Subject"] == 'Argus issue created: Issue <&"'
     plain, html = [part.get_payload(decode=True).decode(part.get_content_charset())
                    for part in message.get_payload()]
     assert 'org/repo <&"' in plain and payload["issue_url"] in plain

@@ -11,7 +11,7 @@ export default function GitHubCallbackPage() {
     const router = useRouter();
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
-    const [errorMessage, setErrorMessage] = useState("There was a problem finalizing your connection. Start again from GitHub settings in RepoMedic.");
+    const [errorMessage, setErrorMessage] = useState("There was a problem finalizing your connection. Start again from GitHub settings in Argus.");
 
     useEffect(() => {
         const handleCallback = async () => {
@@ -20,7 +20,7 @@ export default function GitHubCallbackPage() {
             const state = searchParams.get("state");
 
             if (!installation_id || !setup_action || !state) {
-                setErrorMessage("The GitHub callback is missing its signed state. Start again from GitHub settings in RepoMedic.");
+                setErrorMessage("The GitHub callback is missing its signed state. Start again from GitHub settings in Argus.");
                 setStatus("error");
                 return;
             }

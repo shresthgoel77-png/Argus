@@ -68,7 +68,7 @@ async def upsert_connection_from_installation(
         GitHubConnection.installation_id == installation_id
     ).first()
     if connection is not None and connection.user_id != user_id:
-        raise HTTPException(403, "This installation belongs to another RepoMedic user. No ownership was changed.")
+        raise HTTPException(403, "This installation belongs to another Argus user. No ownership was changed.")
     target = (get_connection_or_404(db, user_id, reconnect_connection_id)
               if reconnect_connection_id else connection)
     if connection is not None and target is not None and connection.id != target.id:

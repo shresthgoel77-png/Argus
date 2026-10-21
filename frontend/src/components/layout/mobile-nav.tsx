@@ -32,7 +32,7 @@ export function MobileNav({ items }: MobileNavProps) {
       </DialogTrigger>
       <DialogContent className="left-auto right-0 top-0 h-full max-w-sm translate-x-0 translate-y-0 rounded-none border-y-0 border-r-0 p-6 sm:rounded-l-lg">
         <DialogHeader>
-          <DialogTitle className="text-left">RepoMedic</DialogTitle>
+          <DialogTitle className="text-left">Argus</DialogTitle>
           <DialogDescription className="text-left">
             Engineering intelligence for the teams building what&apos;s next.
           </DialogDescription>

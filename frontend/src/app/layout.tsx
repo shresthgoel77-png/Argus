@@ -4,7 +4,7 @@ import { geistMono, geistSans } from "./fonts";
 import { AuthProvider } from "@/lib/auth/auth-context";
 
 export const metadata: Metadata = {
-  title: "RepoMedic",
+  title: "Argus",
   description: "Engineering intelligence platform",
 };
 

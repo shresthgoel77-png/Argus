@@ -58,9 +58,9 @@ export function AppSidebar() {
             {/* Logo */}
             <div className="flex h-14 items-center gap-2 px-4">
                 <span className="flex size-7 items-center justify-center rounded-md bg-accent text-xs font-bold text-accent-foreground">
-                    R
+                    A
                 </span>
-                <span className="text-sm font-semibold tracking-tight">RepoMedic</span>
+                <span className="text-sm font-semibold tracking-tight">Argus</span>
             </div>
 
             <Separator />

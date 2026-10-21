@@ -7,7 +7,7 @@ const points = [
         icon: KeyRound,
         title: "Your keys, your control",
         description:
-            "Provide your own API key from OpenAI, Anthropic, Google, or any compatible provider. RepoMedic never stores or proxies your prompts through our infrastructure.",
+            "Provide your own API key from OpenAI, Anthropic, Google, or any compatible provider. Argus never stores or proxies your prompts through our infrastructure.",
     },
     {
         icon: ShieldCheck,
@@ -19,7 +19,7 @@ const points = [
         icon: Layers,
         title: "Provider-agnostic design",
         description:
-            "Switch providers at any time without reconfiguring your monitoring. RepoMedic abstracts the AI layer so your findings stay consistent regardless of the model behind them.",
+            "Switch providers at any time without reconfiguring your monitoring. Argus abstracts the AI layer so your findings stay consistent regardless of the model behind them.",
     },
 ] as const;
 
@@ -29,7 +29,7 @@ export function ByokSection() {
             <SectionHeading
                 eyebrow="Bring your own key"
                 title="AI-powered analysis with full key ownership"
-                description="RepoMedic uses large language models to analyze findings and generate remediation guidance. You control which provider and model to use."
+                description="Argus uses large language models to analyze findings and generate remediation guidance. You control which provider and model to use."
             />
 
             <div className="mt-10 space-y-4">

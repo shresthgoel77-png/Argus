@@ -12,8 +12,8 @@ export function SiteFooter() {
       <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-12 lg:grid-cols-[1.3fr_2fr] lg:px-8">
         <div className="space-y-4">
           <Link href="/" className="inline-flex items-center gap-2 rounded-md text-card-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <span className="flex size-8 items-center justify-center rounded-md bg-accent text-sm font-bold text-accent-foreground">R</span>
-            <span className="text-lg font-semibold tracking-tight">RepoMedic</span>
+            <span className="flex size-8 items-center justify-center rounded-md bg-accent text-sm font-bold text-accent-foreground">A</span>
+            <span className="text-lg font-semibold tracking-tight">Argus</span>
           </Link>
           <p className="max-w-xs text-sm leading-6 text-muted-foreground">
             Clearer signals for healthier repositories and more confident engineering teams.
@@ -40,7 +40,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-6 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <p>© {new Date().getFullYear()} RepoMedic. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Argus. All rights reserved.</p>
           <p>Built for teams that care about the details.</p>
         </div>
       </div>

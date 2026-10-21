@@ -212,7 +212,7 @@ export default function AppOverviewPage() {
                 <EmptyState
                     icon={<ShieldAlert className="size-6" aria-hidden="true" />}
                     title="Overview is temporarily unavailable"
-                    description={error ?? "RepoMedic could not load the dashboard for this repository right now."}
+                    description={error ?? "Argus could not load the dashboard for this repository right now."}
                     action={
                         <Button variant="outline" onClick={() => window.location.reload()}>
                             Try again

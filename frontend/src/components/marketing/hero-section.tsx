@@ -35,7 +35,7 @@ export function HeroSection() {
             />
             <h1 className="relative z-10 max-w-4xl text-3xl font-bold tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.18)] sm:text-5xl md:text-6xl">
                 GitHub has the data.{" "}
-                <span className="text-sky-200">RepoMedic</span> turns it into
+                <span className="text-sky-200">Argus</span> turns it into
                 engineering intelligence.
             </h1>
 

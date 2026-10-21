@@ -28,7 +28,7 @@ export function NeedsAttentionList({ findings, reasons, assessmentAvailable = tr
                     </div>
                     {["open", "acknowledged"].includes(active.status) && <>
                         <FindingIssuePreviewPanel key={active.id} findingId={active.id} triggerLabel="Auto-Generate GitHub Issue" actions={<Button variant="outline" disabled aria-describedby="fix-preview-unavailable" className="h-auto min-h-10 whitespace-normal">Preview Automated Fix</Button>} />
-                        <p id="fix-preview-unavailable" className="text-xs text-muted-foreground">Automated fix preview is unavailable: RepoMedic does not currently provide a fix-preview action. Issue generation opens a preview for approval.</p>
+                        <p id="fix-preview-unavailable" className="text-xs text-muted-foreground">Automated fix preview is unavailable: Argus does not currently provide a fix-preview action. Issue generation opens a preview for approval.</p>
                     </>}
                 </article>
             ) : (

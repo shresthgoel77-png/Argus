@@ -23,7 +23,7 @@ export default async function SettingsPage() {
             <SectionHeading
                 eyebrow="Workspace"
                 title="Settings"
-                description="Configure integrations and preferences for your RepoMedic workspace."
+                description="Configure integrations and preferences for your Argus workspace."
             />
             <Suspense fallback={null}>
                 <GitHubCallbackProcessor />

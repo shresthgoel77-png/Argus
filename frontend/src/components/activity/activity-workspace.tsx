@@ -111,7 +111,7 @@ function UserActivityWorkspace() {
                         {[0, 1, 2].map((index) => <Skeleton key={index} className="h-32 w-full" />)}<span className="sr-only">Loading connected repositories…</span>
                     </div>
                 ) : error ? (
-                    <div role="alert"><EmptyState icon={<AlertTriangle className="size-6" aria-hidden="true" />} title="Repositories are temporarily unavailable" description="RepoMedic could not load your connected repositories. Try again in a moment." action={<Button variant="outline" onClick={refresh}>Try again</Button>} /></div>
+                    <div role="alert"><EmptyState icon={<AlertTriangle className="size-6" aria-hidden="true" />} title="Repositories are temporarily unavailable" description="Argus could not load your connected repositories. Try again in a moment." action={<Button variant="outline" onClick={refresh}>Try again</Button>} /></div>
                 ) : repositories.length === 0 ? (
                     <EmptyState icon={<GitFork className="size-6" aria-hidden="true" />} title="No connected repositories" description="Connect a repository from Repositories to open its workspace." />
                 ) : (

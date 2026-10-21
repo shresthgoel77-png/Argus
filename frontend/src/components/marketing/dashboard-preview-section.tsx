@@ -58,7 +58,7 @@ export function DashboardPreviewSection() {
             <SectionHeading
                 eyebrow="Dashboard"
                 title="Your repository health at a glance"
-                description="A unified view of every signal RepoMedic tracks — from CI success rates to dependency freshness. The dashboard below is illustrative."
+                description="A unified view of every signal Argus tracks — from CI success rates to dependency freshness. The dashboard below is illustrative."
             />
 
             <Card className="mt-10 overflow-hidden shadow-card">

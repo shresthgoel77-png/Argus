@@ -190,7 +190,7 @@ export function ActivityFeedList({ repositoryId, sourceFilter }: { repositoryId:
             <EmptyState
                 icon={<AlertTriangle className="size-6" aria-hidden="true" />}
                 title="Activity feed is temporarily unavailable"
-                description="RepoMedic could not load this repository's activity. Try again in a moment."
+                description="Argus could not load this repository's activity. Try again in a moment."
                 action={<Button variant="outline" onClick={() => setRetryKey((key) => key + 1)}>Try again</Button>}
             />
         );

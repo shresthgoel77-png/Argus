@@ -39,10 +39,9 @@ export function HeroSection() {
                 engineering intelligence.
             </h1>
 
-            <p className="relative z-10 max-w-2xl text-base leading-relaxed text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.3)] sm:text-lg">
+            <p className="relative z-10 max-w-2xl text-pretty text-base leading-relaxed text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.3)] sm:text-lg">
                 Continuous monitoring for CI/CD health, dependency drift, security
-                advisories, and code-quality signals — surfaced as actionable findings
-                in a dashboard and a GitHub bot that meets your team where they work.
+                advisories, and code-quality signals — surfaced as actionable findings.
             </p>
 
             <div className="relative z-10 flex flex-col gap-3 sm:flex-row">

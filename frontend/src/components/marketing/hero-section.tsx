@@ -18,7 +18,7 @@ export function HeroSection() {
 
     return (
         <section
-            className="relative z-0 flex min-h-screen w-full flex-col items-center gap-6 bg-white px-6 pb-24 pt-[max(6rem,14vh)] text-center lg:px-8"
+            className="relative z-0 flex min-h-screen w-full flex-col items-center gap-6 bg-white px-6 pb-24 pt-[calc(max(6rem,14vh)_+_1.5rem)] text-center lg:px-8"
         >
             <div
                 aria-hidden="true"

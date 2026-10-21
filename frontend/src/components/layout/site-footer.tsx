@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { satoshiBlack } from "@/app/fonts";
+
 const footerGroups = [
   { title: "Product", links: ["Solutions"] },
   { title: "Legal", links: ["Privacy Policy", "Terms of Service"] },
@@ -37,8 +39,13 @@ export function SiteFooter() {
           ))}
         </div>
       </div>
-      <div className="border-t">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-6 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between lg:px-8">
+      <div className="bg-[#FFFFFF] px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-7xl py-8 text-center">
+          <p className={`${satoshiBlack.className} inline-block whitespace-nowrap bg-[linear-gradient(90deg,#3B82F6_0%,#2563EB_50%,#1D4ED8_100%)] bg-clip-text text-[clamp(5rem,18vw,17rem)] font-black leading-none tracking-[-0.035em] text-transparent [font-synthesis:none]`}>
+            ARGUS
+          </p>
+        </div>
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 border-t py-5 text-xs leading-5 text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Argus. All rights reserved.</p>
           <p>Built for teams that care about the details.</p>
         </div>
